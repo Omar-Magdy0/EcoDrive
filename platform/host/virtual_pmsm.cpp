@@ -75,7 +75,7 @@ void pmsm_didt(const float* i, float t, const void* params, float *didt)
 {
     pmsm_model* ctx = (pmsm_model*)(params);
     for(int j = 0; j < 3; j++){
-        didt[j] = (ctx->e_bus->v[j] - ctx->elec.vn - ctx->Ra*i[j] - ctx->elec.e[j])/ctx->elec.L[j]; 
+        didt[j] = (ctx->elec.v[j] - ctx->elec.vn - ctx->Ra*i[j] - ctx->elec.e[j])/ctx->elec.L[j]; 
     }
 }
 
@@ -89,8 +89,8 @@ void pmsm_dmechdt(const float* mech, float t, const void* params, float *dmechdt
 void pmsm_update_mech(pmsm_model *m)
 {
     float theta_e = m->pole_pairs * m->mech.theta;
-    m->elec.id=   cos(theta_e)*m->e_bus->i[0] + cos(theta_e - 2*M_PI/3)*m->e_bus->i[1] + cos(theta_e + 2*M_PI/3)*m->e_bus->i[2];
-    m->elec.iq= - sin(theta_e)*m->e_bus->i[0] - sin(theta_e - 2*M_PI/3)*m->e_bus->i[1] - sin(theta_e + 2*M_PI/3)*m->e_bus->i[2];
+    m->elec.id=   cos(theta_e)*m->elec.i[0] + cos(theta_e - 2*M_PI/3)*m->elec.i[1] + cos(theta_e + 2*M_PI/3)*m->elec.i[2];
+    m->elec.iq= - sin(theta_e)*m->elec.i[0] - sin(theta_e - 2*M_PI/3)*m->elec.i[1] - sin(theta_e + 2*M_PI/3)*m->elec.i[2];
     m->mech.torque_e = (3.0/2)*m->pole_pairs*(m->Kt*m->elec.iq + (m->Ld - m->Lq)*m->elec.id*m->elec.iq);
 }
 
@@ -119,34 +119,31 @@ void pmsm_update_elec(pmsm_model *m)
     m->elec.L[2] = L0 + L2 * cosf(2.0f * (theta_e + 2.0f*M_PI/3.0f)); // phase C
 
 
-    m->elec.vn = (m->e_bus->v[0] + m->e_bus->v[1] + m->e_bus->v[2])/3;
-    //check for floating phases for voltage update
-    for(int i = 0; i < 3; i++)
-    {
-        if(!m->e_bus->driven[i])
-        {
-            m->e_bus->v[i] = m->elec.e[i] + m->elec.vn;
-        }
-    }
+
+}
+
+void pmsm_write(pmsm_model *m, float duty[3], bool drive[3])
+{
+
 }
 
 void pmsm_step(pmsm_model *m, float dt, float t)
 {
     pmsm_update_elec(m);
     //step through the electrical model;
-    rk4_step(m->e_bus->i, 3, dt, pmsm_didt, t, m);
+    rk4_step(m->elec.i, 3, dt, pmsm_didt, t, m);
     pmsm_update_mech(m);
     //step through the mechanical model;
     float mech[2] = {m->mech.omega, m->mech.theta};
     rk4_step(mech, 2, dt, pmsm_dmechdt, t, m);
     m->mech.omega = mech[0]; m->mech.theta = mech[1];
     
-    vpmsmHelper.elec_scope.write(m->e_bus->v);
+    vpmsmHelper.elec_scope.write(m->elec.v);
 }
 
-void pmsm_init(pmsm_model *m, elec_bus *bus)
+void pmsm_init(pmsm_model *m)
 {
-    m->e_bus = bus;
+  
 }
 
 void pmsm_deinit()

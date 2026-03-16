@@ -37,7 +37,6 @@ typedef struct{
         float omega;
     }mech;
 
-    elec_bus *e_bus;
 
     float Ra;
     float Ld;
@@ -53,9 +52,9 @@ typedef struct{
 
 
 
-void pmsm_write(pmsm_model *m, float duty[3], bool drive[3], float );
+void pmsm_write(pmsm_model *m, float duty[3], bool drive[3]);
 void pmsm_step(pmsm_model *m, float dt, float t);
-void pmsm_init(pmsm_model *m, elec_bus *bus);
+void pmsm_init(pmsm_model *m);
 
 
 #ifdef __cplusplus
