@@ -245,7 +245,12 @@ void sys_init()
         .freq_Hz            = {100, 125, 200, 250}
     };
     elmotor_pmsm_init(&motor_c, stup_cfg);
+    #ifndef PLATFORM_HOST
     vTaskStartScheduler();
+    #else
+    freeRtos_init();
+    gui_loop();
+    #endif
 }
 
 

@@ -17,15 +17,14 @@ void eldriver_mc3p_init(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS
     pmsm.Ra = 0.05;
     pmsm.Ld = 0.001;
     pmsm.Lq = 0.001;
-    pmsm.Ke = 0.1;
-    pmsm.Kt = 0.1;
-    pmsm.J = 1;
-    pmsm.B = 1;
-    pmsm.mech.omega = 1;
+    pmsm.Ke = 0.01;
+    pmsm.Kt = 0.01;
+    pmsm.J = 5;
+    pmsm.B = 5;
     pmsm.pole_pairs = 7;
 
     inverter.vbus = 16;
-    inverter.min_fw_current = 0.05;
+    inverter.min_fw_current = 0.1;
     inverter.e_bus = &pmsm_ebus_inverter;
 
     pmsm_init(&pmsm, &pmsm_ebus_inverter);
@@ -73,6 +72,16 @@ void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_sta
 void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, uint16_t duty_u_q15, uint16_t duty_v_q15, uint16_t duty_w_q15)
 {
     float duty[3] = {((float)duty_u_q15/INT16_MAX), ((float)duty_v_q15/INT16_MAX), ((float)duty_w_q15/INT16_MAX)};
+    for(int i = 0; i < 3; i++)
+    {
+        if(h->phase_state[i] == ELDRIVER_MC3P_PHASE_L_ON)
+        {
+            duty[i] = 0;
+        }else if (h->phase_state[i] == ELDRIVER_MC3P_PHASE_H_ON)
+        {
+            duty[i] = 1;
+        }
+    }
     float dt = 1.0/h->config.pwm_Hz;
     inverter_step(&inverter, duty, h->switch_state, dt, vtime);
     pmsm_step(&pmsm, dt, vtime);

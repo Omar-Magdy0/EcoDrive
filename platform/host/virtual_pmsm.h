@@ -16,17 +16,13 @@ typedef enum{
 #define MAX_STATE 10
 typedef void (*DerivFunc)(const float* x, float t, const void* params, float *dxdt);
 void euf_step(float *x, int n, float dt, DerivFunc f, float t, const void* params);
-
-
-typedef struct{
-    float i[3];
-    float v[3];
-    bool driven[3];
-}elec_bus;
+void rk4_step(float *x, int n, float dt, DerivFunc f, float t, const void* params);
 
 
 typedef struct{
     struct{
+        float i[3];
+        float v[3];
         float vn;
         float id;
         float iq;
@@ -54,18 +50,40 @@ typedef struct{
     bemf_type_t bemf_type;
 }pmsm_model;
 
-typedef struct{
-    float vbus;
-    float min_fw_current;
-    elec_bus *e_bus;
-}inverter_model;
 
-void inverter_step(inverter_model *inv, float duty[3],int switch_state[3], float dt, float t);
+
+
+void pmsm_write(pmsm_model *m, float duty[3], bool drive[3], float );
 void pmsm_step(pmsm_model *m, float dt, float t);
 void pmsm_init(pmsm_model *m, elec_bus *bus);
 
 
-
 #ifdef __cplusplus
 }
+#endif
+
+
+#ifdef __cplusplus
+
+#include "ElcoreScopeStream.hpp"
+#define VPMSM_ELEC_CHANNELS 3
+class VpmsmHelper{
+
+    public:
+    float *elec_buf;
+    int elec_scope_size;
+    ElcoreScopeStream<float> elec_scope;
+
+    VpmsmHelper(unsigned int elec_buf_depth):
+    elec_buf(new float[VPMSM_ELEC_CHANNELS * elec_buf_depth]),
+    elec_scope(elec_buf, VPMSM_ELEC_CHANNELS, 10, elec_buf_depth/10)
+    {
+        elec_scope_size = elec_buf_depth;
+        elec_scope.trigger_level = 0;
+    }
+    ~VpmsmHelper()
+    {
+        delete elec_buf;
+    }
+};
 #endif

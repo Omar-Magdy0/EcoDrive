@@ -379,7 +379,7 @@ static uint64_t prvGetTimeNs( void )
 
 /* commented as part of the code below in vPortSystemTickHandler,
  * to adjust timing according to full demo requirements */
-/* static uint64_t prvTickCount; */
+static uint64_t prvTickCount; 
 
 static void * prvTimerTickHandler( void * arg )
 {
@@ -422,7 +422,7 @@ static void vPortSystemTickHandler( int sig )
 
     ( void ) sig;
 
-/* uint64_t xExpectedTicks; */
+    uint64_t xExpectedTicks; 
 
     uxCriticalNesting++; /* Signals are blocked in this signal handler. */
 
@@ -433,16 +433,16 @@ static void vPortSystemTickHandler( int sig )
     /* Tick Increment, accounting for any lost signals or drift in
      * the timer. */
 
-/*
- *      Comment code to adjust timing according to full demo requirements
- *      xExpectedTicks = (prvGetTimeNs() - prvStartTimeNs)
- *        / (portTICK_RATE_MICROSECONDS * 1000);
- * do { */
-    xTaskIncrementTick();
 
-/*        prvTickCount++;
- *    } while (prvTickCount < xExpectedTicks);
- */
+
+      xExpectedTicks = (prvGetTimeNs() - prvStartTimeNs)
+        / (portTICK_RATE_MICROSECONDS * 1000);
+    do { 
+        xTaskIncrementTick();
+
+        prvTickCount++;
+    } while (prvTickCount < xExpectedTicks);
+
 
     #if ( configUSE_PREEMPTION == 1 )
         /* Select Next Task. */

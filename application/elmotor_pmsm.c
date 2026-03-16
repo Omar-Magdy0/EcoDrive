@@ -124,9 +124,9 @@ static inline void pmsm_stup_trapBemf(elmotor_pmsm_t *cp)
             }
             if(cp->stup.good_est_count >= STUP_BEMFZC_GOOD_EST_COUNT)
             {
-                //Switchover and handle to closed loop commutation
-                bemfzc_takeover(&cp->pos_sensor.bemf, bemfzc_ComCallback);
-                cp->state = ELMOTOR_CL_TRAP;
+                ////Switchover and handle to closed loop commutation
+                //bemfzc_takeover(&cp->pos_sensor.bemf, bemfzc_ComCallback);
+                //cp->state = ELMOTOR_CL_TRAP;
             }            
         }
         if(comm){
@@ -144,7 +144,6 @@ static inline void pmsm_stup_trapHall(elmotor_pmsm_t *cp)
     //APPLY ALIGN VOLTAGE
     float32_t r = (float32_t)(cp->stup.cfg.align_V / cp->stup.cfg.bus_V);
     arm_float_to_q15(&r, &(cp->elec.trap_duty_q15), 1);
-    cp->elec.trap_duty_q15 = r;
     uint8_t hall_value = eldriver_hall1_read();
     cp->elec.sector = HALL_TO_TRAP_TABLE[hall_value];  
     cp->elec.sector = TRAP_INCREMENT(cp->elec.sector, motor_c.mech.dir);
@@ -200,7 +199,7 @@ static inline void pmsm_ol_trap(elmotor_pmsm_t *cp)
         if(comm)
         {
             cp->mech.speed_rpm = cp->mech.speed_sp_rpm;
-            float32_t f = (cp->mech.speed_sp_rpm * 60.0) * (cp->pole_pairs);
+            float32_t f = (cp->mech.speed_sp_rpm / 60.0) * (cp->pole_pairs);
             cp->stup.comm_ticks = XCPWM_MS_TO_TICKS(1000.0 / (f * 6));
             cp->elec.speed_hz = 2 * M_PI * (XCPWM_TICKFREQ / (cp->stup.comm_ticks * 6) );
             cp->elec.sector = TRAP_INCREMENT(cp->elec.sector, cp->mech.dir);   

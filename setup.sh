@@ -78,3 +78,6 @@ else
     echo "  pip install -r requirements.txt"
     exit 1
 fi
+
+#Install Libglfw3 and opengl if needed
+sudo apt install libglfw3-dev libgl1-mesa-dev

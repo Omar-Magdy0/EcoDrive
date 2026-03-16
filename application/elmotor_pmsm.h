@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-#define PWM_FREQ                   10000
+#define PWM_FREQ                   40000
 #define STUP_BEMFZC_ERROR_MARGIN    0.05 
 #define STUP_BEMFZC_GOOD_EST_COUNT    10
 
