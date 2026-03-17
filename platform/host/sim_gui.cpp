@@ -1,4 +1,4 @@
-#include "virtual_pmsm_gui.h"
+#include "sim_gui.h"
 #include "virtual_pmsm.h"
 
 #include <imgui.h>
@@ -17,7 +17,7 @@
 
 #endif
 
-extern VpmsmHelper vpmsmHelper;
+SimHelper simHelper = SimHelper(1000);
 float view_buffer[VPMSM_ELEC_CHANNELS*1000];
 
 constexpr int CONTROL_PANEL_WIDTH = 200;
@@ -61,8 +61,8 @@ void virtual_pmsm_gui() {
 
     // --- Plot 1: Phase Currents ---
     if (ImPlot::BeginPlot("##PhaseCurrents", ImVec2(-1, plotHeight))) {
-        if(vpmsmHelper.elec_scope.frozen){
-            vpmsmHelper.elec_scope.read_aligned(view_buffer);
+        if(simHelper.elec_scope.frozen){
+            simHelper.elec_scope.read_aligned(view_buffer);
         }
         ImPlot::SetupAxes("Sample Index", "Current");
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, 1000);

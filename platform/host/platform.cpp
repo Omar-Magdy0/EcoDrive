@@ -89,7 +89,7 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer,
 #include <pthread.h>
 #include <time.h>
 #include <unistd.h>
-#include "virtual_pmsm_gui.h"
+#include "sim_gui.h"
 
 volatile uint64_t virtual_tick = 0;
 float vtime = 0;

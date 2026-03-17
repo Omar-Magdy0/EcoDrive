@@ -8,22 +8,10 @@
 #define Q15_SQRT3_BY_2  28378   // 0.8660254 × 32768
 
 extern float vtime;
-pmsm_model pmsm;
 
 
 void eldriver_mc3p_init(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2])
 {
-    pmsm.Ra = 0.05;
-    pmsm.Ld = 0.001;
-    pmsm.Lq = 0.001;
-    pmsm.Ke = 0.01;
-    pmsm.Kt = 0.01;
-    pmsm.J = 5;
-    pmsm.B = 5;
-    pmsm.pole_pairs = 7;
-
-
-    pmsm_init(&pmsm);
     register_timer(&timer_manager, eldriver_mc3p_sync_postScanCallback, (uint64_t)(1e9/h->config.pwm_Hz));
 }
 
@@ -79,7 +67,6 @@ void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, uint16_t duty_u_q15, uin
         }
     }
     float dt = 1.0/h->config.pwm_Hz;
-    pmsm_step(&pmsm, dt, vtime);
     vtime += dt;
 }
 

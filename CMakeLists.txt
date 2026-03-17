@@ -113,9 +113,27 @@ if(PLATFORM_NAME STREQUAL "host")
         #tinycbor
     )
 
-    add_executable(test_electricalSim ${CMAKE_CURRENT_SOURCE_DIR}/test/test_electricalSim.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
-    target_sources(test_electricalSim PRIVATE ${PLATFORM_SOURCE})
-    target_link_libraries(test_electricalSim PRIVATE
+    add_executable(test_inverter ${CMAKE_CURRENT_SOURCE_DIR}/test/test_inverter.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
+    target_sources(test_inverter PRIVATE ${PLATFORM_SOURCE})
+    target_link_libraries(test_inverter PRIVATE
+        ${PLATFORM_INTERFACE}
+        ${PLATFORM_LIB}
+        ${TOOLCHAIN_LINK_LIBRARIES}
+        #tinycbor
+    )
+
+    add_executable(test_pmsm ${CMAKE_CURRENT_SOURCE_DIR}/test/test_pmsm.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
+    target_sources(test_pmsm PRIVATE ${PLATFORM_SOURCE})
+    target_link_libraries(test_pmsm PRIVATE
+        ${PLATFORM_INTERFACE}
+        ${PLATFORM_LIB}
+        ${TOOLCHAIN_LINK_LIBRARIES}
+        #tinycbor
+    )
+
+    add_executable(test_pmsm2 ${CMAKE_CURRENT_SOURCE_DIR}/test/test_pmsm2.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
+    target_sources(test_pmsm2 PRIVATE ${PLATFORM_SOURCE})
+    target_link_libraries(test_pmsm2 PRIVATE
         ${PLATFORM_INTERFACE}
         ${PLATFORM_LIB}
         ${TOOLCHAIN_LINK_LIBRARIES}

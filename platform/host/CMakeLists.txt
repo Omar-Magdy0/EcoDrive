@@ -49,8 +49,7 @@ set(IMGUI_SRC
 
 set(Platform_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/platform.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/virtual_pmsm.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/virtual_pmsm_gui.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sim_gui.cpp
 )
 
 file(GLOB_RECURSE Driver_Core_Src
