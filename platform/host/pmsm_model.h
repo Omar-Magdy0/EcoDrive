@@ -14,7 +14,6 @@ typedef struct {
 typedef struct {
     float vthev[3];
     float rthev[3];
-    float T_load;
 } MotorInput;
 
 typedef struct {

@@ -131,14 +131,6 @@ if(PLATFORM_NAME STREQUAL "host")
         #tinycbor
     )
 
-    add_executable(test_pmsm2 ${CMAKE_CURRENT_SOURCE_DIR}/test/test_pmsm2.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
-    target_sources(test_pmsm2 PRIVATE ${PLATFORM_SOURCE})
-    target_link_libraries(test_pmsm2 PRIVATE
-        ${PLATFORM_INTERFACE}
-        ${PLATFORM_LIB}
-        ${TOOLCHAIN_LINK_LIBRARIES}
-        #tinycbor
-    )
 endif()
 
 

@@ -109,7 +109,7 @@ with open("pmsm_model.h", "w") as f:
     f.write("#include <math.h>\n\n")
     
     f.write("typedef struct {\n    float i[3];\n    float v[3];\n   float vn;\n   float theta;\n    float omega;\n} MotorState;\n\n")
-    f.write("typedef struct {\n    float vthev[3];\n    float rthev[3];\n    float T_load;\n} MotorInput;\n\n")
+    f.write("typedef struct {\n    float vthev[3];\n    float rthev[3];\n} MotorInput;\n\n")
     f.write("typedef struct {\n    float Ld, Lq, Rs, pp, Ke, J, B;\n} MotorParams;\n\n")
     f.write("typedef struct {\n    float T;\n} MotorOutput;\n\n")
 
