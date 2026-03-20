@@ -6,20 +6,18 @@
 #include "queue.h"
 #include "semphr.h"
 #include "aebfStream.h"
-#include "elmotor_pmsm.h"
+#include <array>
 
-
-
-#define AEBF_PWM_SERVICEID 0xC1
+constexpr uint8_t AEBF_PWM_SERVICEID = 0xC1;
 //==================== FREERTOS Variables ===============================
-#define AEBF_ENCODE_BUFFER_SIZE 255
-uint8_t aebf_encode_buffer[AEBF_ENCODE_BUFFER_SIZE];
+constexpr size_t AEBF_ENCODE_BUFFER_SIZE = 255;
+std::array<uint8_t, AEBF_ENCODE_BUFFER_SIZE> aebf_encode_buffer{};
 
 SemaphoreHandle_t aebf_mutex;
 TaskHandle_t xAebf_handle;
 
-#define AEBF_PRIO1_QUEUE_LENGTH 20
-#define LOG_MAX_SIZE 64
+constexpr uint8_t AEBF_PRIO1_QUEUE_LENGTH = 20;
+constexpr uint8_t LOG_MAX_SIZE = 64;
 
 #include "eldriver/eldriver_usbcdc.h"
 
@@ -37,17 +35,17 @@ eldriver_core_t core;
 
 QueueHandle_t aebf_queue_prio1;
 
-enum{
-    AEBF_LOG = 0,
-    AEBF_DEBUG,
-    AEBF_MODBUSRTU
+enum class AebfMsgType : uint8_t {
+    Log = 0,
+    Debug,
+    ModbusRtu
 };
 
-typedef struct{
-    uint8_t type;
-    uint8_t len;
-    uint8_t buffer[LOG_MAX_SIZE];
-}aebf_message_t;
+struct aebf_message_t {
+    uint8_t type{};
+    uint8_t len{};
+    uint8_t buffer[LOG_MAX_SIZE]{};
+};
 
 //========================================================================
 
@@ -56,10 +54,10 @@ pwmDataBuffer_t pwmDataBuffer;
 uint32_t logMessages = 0;
 uint32_t buffer_overrun = 0;
 
-void aebf_print_string_prio1(char *data, uint8_t len, uint8_t type, uint8_t timeout_ms)
+void aebf_print_string_prio1(char *data, uint8_t len, AebfMsgType type, uint8_t timeout_ms)
 {
     aebf_message_t msg;
-    msg.type = type;
+    msg.type = static_cast<uint8_t>(type);
     msg.len = len;
     if(len < LOG_MAX_SIZE) memcpy(msg.buffer, data, len);
     xQueueSend(aebf_queue_prio1, &msg, pdMS_TO_TICKS(timeout_ms));
@@ -75,7 +73,7 @@ void print_log(const char* format, ...)
     int len = vsnprintf(buffer, LOG_MAX_SIZE, format, args);
     va_end(args);
     if(len > 0){
-        aebf_print_string_prio1(buffer, (len < LOG_MAX_SIZE) ? len : LOG_MAX_SIZE-1, AEBF_LOG, 0);
+        aebf_print_string_prio1(buffer, (len < LOG_MAX_SIZE) ? len : LOG_MAX_SIZE-1, AebfMsgType::Log, 0);
     }
 }
 
@@ -87,7 +85,7 @@ void print_debug(const char* format, ...)
     int len = vsnprintf(buffer, LOG_MAX_SIZE, format, args);
     va_end(args);
     if(len > 0){
-        aebf_print_string_prio1(buffer, (len < LOG_MAX_SIZE) ? len : LOG_MAX_SIZE-1, AEBF_DEBUG, 0);
+        aebf_print_string_prio1(buffer, (len < LOG_MAX_SIZE) ? len : LOG_MAX_SIZE-1, AebfMsgType::Debug, 0);
     }
 }
 
@@ -159,32 +157,32 @@ void xAEBF(void* argument)
             // Process message
             switch (msg.type)
             {
-            case AEBF_LOG:
+            case static_cast<uint8_t>(AebfMsgType::Log):
                 // Handle log message (e.g., print to console)
-                memccpy(aebf_encode_buffer + 5, msg.buffer, 0, msg.len);
-                aebf_encode_frame(aebf_encode_buffer, AEBF_DEVICE_ID, AEBF_LOG_SERVICEID, msg.len);
+                memccpy(aebf_encode_buffer.data() + 5, msg.buffer, 0, msg.len);
+                aebf_encode_frame(aebf_encode_buffer.data(), AEBF_DEVICE_ID, AEBF_LOG_SERVICEID, msg.len);
                 break;
-            case AEBF_DEBUG:
+            case static_cast<uint8_t>(AebfMsgType::Debug):
                 // Handle debug message
-                memccpy(aebf_encode_buffer + 5, msg.buffer, 0, msg.len);
-                aebf_encode_frame(aebf_encode_buffer, AEBF_DEVICE_ID, AEBF_DEBUG_SERVICEID, msg.len);
+                memccpy(aebf_encode_buffer.data() + 5, msg.buffer, 0, msg.len);
+                aebf_encode_frame(aebf_encode_buffer.data(), AEBF_DEVICE_ID, AEBF_DEBUG_SERVICEID, msg.len);
                 break;
 
             default:
                 break;
             }
-            serial_write(aebf_encode_buffer, AEBF_FRAMED_SIZE(msg.len));
+            serial_write(aebf_encode_buffer.data(), AEBF_FRAMED_SIZE(msg.len));
             continue;
         }
 
         // No messages, check for prio0 aebf_tasks (e.g., PWM stream)
         PwmDataFrame_t *frame;
-        if(pwmDataBuffer_readFrame(&pwmDataBuffer, &frame))
+        if(pwmDataBuffer.readFrame(&frame))
         {
             // Process a PWM data frame 
-            memcpy(aebf_encode_buffer + 5, frame, sizeof(PwmDataFrame_t));
-            aebf_encode_frame(aebf_encode_buffer, AEBF_DEVICE_ID, AEBF_PWM_SERVICEID, sizeof(PwmDataFrame_t));
-            serial_write(aebf_encode_buffer, AEBF_FRAMED_SIZE(sizeof(PwmDataFrame_t)));
+            memcpy(aebf_encode_buffer.data() + 5, frame, sizeof(PwmDataFrame_t));
+            aebf_encode_frame(aebf_encode_buffer.data(), AEBF_DEVICE_ID, AEBF_PWM_SERVICEID, sizeof(PwmDataFrame_t));
+            serial_write(aebf_encode_buffer.data(), AEBF_FRAMED_SIZE(sizeof(PwmDataFrame_t)));
             continue;
         }
 
@@ -199,7 +197,7 @@ void sys_init()
 {
     platform_init();
     eldriver_core_init(&core);
-    pwmDataBuffer_init(&pwmDataBuffer);
+    pwmDataBuffer.init();
     serial.config.baudrate = 912600;
     serial_init();
     //enable motor control function
@@ -244,7 +242,7 @@ void sys_init()
         .volt_V             = {2 , 2.25, 2.5, 2.75},
         .freq_Hz            = {100, 125, 200, 250}
     };
-    elmotor_pmsm_init(&motor_c, stup_cfg);
+    motor_c.init(stup_cfg);
     #ifndef PLATFORM_HOST
     vTaskStartScheduler();
     #else
@@ -252,8 +250,5 @@ void sys_init()
     gui_loop();
     #endif
 }
-
-
-
 
 

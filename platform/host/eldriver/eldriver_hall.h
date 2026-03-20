@@ -4,6 +4,9 @@
 #include "eldriver_conf.h"
 #include <math.h>
 
+#ifdef __cplusplus
+extern "C"{
+#endif
 
 void eldriver_hall1_init();
 void eldriver_hall1_setComDelay_uS(uint32_t COM_delay_uS);
@@ -16,6 +19,8 @@ void eldriver_comDelay_init();
 void eldriver_comDelay_setComDelay_uS(uint32_t COM_delay_uS);
 void eldriver_comDelay_setComCallback(void (*callback)(void));
 
-
+#ifdef __cplusplus
+}
 #endif
 
+#endif

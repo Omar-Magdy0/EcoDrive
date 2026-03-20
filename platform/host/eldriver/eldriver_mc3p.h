@@ -102,12 +102,14 @@ typedef struct{
 
 
 //TODO  FINISH ADC IMPLEMENTATION FOR 1)TRAP & 2)SVM
-
+void mc3p_adc_init(eldriver_mc3p_t *h);
 void eldriver_mc3p_init(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2]);
 void eldriver_mc3p_setScales(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2]);
 void eldriver_mc3p_bg_startConv(eldriver_mc3p_t *h);
 uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_t *h);
-uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float* scanData);
+float mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel);
+
+uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float *scanData);
 uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_t *h);
 void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void* scanData);
 
@@ -127,3 +129,5 @@ __attribute__((weak)) void eldriver_mc3p_sync_postScanCallback(void);
 
 
 #endif
+
+

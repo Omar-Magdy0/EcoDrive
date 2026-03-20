@@ -1,6 +1,7 @@
 #pragma once
 #include "eldriver/eldriver_conf.h"
 #include "eldriver/eldriver_hall.h"
+#include <cstdint>
 
 #ifndef ELDRIVER_HALL1_ENABLED
 #define ELDRIVER_BEMFZC_ENABLED
@@ -12,105 +13,67 @@
 
 
 
-#define BEMF_THRESHOLD_LOW         0.1
-#define BEMF_THRESHOLD_HIGH        0.3
-#define COMMUTATION_PHASE_DELAY    0
+constexpr float BEMF_THRESHOLD_LOW = 0.1f;
+constexpr float BEMF_THRESHOLD_HIGH = 0.3f;
+constexpr uint32_t COMMUTATION_PHASE_DELAY = 0;
 
 
-typedef struct{
-    int32_t threshold_low;
-    int32_t threshold_high;
-    int32_t elec_angle_q31;
-    uint32_t last_zc_tick;
-    uint16_t tick_freq;
-    float elec_speed;
-    float phase_delay;
-    uint8_t state;
-} bemfzc_t;
+class BemfZc {
+public:
+    int32_t threshold_low{};
+    int32_t threshold_high{};
+    int32_t elec_angle_q31_{};
+    uint32_t last_zc_tick{};
+    uint16_t tick_freq{};
+    float elec_speed_{};
+    float phase_delay_{};
+    bool state{};
 
-void bemfzf_init(bemfzc_t *h,float threshold_low_V, float threshold_high_V, float phase_delay, uint16_t tick_freq);
-void bemfzc_update(bemfzc_t *h, int32_t bemf, uint32_t ticks, uint8_t dir);
-void bemfzc_takeover(bemfzc_t *h, void(*cb)(void));
-int32_t bemfzc_elec_angle_q31(bemfzc_t *h);
-float bemfzc_elec_speed(bemfzc_t *h);
-void bemfzc_reset(bemfzc_t *h);
+    void init(float threshold_low_V, float threshold_high_V, float phase_delay, uint16_t tick_freq);
+    void update(int32_t bemf, uint32_t ticks, int8_t dir);
+    void takeover(void(*cb)(void));
+    int32_t elec_angle_q31_value() const;
+    float elec_speed_value() const;
+    void reset();
 
+    void init(uint16_t tick_freq) { init(BEMF_THRESHOLD_LOW, BEMF_THRESHOLD_HIGH, COMMUTATION_PHASE_DELAY, tick_freq); }
+    float elec_speed() const { return elec_speed_value(); }
+    int32_t elec_angle_q31() const { return elec_angle_q31_value(); }
+    void set_com_delay_us(uint32_t delay_uS) { eldriver_comDelay_setComDelay_uS(delay_uS); }
+    void set_com_callback(void (*callback)(void)) { eldriver_comDelay_setComCallback(callback); }
+};
 
-
-typedef struct{
-
-
-}hall_t;
+class HallSensor {
+public:
+    void init(uint16_t tick_freq);
+    void update(int32_t bemf_q31, uint32_t ticks, int8_t dir);
+    float elec_speed() const;
+    int32_t elec_angle_q31() const;
+    void set_com_delay_us(uint32_t delay_uS);
+    void set_com_callback(void (*callback)(void));
+};
 void    hall1_update();
 int32_t hall1_elec_angle_q31();
 
-typedef union
-{
-    bemfzc_t bemf;
-    hall_t   hall;
-}pos_sensor_t;
+template <typename Impl>
+class PosSensorT {
+public:
+    void init(uint16_t tick_freq) { impl_.init(tick_freq); }
+    void update(int32_t bemf_q31, uint32_t ticks, int8_t dir) { impl_.update(bemf_q31, ticks, dir); }
+    float elec_speed() const { return impl_.elec_speed(); }
+    int32_t elec_angle_q31() const { return impl_.elec_angle_q31(); }
+    void set_com_delay_us(uint32_t delay_uS) { impl_.set_com_delay_us(delay_uS); }
+    void set_com_callback(void (*callback)(void)) { impl_.set_com_callback(callback); }
 
+    Impl& impl() { return impl_; }
+    const Impl& impl() const { return impl_; }
 
+private:
+    Impl impl_{};
+};
 
-// Compile-time position sensor dispatch (no function pointers)
-static inline void pos_init(pos_sensor_t *pos_ctx, uint16_t tick_freq)
-{
 #ifdef ELDRIVER_HALL1_ENABLED
-    (void)pos_ctx;
-    (void)tick_freq;
-    eldriver_hall1_init();
+using PosSensor = PosSensorT<HallSensor>;
 #else
-    bemfzf_init(&pos_ctx->bemf, BEMF_THRESHOLD_LOW, BEMF_THRESHOLD_HIGH, COMMUTATION_PHASE_DELAY, tick_freq);
+using PosSensor = PosSensorT<BemfZc>;
 #endif
-}
-
-static inline void pos_update(pos_sensor_t *pos_ctx, int32_t bemf_q31, uint32_t ticks, uint8_t dir)
-{
-#ifdef ELDRIVER_HALL1_ENABLED
-    (void)pos_ctx;
-    (void)bemf_q31;
-    (void)ticks;
-    (void)dir;
-    hall1_update();
-#else
-    bemfzc_update(&pos_ctx->bemf, bemf_q31, ticks, dir);
-#endif
-}
-
-static inline float pos_elec_speed(pos_sensor_t *pos_ctx)
-{
-#ifdef ELDRIVER_HALL1_ENABLED
-    (void)pos_ctx;
-    return eldriver_hall1_elec_speed();
-#else
-    return bemfzc_elec_speed(&pos_ctx->bemf);
-#endif
-}
-
-static inline int32_t pos_elec_angle_q31(pos_sensor_t *pos_ctx)
-{
-#ifdef ELDRIVER_HALL1_ENABLED
-    (void)pos_ctx;
-    return eldriver_hall1_elec_angle_q31();
-#else
-    return bemfzc_elec_angle_q31(&pos_ctx->bemf);
-#endif
-}
-
-static inline void pos_set_com_delay_uS(pos_sensor_t *pos_ctx, uint32_t delay_uS)
-{
-#ifdef ELDRIVER_HALL1_ENABLED
-    eldriver_hall1_setComDelay_uS(delay_uS);
-#else
-    eldriver_comDelay_setComDelay_uS(delay_uS);
-#endif
-}
-
-static inline void pos_set_com_callback(pos_sensor_t *pos_ctx, void (*callback)(void))
-{
-#ifdef ELDRIVER_HALL1_ENABLED
-    eldriver_hall1_setComCallback(callback);
-#else
-    eldriver_comDelay_setComCallback(callback);
-#endif
-}

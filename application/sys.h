@@ -1,14 +1,15 @@
 #pragma once
 
-#include "elmotor_pmsm.h"
+#include "PmsmController.h"
 #include "platform.h"
 #include "middleware/aebfStream.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include <cstdint>
 
 
-#define AEBF_DEVICE_ID 0x01
-#define AEBF_PWMDATA_SERVICEID 0xC1
+constexpr uint8_t AEBF_DEVICE_ID = 0x01;
+constexpr uint8_t AEBF_PWMDATA_SERVICEID = 0xC1;
 
 // AEBF_PWMSCAN structure 
 
