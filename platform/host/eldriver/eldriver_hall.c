@@ -48,6 +48,10 @@ int32_t eldriver_hall1_elec_angle_q31(){
 
 }
 
+uint8_t eldriver_hall1_read(){
+    
+}
+
 void eldriver_comDelay_init()
 {
 

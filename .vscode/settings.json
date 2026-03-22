@@ -20,5 +20,12 @@
         "type_traits": "cpp",
         "stm32f4xx_hal_tim.h": "c"
     },
-    "C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-g++"
+    "C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-g++",
+    "python-envs.pythonProjects": [
+        {
+            "path": ".",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ]
 }

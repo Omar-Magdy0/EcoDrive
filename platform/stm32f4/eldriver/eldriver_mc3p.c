@@ -107,6 +107,12 @@ uint16_t adc1_Sample_Single_Channel_Temporary(uint32_t channel)
     return result;
 }
 
+float mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel)
+{
+  uint16_t readVal = adc1_Sample_Single_Channel_Temporary(channel);
+  return ((float)(readVal)/( 1<< ELDRIVER_MC3P_ADCRES)) * h->adc_ref_V;
+}
+
 //=========================================
 // AdcCalibrate Function
 //==========================================

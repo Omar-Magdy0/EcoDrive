@@ -70,21 +70,29 @@ include_directories(${PLATFORM_INCLUDES})
 
 
 
-set(MIDDLEWARE_SOURCES
+set(MIDDLEWARE_SRC
     ${CMAKE_SOURCE_DIR}/middleware/aebfStream.c
 )
 
-# Source files
-file(GLOB_RECURSE SOURCES
+file(GLOB_RECURSE APPLICATION_SRC
     "application/*.cpp"
     "application/*.c"
-    "driver/*.cpp"
-    "driver/*.c"
-    "core/elmath.h"
 )
 
+file(GLOB_RECURSE DRIVER_SRC
+    "driver/*.cpp"
+    "driver/*.c"
+)
+# Source files
+
+file(GLOB_RECURSE CORE_SRC
+    "core/*.cpp"
+    "core/*.c"
+)
+
+
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${MIDDLEWARE_SOURCES})
+add_executable(${PROJECT_NAME} ${APPLICATION_SRC} ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
 
 # Add eld sources directly to the executable to ensure strong IRQ handlers
 # override weak startup symbols (avoids linker archive symbol resolution issues)
@@ -92,12 +100,45 @@ target_sources(${PROJECT_NAME} PRIVATE ${PLATFORM_SOURCE})
 #target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/middleware/tinycbor/src)
 #target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/middleware/tinycbor/build)
 
-target_link_libraries(EcoDrive PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     ${PLATFORM_INTERFACE}
     ${PLATFORM_LIB}
     ${TOOLCHAIN_LINK_LIBRARIES}
     #tinycbor
 )
+
+# BUILD TEST CODE
+if(PLATFORM_NAME STREQUAL "host")
+    add_definitions(-DPLATFORM_HOST)
+    add_executable(test_scopeStream ${CMAKE_CURRENT_SOURCE_DIR}/test/test_scopeStream.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
+    target_sources(test_scopeStream PRIVATE ${PLATFORM_SOURCE})
+    target_link_libraries(test_scopeStream PRIVATE
+        ${PLATFORM_INTERFACE}
+        ${PLATFORM_LIB}
+        ${TOOLCHAIN_LINK_LIBRARIES}
+        #tinycbor
+    )
+
+    add_executable(test_inverter ${CMAKE_CURRENT_SOURCE_DIR}/test/test_inverter.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
+    target_sources(test_inverter PRIVATE ${PLATFORM_SOURCE})
+    target_link_libraries(test_inverter PRIVATE
+        ${PLATFORM_INTERFACE}
+        ${PLATFORM_LIB}
+        ${TOOLCHAIN_LINK_LIBRARIES}
+        #tinycbor
+    )
+
+    add_executable(test_pmsm ${CMAKE_CURRENT_SOURCE_DIR}/test/test_pmsm.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
+    target_sources(test_pmsm PRIVATE ${PLATFORM_SOURCE})
+    target_link_libraries(test_pmsm PRIVATE
+        ${PLATFORM_INTERFACE}
+        ${PLATFORM_LIB}
+        ${TOOLCHAIN_LINK_LIBRARIES}
+        #tinycbor
+    )
+
+endif()
+
 
 
 if(NOT PLATFORM_NAME STREQUAL "host")

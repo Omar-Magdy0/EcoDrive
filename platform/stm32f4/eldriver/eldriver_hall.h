@@ -13,6 +13,10 @@
 #include <math.h>
 
 /** @brief Initializes the Hall sensor interface. */
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 void eldriver_hall1_init();
 
 /** @brief Sets the commutation delay in microseconds. */
@@ -39,4 +43,12 @@ void eldriver_comDelay_setComDelay_uS(uint32_t COM_delay_uS);
 /** @brief Registers the callback for delay-based commutation. */
 void eldriver_comDelay_setComCallback(void (*callback)(void));
 
+<<<<<<< HEAD
 #endif
+=======
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+>>>>>>> 0693b4436cfbebc556c63ff92dc057a7a31f9452

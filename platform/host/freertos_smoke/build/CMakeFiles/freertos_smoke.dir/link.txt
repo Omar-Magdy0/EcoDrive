@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--dependency-file=CMakeFiles/freertos_smoke.dir/link.d CMakeFiles/freertos_smoke.dir/main.c.o -o freertos_smoke  FreeRTOS-Kernel/libfreertos_kernel.a

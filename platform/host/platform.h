@@ -7,8 +7,6 @@ extern "C" {
 #endif
 
 #define HOST_TIMERS 30
-
-
 typedef void (*timer_callback_t)(void);
 
 typedef struct {
@@ -31,8 +29,12 @@ extern float vtime;
 bool register_timer(vtimer_manager_t* mgr, timer_callback_t cb, uint64_t timestep_ns);
 
 void platform_init();
-
+void freeRtos_init();
+void gui_loop();
 
 #ifdef __cplusplus
 }
 #endif
+
+
+

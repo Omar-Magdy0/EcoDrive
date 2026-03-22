@@ -9,12 +9,16 @@ set(DEVICE_DEFINITIONS
 set(FREERTOS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/Source)
 set(CMSIS_DSP_DIR ${CMAKE_SOURCE_DIR}/platform/host/CMSIS-DSP)
 set(CMSISCORE ${CMAKE_SOURCE_DIR}/platform/stm32f4/Drivers/CMSIS)
+set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/platform/host/imgui)
 
 set(HOST_COMMON_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${FREERTOS_DIR}/include
     ${FREERTOS_DIR}/portable/ThirdParty/GCC/Posix
     ${FREERTOS_DIR}/portable/ThirdParty/GCC/Posix/utils
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/implot
+    ${IMGUI_DIR}/backends
 )
 
 set(FreeRTOS_Src
@@ -30,9 +34,22 @@ set(FreeRTOS_Src
     ${FREERTOS_DIR}/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c
 )
 
+set(IMGUI_SRC  
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/implot/implot_items.cpp
+    ${IMGUI_DIR}/implot/implot.cpp
+    ${IMGUI_DIR}/implot/implot_demo.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+)
+
 set(Platform_Src
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/virtual_pmsm.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sim_gui.cpp
 )
 
 file(GLOB_RECURSE Driver_Core_Src
@@ -43,17 +60,24 @@ file(GLOB_RECURSE Driver_Core_Src
 find_package(Threads REQUIRED)
 add_subdirectory(${CMSIS_DSP_DIR}/Source ${CMAKE_CURRENT_BINARY_DIR}/cmsis_dsp_host)
 
+find_package(PkgConfig REQUIRED)
+find_package(OpenGL REQUIRED)
+# This looks for the glfw3 library you installed via apt
+find_package(glfw3 REQUIRED)
+
 add_library(host_platform STATIC)
 target_sources(host_platform PRIVATE
     ${FreeRTOS_Src}
+    ${IMGUI_SRC}
 )
+
 target_include_directories(host_platform PUBLIC ${HOST_COMMON_INCLUDES})
 target_compile_definitions(host_platform PUBLIC
     ${DEVICE_DEFINITIONS}
     projCOVERAGE_TEST=0
     projENABLE_TRACING=0
 )
-target_link_libraries(host_platform PUBLIC Threads::Threads CMSISDSP)
+target_link_libraries(host_platform PUBLIC Threads::Threads CMSISDSP OpenGL::GL glfw)
 
 add_library(host_platform_interface INTERFACE)
 target_link_libraries(host_platform_interface INTERFACE
@@ -61,6 +85,7 @@ target_link_libraries(host_platform_interface INTERFACE
     Threads::Threads
     CMSISDSP
 )
+
 target_include_directories(host_platform_interface INTERFACE
     ${HOST_COMMON_INCLUDES}
     ${CMSIS_DSP_DIR}/Include

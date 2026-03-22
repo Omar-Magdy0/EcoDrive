@@ -8,27 +8,10 @@
 #define Q15_SQRT3_BY_2  28378   // 0.8660254 × 32768
 
 extern float vtime;
-pmsm_model pmsm;
-elec_bus pmsm_ebus_inverter;
-inverter_model inverter;
+
 
 void eldriver_mc3p_init(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2])
 {
-    pmsm.Ra = 0.05;
-    pmsm.Ld = 0.001;
-    pmsm.Lq = 0.001;
-    pmsm.Ke = 0.1;
-    pmsm.Kt = 0.1;
-    pmsm.J = 1;
-    pmsm.B = 1;
-    pmsm.mech.omega = 1;
-    pmsm.pole_pairs = 7;
-
-    inverter.vbus = 16;
-    inverter.min_fw_current = 0.05;
-    inverter.e_bus = &pmsm_ebus_inverter;
-
-    pmsm_init(&pmsm, &pmsm_ebus_inverter);
     register_timer(&timer_manager, eldriver_mc3p_sync_postScanCallback, (uint64_t)(1e9/h->config.pwm_Hz));
 }
 
@@ -45,19 +28,19 @@ void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void* data)
     uint8_t is_trap = IS_TRAP_SECTOR(h->sector_last);
     if(is_svm)
     {
-        ((eldriver_mc3p_trap_data_t *)(data))->vbus_q31  = ((float)(inverter.vbus)/ELDRIVER_MC3P_VS_SCALE) * INT32_MAX;
+
         ((eldriver_mc3p_svm_data_t *)(data))->cu_q31     = 0;
         ((eldriver_mc3p_svm_data_t *)(data))->cv_q31     = 0;  
         ((eldriver_mc3p_svm_data_t *)(data))->cw_q31     = 0;        
     }
     else if (is_trap)
     {
-        ((eldriver_mc3p_trap_data_t *)(data))->vbus_q31  = ((float)(inverter.vbus)/ELDRIVER_MC3P_VS_SCALE) * INT32_MAX;
+
         ((eldriver_mc3p_trap_data_t *)(data))->vbemf_q31 = 0;
         ((eldriver_mc3p_trap_data_t *)(data))->cbus_q31  = 0;
     }
     else{
-        ((eldriver_mc3p_trap_data_t *)(data))->vbus_q31  = ((float)(inverter.vbus)/ELDRIVER_MC3P_VS_SCALE) * INT32_MAX;
+
     }
 }
 
@@ -73,9 +56,17 @@ void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_sta
 void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, uint16_t duty_u_q15, uint16_t duty_v_q15, uint16_t duty_w_q15)
 {
     float duty[3] = {((float)duty_u_q15/INT16_MAX), ((float)duty_v_q15/INT16_MAX), ((float)duty_w_q15/INT16_MAX)};
+    for(int i = 0; i < 3; i++)
+    {
+        if(h->phase_state[i] == ELDRIVER_MC3P_PHASE_L_ON)
+        {
+            duty[i] = 0;
+        }else if (h->phase_state[i] == ELDRIVER_MC3P_PHASE_H_ON)
+        {
+            duty[i] = 1;
+        }
+    }
     float dt = 1.0/h->config.pwm_Hz;
-    inverter_step(&inverter, duty, h->switch_state, dt, vtime);
-    pmsm_step(&pmsm, dt, vtime);
     vtime += dt;
 }
 
