@@ -1,0 +1,9 @@
+<map id="platform/stm32f4/eldriver/eldriver_uart.h" name="platform/stm32f4/eldriver/eldriver_uart.h">
+<area shape="rect" id="Node000001" title="Header file for UART/Communication Peripheral Driver." alt="" coords="112,5,303,45"/>
+<area shape="rect" id="Node000002" href="$eldriver__uart_8c.html" title=" " alt="" coords="5,93,196,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,56,126,95,123,91,171,52"/>
+<area shape="rect" id="Node000003" href="$eldriver__usbcdc_8h.html" title="USB CDC (Communication Device Class) Driver." alt="" coords="220,93,411,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="244,52,293,91,290,95,240,56"/>
+<area shape="rect" id="Node000004" href="$eldriver__usbcdc_8c.html" title=" " alt="" coords="220,181,411,221"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="318,147,318,181,313,181,313,147"/>
+</map>

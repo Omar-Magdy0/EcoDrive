@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['mc3p_5fadc_5fcalibrate_0',['mc3p_adc_calibrate',['../eldriver__mc3p_8c.html#aa58bb4d04fd5a5a06abc1e9f53dd5ccd',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fadc_5fgpioinit_1',['MC3P_ADC_GpioInit',['../eldriver__mc3p_8c.html#a62b3886ef52ea82e753f750146c60096',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fadc_5finit_2',['mc3p_adc_init',['../eldriver__mc3p_8c.html#aa0a13dc55dd5d0f95e3c4d2c0d9b16bc',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fadc_5fmap_5ft_3',['mc3p_adc_map_t',['../structmc3p__adc__map__t.html',1,'']]],
+  ['mc3p_5fadc_5fmode_4',['mc3p_adc_mode',['../eldriver__mc3p_8c.html#a67c51fab30879ed9437d046eb9eb5037',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fadc_5fsvm_5fupdate_5',['mc3p_adc_svm_update',['../eldriver__mc3p_8c.html#a083ce9031f422dc9a92fa085226ceb0a',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fadc_5ftrap_5fupdate_6',['mc3p_adc_trap_update',['../eldriver__mc3p_8c.html#acb08648129be5f9af02805d22df08cc3',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fbg_5factive_5fbuffer_7',['mc3p_bg_active_buffer',['../eldriver__mc3p_8c.html#a12eb726faf9abbfc81d8f3eef3208ab4',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fbg_5fdata_8',['mc3p_bg_data',['../eldriver__mc3p_8c.html#aae22192b593a72a935d099a73a0c82ef',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fbg_5fdata_5fv_9',['mc3p_bg_data_V',['../eldriver__mc3p_8c.html#a03d000deb4086361b2d9affc2a8ed8db',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fdma_5fbackground_5fstream_10',['MC3P_DMA_BACKGROUND_STREAM',['../eldriver__conf_8h.html#a25451e3a70adae675700b2f2576b3582',1,'eldriver_conf.h']]],
+  ['mc3p_5fdma_5fchannel_11',['MC3P_DMA_CHANNEL',['../eldriver__conf_8h.html#a3734ae4821a47a90e67f8eb022df985e',1,'eldriver_conf.h']]],
+  ['mc3p_5fdma_5finit_12',['mc3p_dma_init',['../eldriver__mc3p_8c.html#a432dc77cbcdc5359aa8c84c91e039905',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fdma_5finstance_13',['MC3P_DMA_INSTANCE',['../eldriver__conf_8h.html#a33706603f63d58ab336e65044b365997',1,'eldriver_conf.h']]],
+  ['mc3p_5fgpio_5finit_14',['mc3p_gpio_init',['../eldriver__mc3p_8c.html#a971c27cf7b21c2d9ec874625cf83d7dd',1,'eldriver_mc3p.c']]],
+  ['mc3p_5finterrupt_5finit_15',['mc3p_interrupt_init',['../eldriver__mc3p_8c.html#ae8efda39d349a2234ffa3a0ec6ee80f7',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fpwm_5fgpioinit_16',['MC3P_PWM_GpioInit',['../eldriver__mc3p_8c.html#aec2c49ed27eda3eb69eb33d206269c1a',1,'eldriver_mc3p.c']]],
+  ['mc3p_5fsync_5fchannels_17',['MC3P_SYNC_CHANNELS',['../eldriver__mc3p_8h.html#aa76078217c75b0dd7c3a14003c56aac3',1,'eldriver_mc3p.h']]],
+  ['mc3p_5ftim1_5finit_18',['mc3p_tim1_init',['../eldriver__mc3p_8c.html#ac542e614c6fdbb7ab8c67d4ad175f7f2',1,'eldriver_mc3p.c']]],
+  ['mc3p_5ftrap_5fsector_5fmap_5ft_19',['mc3p_trap_sector_map_t',['../structmc3p__trap__sector__map__t.html',1,'']]],
+  ['mode_20',['mode',['../structeldriver__mc3p__t.html#a73dc2acbef797d60795bb7f758636dc5',1,'eldriver_mc3p_t']]],
+  ['modulation_21',['B. PWM Driver (Pulse Width Modulation)',['../index.html#autotoc_md10',1,'']]]
+];

@@ -1,0 +1,10 @@
+/home/carol_nasser/EcoDrive/build_arm/CMakeFiles/EcoDrive.dir
+/home/carol_nasser/EcoDrive/build_arm/CMakeFiles/size.dir
+/home/carol_nasser/EcoDrive/build_arm/CMakeFiles/edit_cache.dir
+/home/carol_nasser/EcoDrive/build_arm/CMakeFiles/rebuild_cache.dir
+/home/carol_nasser/EcoDrive/build_arm/platform/stm32f4/CMakeFiles/stm32f4_platform.dir
+/home/carol_nasser/EcoDrive/build_arm/platform/stm32f4/CMakeFiles/edit_cache.dir
+/home/carol_nasser/EcoDrive/build_arm/platform/stm32f4/CMakeFiles/rebuild_cache.dir
+/home/carol_nasser/EcoDrive/build_arm/platform/stm32f4/Drivers/CMSIS-DSP/Source/CMakeFiles/CMSISDSP.dir
+/home/carol_nasser/EcoDrive/build_arm/platform/stm32f4/Drivers/CMSIS-DSP/Source/CMakeFiles/edit_cache.dir
+/home/carol_nasser/EcoDrive/build_arm/platform/stm32f4/Drivers/CMSIS-DSP/Source/CMakeFiles/rebuild_cache.dir

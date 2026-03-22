@@ -1,0 +1,9 @@
+/home/carol_nasser/EcoDrive/build_host/CMakeFiles/EcoDrive.dir
+/home/carol_nasser/EcoDrive/build_host/CMakeFiles/edit_cache.dir
+/home/carol_nasser/EcoDrive/build_host/CMakeFiles/rebuild_cache.dir
+/home/carol_nasser/EcoDrive/build_host/platform/host/CMakeFiles/host_platform.dir
+/home/carol_nasser/EcoDrive/build_host/platform/host/CMakeFiles/edit_cache.dir
+/home/carol_nasser/EcoDrive/build_host/platform/host/CMakeFiles/rebuild_cache.dir
+/home/carol_nasser/EcoDrive/build_host/platform/host/cmsis_dsp_host/CMakeFiles/CMSISDSP.dir
+/home/carol_nasser/EcoDrive/build_host/platform/host/cmsis_dsp_host/CMakeFiles/edit_cache.dir
+/home/carol_nasser/EcoDrive/build_host/platform/host/cmsis_dsp_host/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,202 @@
+\doxysection{eldriver\+\_\+mc3p\+\_\+t Struct Reference}
+\hypertarget{structeldriver__mc3p__t}{}\label{structeldriver__mc3p__t}\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+
+
+Main handle structure for the MC3P driver instance.  
+
+
+
+
+{\ttfamily \#include $<$eldriver\+\_\+mc3p.\+h$>$}
+
+
+
+Collaboration diagram for eldriver\+\_\+mc3p\+\_\+t\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{structeldriver__mc3p__t__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+float \mbox{\hyperlink{structeldriver__mc3p__t_aff4d43ba9ad41dd2289cf69c05438d88}{adc\+\_\+ref\+\_\+V}}
+\begin{DoxyCompactList}\small\item\em ADC reference voltage. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{structeldriver__mc3p__t_a5200b8016091c7d5e111f061227952f2}{adc\+\_\+to\+\_\+uV}}
+\begin{DoxyCompactList}\small\item\em ADC to micro-\/volts conversion factor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structeldriver__mc3p__config__t}{eldriver\+\_\+mc3p\+\_\+config\+\_\+t}} \mbox{\hyperlink{structeldriver__mc3p__t_a84636602107df7f9312cd0b95c2a3be3}{config}}
+\begin{DoxyCompactList}\small\item\em Driver configuration. \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{structeldriver__mc3p__t_a695b8595bd59b5d551516978a353891a}{duty\+\_\+max\+\_\+q15}}
+\begin{DoxyCompactList}\small\item\em Max duty in Q15 format. \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{structeldriver__mc3p__t_ad9be9dae1c6a4a1930094281e7272729}{duty\+\_\+min\+\_\+q15}}
+\begin{DoxyCompactList}\small\item\em Min duty in Q15 format. \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{structeldriver__mc3p__t_abdfd168de3b2177704f050b96233a205}{dutyu\+\_\+q15}}
+\begin{DoxyCompactList}\small\item\em Phase U duty in Q15. \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{structeldriver__mc3p__t_a197f9cf955e222e39ad52d45b492070a}{dutyv\+\_\+q15}}
+\begin{DoxyCompactList}\small\item\em Phase V duty in Q15. \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{structeldriver__mc3p__t_a2f8fd04bdee7e9517e7080edae79d9a7}{dutyw\+\_\+q15}}
+\begin{DoxyCompactList}\small\item\em Phase W duty in Q15. \end{DoxyCompactList}\item 
+float \mbox{\hyperlink{structeldriver__mc3p__t_a1717db448ab646b5cc798dbfb656dc16}{internal\+\_\+ref\+\_\+V}}
+\begin{DoxyCompactList}\small\item\em MCU internal reference voltage. \end{DoxyCompactList}\item 
+volatile \mbox{\hyperlink{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934}{eldriver\+\_\+mc3p\+\_\+mode\+\_\+t}} \mbox{\hyperlink{structeldriver__mc3p__t_a73dc2acbef797d60795bb7f758636dc5}{mode}}
+\begin{DoxyCompactList}\small\item\em Current active modulation mode. \end{DoxyCompactList}\item 
+volatile \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5d}{eldriver\+\_\+mc3p\+\_\+sector\+\_\+t}} \mbox{\hyperlink{structeldriver__mc3p__t_a1569a0ad8f2bbf5a4a752b8f02c7a31d}{sector\+\_\+last}}
+\begin{DoxyCompactList}\small\item\em Last active sector. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{structeldriver__mc3p__t_a6b92ae3cd22c5ae61221a9dd4f91b20a}{sync\+\_\+rank\+\_\+scale}} \mbox{[}4\mbox{]}
+\begin{DoxyCompactList}\small\item\em Ranking/scaling priority. \end{DoxyCompactList}\item 
+int32\+\_\+t \mbox{\hyperlink{structeldriver__mc3p__t_acd9e58aebde0ef9da4571412c3e7b797}{sync\+\_\+scale\+\_\+q31}} \mbox{[}\mbox{\hyperlink{eldriver__mc3p_8h_aa76078217c75b0dd7c3a14003c56aac3}{MC3\+P\+\_\+\+SYNC\+\_\+\+CHANNELS}}\mbox{]}\mbox{[}2\mbox{]}
+\begin{DoxyCompactList}\small\item\em Scaling factors for ADC sync. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{structeldriver__mc3p__t_a5b3e4df7658aa110419891867357095a}{timer\+\_\+max\+\_\+q15}}
+\begin{DoxyCompactList}\small\item\em Timer count value for full scale. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Main handle structure for the MC3P driver instance. 
+
+\doxysubsection{Field Documentation}
+\Hypertarget{structeldriver__mc3p__t_aff4d43ba9ad41dd2289cf69c05438d88}\label{structeldriver__mc3p__t_aff4d43ba9ad41dd2289cf69c05438d88} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!adc\_ref\_V@{adc\_ref\_V}}
+\index{adc\_ref\_V@{adc\_ref\_V}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{adc\_ref\_V}{adc\_ref\_V}}
+{\footnotesize\ttfamily float eldriver\+\_\+mc3p\+\_\+t\+::adc\+\_\+ref\+\_\+V}
+
+
+
+ADC reference voltage. 
+
+\Hypertarget{structeldriver__mc3p__t_a5200b8016091c7d5e111f061227952f2}\label{structeldriver__mc3p__t_a5200b8016091c7d5e111f061227952f2} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!adc\_to\_uV@{adc\_to\_uV}}
+\index{adc\_to\_uV@{adc\_to\_uV}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{adc\_to\_uV}{adc\_to\_uV}}
+{\footnotesize\ttfamily int16\+\_\+t eldriver\+\_\+mc3p\+\_\+t\+::adc\+\_\+to\+\_\+uV}
+
+
+
+ADC to micro-\/volts conversion factor. 
+
+\Hypertarget{structeldriver__mc3p__t_a84636602107df7f9312cd0b95c2a3be3}\label{structeldriver__mc3p__t_a84636602107df7f9312cd0b95c2a3be3} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!config@{config}}
+\index{config@{config}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{config}{config}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structeldriver__mc3p__config__t}{eldriver\+\_\+mc3p\+\_\+config\+\_\+t}} eldriver\+\_\+mc3p\+\_\+t\+::config}
+
+
+
+Driver configuration. 
+
+\Hypertarget{structeldriver__mc3p__t_a695b8595bd59b5d551516978a353891a}\label{structeldriver__mc3p__t_a695b8595bd59b5d551516978a353891a} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!duty\_max\_q15@{duty\_max\_q15}}
+\index{duty\_max\_q15@{duty\_max\_q15}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{duty\_max\_q15}{duty\_max\_q15}}
+{\footnotesize\ttfamily uint16\+\_\+t eldriver\+\_\+mc3p\+\_\+t\+::duty\+\_\+max\+\_\+q15}
+
+
+
+Max duty in Q15 format. 
+
+\Hypertarget{structeldriver__mc3p__t_ad9be9dae1c6a4a1930094281e7272729}\label{structeldriver__mc3p__t_ad9be9dae1c6a4a1930094281e7272729} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!duty\_min\_q15@{duty\_min\_q15}}
+\index{duty\_min\_q15@{duty\_min\_q15}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{duty\_min\_q15}{duty\_min\_q15}}
+{\footnotesize\ttfamily uint16\+\_\+t eldriver\+\_\+mc3p\+\_\+t\+::duty\+\_\+min\+\_\+q15}
+
+
+
+Min duty in Q15 format. 
+
+\Hypertarget{structeldriver__mc3p__t_abdfd168de3b2177704f050b96233a205}\label{structeldriver__mc3p__t_abdfd168de3b2177704f050b96233a205} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!dutyu\_q15@{dutyu\_q15}}
+\index{dutyu\_q15@{dutyu\_q15}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{dutyu\_q15}{dutyu\_q15}}
+{\footnotesize\ttfamily uint16\+\_\+t eldriver\+\_\+mc3p\+\_\+t\+::dutyu\+\_\+q15}
+
+
+
+Phase U duty in Q15. 
+
+\Hypertarget{structeldriver__mc3p__t_a197f9cf955e222e39ad52d45b492070a}\label{structeldriver__mc3p__t_a197f9cf955e222e39ad52d45b492070a} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!dutyv\_q15@{dutyv\_q15}}
+\index{dutyv\_q15@{dutyv\_q15}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{dutyv\_q15}{dutyv\_q15}}
+{\footnotesize\ttfamily uint16\+\_\+t eldriver\+\_\+mc3p\+\_\+t\+::dutyv\+\_\+q15}
+
+
+
+Phase V duty in Q15. 
+
+\Hypertarget{structeldriver__mc3p__t_a2f8fd04bdee7e9517e7080edae79d9a7}\label{structeldriver__mc3p__t_a2f8fd04bdee7e9517e7080edae79d9a7} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!dutyw\_q15@{dutyw\_q15}}
+\index{dutyw\_q15@{dutyw\_q15}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{dutyw\_q15}{dutyw\_q15}}
+{\footnotesize\ttfamily uint16\+\_\+t eldriver\+\_\+mc3p\+\_\+t\+::dutyw\+\_\+q15}
+
+
+
+Phase W duty in Q15. 
+
+\Hypertarget{structeldriver__mc3p__t_a1717db448ab646b5cc798dbfb656dc16}\label{structeldriver__mc3p__t_a1717db448ab646b5cc798dbfb656dc16} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!internal\_ref\_V@{internal\_ref\_V}}
+\index{internal\_ref\_V@{internal\_ref\_V}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{internal\_ref\_V}{internal\_ref\_V}}
+{\footnotesize\ttfamily float eldriver\+\_\+mc3p\+\_\+t\+::internal\+\_\+ref\+\_\+V}
+
+
+
+MCU internal reference voltage. 
+
+\Hypertarget{structeldriver__mc3p__t_a73dc2acbef797d60795bb7f758636dc5}\label{structeldriver__mc3p__t_a73dc2acbef797d60795bb7f758636dc5} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!mode@{mode}}
+\index{mode@{mode}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{mode}{mode}}
+{\footnotesize\ttfamily volatile \mbox{\hyperlink{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934}{eldriver\+\_\+mc3p\+\_\+mode\+\_\+t}} eldriver\+\_\+mc3p\+\_\+t\+::mode}
+
+
+
+Current active modulation mode. 
+
+\Hypertarget{structeldriver__mc3p__t_a1569a0ad8f2bbf5a4a752b8f02c7a31d}\label{structeldriver__mc3p__t_a1569a0ad8f2bbf5a4a752b8f02c7a31d} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!sector\_last@{sector\_last}}
+\index{sector\_last@{sector\_last}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{sector\_last}{sector\_last}}
+{\footnotesize\ttfamily volatile \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5d}{eldriver\+\_\+mc3p\+\_\+sector\+\_\+t}} eldriver\+\_\+mc3p\+\_\+t\+::sector\+\_\+last}
+
+
+
+Last active sector. 
+
+\Hypertarget{structeldriver__mc3p__t_a6b92ae3cd22c5ae61221a9dd4f91b20a}\label{structeldriver__mc3p__t_a6b92ae3cd22c5ae61221a9dd4f91b20a} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!sync\_rank\_scale@{sync\_rank\_scale}}
+\index{sync\_rank\_scale@{sync\_rank\_scale}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{sync\_rank\_scale}{sync\_rank\_scale}}
+{\footnotesize\ttfamily uint8\+\_\+t eldriver\+\_\+mc3p\+\_\+t\+::sync\+\_\+rank\+\_\+scale\mbox{[}4\mbox{]}}
+
+
+
+Ranking/scaling priority. 
+
+\Hypertarget{structeldriver__mc3p__t_acd9e58aebde0ef9da4571412c3e7b797}\label{structeldriver__mc3p__t_acd9e58aebde0ef9da4571412c3e7b797} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!sync\_scale\_q31@{sync\_scale\_q31}}
+\index{sync\_scale\_q31@{sync\_scale\_q31}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{sync\_scale\_q31}{sync\_scale\_q31}}
+{\footnotesize\ttfamily int32\+\_\+t eldriver\+\_\+mc3p\+\_\+t\+::sync\+\_\+scale\+\_\+q31\mbox{[}\mbox{\hyperlink{eldriver__mc3p_8h_aa76078217c75b0dd7c3a14003c56aac3}{MC3\+P\+\_\+\+SYNC\+\_\+\+CHANNELS}}\mbox{]}\mbox{[}2\mbox{]}}
+
+
+
+Scaling factors for ADC sync. 
+
+\Hypertarget{structeldriver__mc3p__t_a5b3e4df7658aa110419891867357095a}\label{structeldriver__mc3p__t_a5b3e4df7658aa110419891867357095a} 
+\index{eldriver\_mc3p\_t@{eldriver\_mc3p\_t}!timer\_max\_q15@{timer\_max\_q15}}
+\index{timer\_max\_q15@{timer\_max\_q15}!eldriver\_mc3p\_t@{eldriver\_mc3p\_t}}
+\doxysubsubsection{\texorpdfstring{timer\_max\_q15}{timer\_max\_q15}}
+{\footnotesize\ttfamily uint32\+\_\+t eldriver\+\_\+mc3p\+\_\+t\+::timer\+\_\+max\+\_\+q15}
+
+
+
+Timer count value for full scale. 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+platform/stm32f4/eldriver/\mbox{\hyperlink{eldriver__mc3p_8h}{eldriver\+\_\+mc3p.\+h}}\end{DoxyCompactItemize}

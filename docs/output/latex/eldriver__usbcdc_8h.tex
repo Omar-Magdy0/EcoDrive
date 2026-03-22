@@ -1,0 +1,142 @@
+\doxysection{platform/stm32f4/eldriver/eldriver\+\_\+usbcdc.h File Reference}
+\hypertarget{eldriver__usbcdc_8h}{}\label{eldriver__usbcdc_8h}\index{platform/stm32f4/eldriver/eldriver\_usbcdc.h@{platform/stm32f4/eldriver/eldriver\_usbcdc.h}}
+
+
+USB CDC (Communication Device Class) Driver.  
+
+
+{\ttfamily \#include "{}eldriver\+\_\+uart.\+h"{}}\newline
+{\ttfamily \#include "{}eldriver/eldriver\+\_\+conf.\+h"{}}\newline
+Include dependency graph for eldriver\+\_\+usbcdc.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{eldriver__usbcdc_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{eldriver__usbcdc_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{eldriver__usbcdc_8h_a7bc9b6a244056c72f69dc98fa76b8cd5}{eldriver\+\_\+usbcdc\+\_\+init}} (\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}handle)
+\begin{DoxyCompactList}\small\item\em Initializes the USB CDC peripheral. \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{eldriver__usbcdc_8h_a855e5a83787df585e28b8cfe618720bb}{eldriver\+\_\+usbcdc\+\_\+read}} (\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}handle, uint8\+\_\+t \texorpdfstring{$\ast$}{*}data, uint8\+\_\+t len)
+\begin{DoxyCompactList}\small\item\em Receives data from USB CDC. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__usbcdc_8h_a274712b4def9f065ff82255f589820d5}{eldriver\+\_\+usbcdc\+\_\+reset\+Stats}} (\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}handle)
+\begin{DoxyCompactList}\small\item\em Resets all USB CDC traffic statistics. \end{DoxyCompactList}\item 
+elcore\+\_\+rstream\+\_\+stats\+\_\+t \mbox{\hyperlink{eldriver__usbcdc_8h_a75fc50bfcf9514b3337e844077c3544f}{eldriver\+\_\+usbcdc\+\_\+rx\+\_\+stats}} (\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}handle)
+\begin{DoxyCompactList}\small\item\em Returns USB CDC receive stream statistics. \end{DoxyCompactList}\item 
+elcore\+\_\+rstream\+\_\+stats\+\_\+t \mbox{\hyperlink{eldriver__usbcdc_8h_a62fd9325de9b01cac7dc446347e90234}{eldriver\+\_\+usbcdc\+\_\+tx\+\_\+stats}} (\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}handle)
+\begin{DoxyCompactList}\small\item\em Returns USB CDC transmit stream statistics. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{eldriver__usbcdc_8h_a56169155ae90d7069cbdea5ac4182f91}{eldriver\+\_\+usbcdc\+\_\+write}} (\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}handle, uint8\+\_\+t \texorpdfstring{$\ast$}{*}data, uint8\+\_\+t len)
+\begin{DoxyCompactList}\small\item\em Sends data over USB CDC. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+USB CDC (Communication Device Class) Driver. 
+
+\begin{DoxyAuthor}{Author}
+Carol Nasser
+\end{DoxyAuthor}
+Implements a Virtual COM Port (VCP) interface for the STM32\+F4, using the UART handle structure for consistent data streaming. 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{eldriver__usbcdc_8h_a7bc9b6a244056c72f69dc98fa76b8cd5}\label{eldriver__usbcdc_8h_a7bc9b6a244056c72f69dc98fa76b8cd5} 
+\index{eldriver\_usbcdc.h@{eldriver\_usbcdc.h}!eldriver\_usbcdc\_init@{eldriver\_usbcdc\_init}}
+\index{eldriver\_usbcdc\_init@{eldriver\_usbcdc\_init}!eldriver\_usbcdc.h@{eldriver\_usbcdc.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_usbcdc\_init()}{eldriver\_usbcdc\_init()}}
+{\footnotesize\ttfamily void eldriver\+\_\+usbcdc\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{handle }\end{DoxyParamCaption})}
+
+
+
+Initializes the USB CDC peripheral. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & UART handle instance to manage USB streams. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{eldriver__usbcdc_8h_a855e5a83787df585e28b8cfe618720bb}\label{eldriver__usbcdc_8h_a855e5a83787df585e28b8cfe618720bb} 
+\index{eldriver\_usbcdc.h@{eldriver\_usbcdc.h}!eldriver\_usbcdc\_read@{eldriver\_usbcdc\_read}}
+\index{eldriver\_usbcdc\_read@{eldriver\_usbcdc\_read}!eldriver\_usbcdc.h@{eldriver\_usbcdc.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_usbcdc\_read()}{eldriver\_usbcdc\_read()}}
+{\footnotesize\ttfamily uint16\+\_\+t eldriver\+\_\+usbcdc\+\_\+read (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{handle,  }\item[{uint8\+\_\+t \texorpdfstring{$\ast$}{*}}]{data,  }\item[{uint8\+\_\+t}]{len }\end{DoxyParamCaption})}
+
+
+
+Receives data from USB CDC. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & USB CDC handle. \\
+\hline
+{\em data} & Pointer to buffer for incoming data. \\
+\hline
+{\em len} & Maximum bytes to read. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em uint16\+\_\+t} & Actual bytes read. \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{eldriver__usbcdc_8h_a274712b4def9f065ff82255f589820d5}\label{eldriver__usbcdc_8h_a274712b4def9f065ff82255f589820d5} 
+\index{eldriver\_usbcdc.h@{eldriver\_usbcdc.h}!eldriver\_usbcdc\_resetStats@{eldriver\_usbcdc\_resetStats}}
+\index{eldriver\_usbcdc\_resetStats@{eldriver\_usbcdc\_resetStats}!eldriver\_usbcdc.h@{eldriver\_usbcdc.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_usbcdc\_resetStats()}{eldriver\_usbcdc\_resetStats()}}
+{\footnotesize\ttfamily void eldriver\+\_\+usbcdc\+\_\+reset\+Stats (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{handle }\end{DoxyParamCaption})}
+
+
+
+Resets all USB CDC traffic statistics. 
+
+\Hypertarget{eldriver__usbcdc_8h_a75fc50bfcf9514b3337e844077c3544f}\label{eldriver__usbcdc_8h_a75fc50bfcf9514b3337e844077c3544f} 
+\index{eldriver\_usbcdc.h@{eldriver\_usbcdc.h}!eldriver\_usbcdc\_rx\_stats@{eldriver\_usbcdc\_rx\_stats}}
+\index{eldriver\_usbcdc\_rx\_stats@{eldriver\_usbcdc\_rx\_stats}!eldriver\_usbcdc.h@{eldriver\_usbcdc.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_usbcdc\_rx\_stats()}{eldriver\_usbcdc\_rx\_stats()}}
+{\footnotesize\ttfamily elcore\+\_\+rstream\+\_\+stats\+\_\+t eldriver\+\_\+usbcdc\+\_\+rx\+\_\+stats (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{handle }\end{DoxyParamCaption})}
+
+
+
+Returns USB CDC receive stream statistics. 
+
+\Hypertarget{eldriver__usbcdc_8h_a62fd9325de9b01cac7dc446347e90234}\label{eldriver__usbcdc_8h_a62fd9325de9b01cac7dc446347e90234} 
+\index{eldriver\_usbcdc.h@{eldriver\_usbcdc.h}!eldriver\_usbcdc\_tx\_stats@{eldriver\_usbcdc\_tx\_stats}}
+\index{eldriver\_usbcdc\_tx\_stats@{eldriver\_usbcdc\_tx\_stats}!eldriver\_usbcdc.h@{eldriver\_usbcdc.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_usbcdc\_tx\_stats()}{eldriver\_usbcdc\_tx\_stats()}}
+{\footnotesize\ttfamily elcore\+\_\+rstream\+\_\+stats\+\_\+t eldriver\+\_\+usbcdc\+\_\+tx\+\_\+stats (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{handle }\end{DoxyParamCaption})}
+
+
+
+Returns USB CDC transmit stream statistics. 
+
+\Hypertarget{eldriver__usbcdc_8h_a56169155ae90d7069cbdea5ac4182f91}\label{eldriver__usbcdc_8h_a56169155ae90d7069cbdea5ac4182f91} 
+\index{eldriver\_usbcdc.h@{eldriver\_usbcdc.h}!eldriver\_usbcdc\_write@{eldriver\_usbcdc\_write}}
+\index{eldriver\_usbcdc\_write@{eldriver\_usbcdc\_write}!eldriver\_usbcdc.h@{eldriver\_usbcdc.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_usbcdc\_write()}{eldriver\_usbcdc\_write()}}
+{\footnotesize\ttfamily uint8\+\_\+t eldriver\+\_\+usbcdc\+\_\+write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\+\_\+uart\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{handle,  }\item[{uint8\+\_\+t \texorpdfstring{$\ast$}{*}}]{data,  }\item[{uint8\+\_\+t}]{len }\end{DoxyParamCaption})}
+
+
+
+Sends data over USB CDC. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & USB CDC handle. \\
+\hline
+{\em data} & Pointer to data buffer. \\
+\hline
+{\em len} & Length of data to send. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em uint8\+\_\+t} & Status or bytes written. \\
+\hline
+\end{DoxyRetVals}

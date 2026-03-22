@@ -1,0 +1,208 @@
+\doxysection{platform/stm32f4/eldriver/eldriver\+\_\+hall.c File Reference}
+\hypertarget{eldriver__hall_8c}{}\label{eldriver__hall_8c}\index{platform/stm32f4/eldriver/eldriver\_hall.c@{platform/stm32f4/eldriver/eldriver\_hall.c}}
+{\ttfamily \#include "{}stm32f4xx\+\_\+ll\+\_\+adc.\+h"{}}\newline
+{\ttfamily \#include "{}stm32f4xx\+\_\+ll\+\_\+tim.\+h"{}}\newline
+{\ttfamily \#include "{}stm32f4xx\+\_\+ll\+\_\+rcc.\+h"{}}\newline
+{\ttfamily \#include "{}stm32f4xx\+\_\+ll\+\_\+bus.\+h"{}}\newline
+{\ttfamily \#include "{}stm32f4xx\+\_\+ll\+\_\+gpio.\+h"{}}\newline
+{\ttfamily \#include "{}eldriver\+\_\+hall.\+h"{}}\newline
+{\ttfamily \#include "{}eldriver\+\_\+conf.\+h"{}}\newline
+Include dependency graph for eldriver\+\_\+hall.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{eldriver__hall_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{eldriver__hall_8c_aafc10c8bbf3d3c18ed615f24925bbb10}{CLK\+\_\+\+FREQ}}~1000000
+\item 
+\#define \mbox{\hyperlink{eldriver__hall_8c_a60ea21b730b7d5c8a598ddced70d7abc}{CLK\+\_\+\+TO\+\_\+\+US}}(clk)~((clk) \texorpdfstring{$\ast$}{*} 1000000\+ULL / \mbox{\hyperlink{eldriver__hall_8c_aafc10c8bbf3d3c18ed615f24925bbb10}{CLK\+\_\+\+FREQ}})
+\item 
+\#define \mbox{\hyperlink{eldriver__hall_8c_a7ae1a3c8e894c57d4da524dc4143562d}{HALL1\+\_\+\+GPIO\+\_\+\+INIT}}(pin,  port)
+\item 
+\#define \mbox{\hyperlink{eldriver__hall_8c_a95e62e92a9aca0212993caa856252c17}{US\+\_\+\+TO\+\_\+\+CLK}}(us)~(us \texorpdfstring{$\ast$}{*} (\mbox{\hyperlink{eldriver__hall_8c_aafc10c8bbf3d3c18ed615f24925bbb10}{CLK\+\_\+\+FREQ}} / 1000000))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+float \mbox{\hyperlink{eldriver__hall_8c_a548d28bb4e22983ca0319419eda992fd}{eldriver\+\_\+hall1\+\_\+elec\+\_\+speed}} ()
+\begin{DoxyCompactList}\small\item\em Calculates and returns the electrical speed of the motor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__hall_8c_a22da6aa36c47afcbd3acd86fa722f52c}{eldriver\+\_\+hall1\+\_\+init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the Hall sensor interface. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{eldriver__hall_8c_ab4db0768927eb07b0a8d020e0b8957f1}{eldriver\+\_\+hall1\+\_\+read}} ()
+\begin{DoxyCompactList}\small\item\em Reads the current digital state of the Hall sensors. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__hall_8c_a1d1934bb9285eb6656f63b3a00760a13}{eldriver\+\_\+hall1\+\_\+set\+Com\+Callback}} (void(\texorpdfstring{$\ast$}{*}callback)(void))
+\begin{DoxyCompactList}\small\item\em Sets the callback function for commutation events. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__hall_8c_ac24ab8208c13abb59d825b8b6dee843b}{eldriver\+\_\+hall1\+\_\+set\+Com\+Delay\+\_\+uS}} (uint32\+\_\+t COM\+\_\+delay\+\_\+uS)
+\begin{DoxyCompactList}\small\item\em Sets the commutation delay in microseconds. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{eldriver__hall_8c_a1ea6e86ff52dd2efcec749cc06f872d2}{hall1\+\_\+gpio\+Read}} ()
+\item 
+void \mbox{\hyperlink{eldriver__hall_8c_a38ad4725462bdc5e86c4ead4f04b9fc2}{TIM2\+\_\+\+IRQHandler}} (void)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{eldriver__hall_8c_affb11339fabaa98b30757adf1c1f0339}{commutation\+\_\+callback}} )()
+\item 
+static volatile uint32\+\_\+t \mbox{\hyperlink{eldriver__hall_8c_ace8f43b4408db30391a7650bcaf96ce0}{hall1\+\_\+period\+\_\+uS}} = 0
+\item 
+static volatile uint8\+\_\+t \mbox{\hyperlink{eldriver__hall_8c_afbd204bab0ca3cb3f818eebb453ae412}{hall1\+\_\+value}} = 0b000
+\item 
+uint32\+\_\+t \mbox{\hyperlink{eldriver__hall_8c_ab9ddcfc520a8e5e3755776b05d8596de}{last\+\_\+t}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{eldriver__hall_8c_aafc10c8bbf3d3c18ed615f24925bbb10}\label{eldriver__hall_8c_aafc10c8bbf3d3c18ed615f24925bbb10} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!CLK\_FREQ@{CLK\_FREQ}}
+\index{CLK\_FREQ@{CLK\_FREQ}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{CLK\_FREQ}{CLK\_FREQ}}
+{\footnotesize\ttfamily \#define CLK\+\_\+\+FREQ~1000000}
+
+\Hypertarget{eldriver__hall_8c_a60ea21b730b7d5c8a598ddced70d7abc}\label{eldriver__hall_8c_a60ea21b730b7d5c8a598ddced70d7abc} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!CLK\_TO\_US@{CLK\_TO\_US}}
+\index{CLK\_TO\_US@{CLK\_TO\_US}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{CLK\_TO\_US}{CLK\_TO\_US}}
+{\footnotesize\ttfamily \#define CLK\+\_\+\+TO\+\_\+\+US(\begin{DoxyParamCaption}\item[{}]{clk }\end{DoxyParamCaption})~((clk) \texorpdfstring{$\ast$}{*} 1000000\+ULL / \mbox{\hyperlink{eldriver__hall_8c_aafc10c8bbf3d3c18ed615f24925bbb10}{CLK\+\_\+\+FREQ}})}
+
+\Hypertarget{eldriver__hall_8c_a7ae1a3c8e894c57d4da524dc4143562d}\label{eldriver__hall_8c_a7ae1a3c8e894c57d4da524dc4143562d} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!HALL1\_GPIO\_INIT@{HALL1\_GPIO\_INIT}}
+\index{HALL1\_GPIO\_INIT@{HALL1\_GPIO\_INIT}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{HALL1\_GPIO\_INIT}{HALL1\_GPIO\_INIT}}
+{\footnotesize\ttfamily \#define HALL1\+\_\+\+GPIO\+\_\+\+INIT(\begin{DoxyParamCaption}\item[{}]{pin,  }\item[{}]{port }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ LL\_GPIO\_InitTypeDef\ GPIO\_InitStruct\ =\ \{0\};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ GPIO\_InitStruct.Pin\ =\ pin;\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ GPIO\_InitStruct.Mode\ =\ LL\_GPIO\_MODE\_ALTERNATE;\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ GPIO\_InitStruct.Speed\ =\ LL\_GPIO\_SPEED\_FREQ\_MEDIUM;\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ GPIO\_InitStruct.OutputType\ =\ LL\_GPIO\_OUTPUT\_PUSHPULL;\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ GPIO\_InitStruct.Alternate\ =\ LL\_GPIO\_AF\_1;\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ LL\_GPIO\_Init(port,\ \&GPIO\_InitStruct);\(\backslash\)}
+\DoxyCodeLine{\}\textcolor{keywordflow}{while}(0)}
+
+\end{DoxyCode}
+\Hypertarget{eldriver__hall_8c_a95e62e92a9aca0212993caa856252c17}\label{eldriver__hall_8c_a95e62e92a9aca0212993caa856252c17} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!US\_TO\_CLK@{US\_TO\_CLK}}
+\index{US\_TO\_CLK@{US\_TO\_CLK}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{US\_TO\_CLK}{US\_TO\_CLK}}
+{\footnotesize\ttfamily \#define US\+\_\+\+TO\+\_\+\+CLK(\begin{DoxyParamCaption}\item[{}]{us }\end{DoxyParamCaption})~(us \texorpdfstring{$\ast$}{*} (\mbox{\hyperlink{eldriver__hall_8c_aafc10c8bbf3d3c18ed615f24925bbb10}{CLK\+\_\+\+FREQ}} / 1000000))}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{eldriver__hall_8c_a548d28bb4e22983ca0319419eda992fd}\label{eldriver__hall_8c_a548d28bb4e22983ca0319419eda992fd} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!eldriver\_hall1\_elec\_speed@{eldriver\_hall1\_elec\_speed}}
+\index{eldriver\_hall1\_elec\_speed@{eldriver\_hall1\_elec\_speed}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{eldriver\_hall1\_elec\_speed()}{eldriver\_hall1\_elec\_speed()}}
+{\footnotesize\ttfamily float eldriver\+\_\+hall1\+\_\+elec\+\_\+speed (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Calculates and returns the electrical speed of the motor. 
+
+\Hypertarget{eldriver__hall_8c_a22da6aa36c47afcbd3acd86fa722f52c}\label{eldriver__hall_8c_a22da6aa36c47afcbd3acd86fa722f52c} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!eldriver\_hall1\_init@{eldriver\_hall1\_init}}
+\index{eldriver\_hall1\_init@{eldriver\_hall1\_init}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{eldriver\_hall1\_init()}{eldriver\_hall1\_init()}}
+{\footnotesize\ttfamily void eldriver\+\_\+hall1\+\_\+init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Initializes the Hall sensor interface. 
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{eldriver__hall_8c_a22da6aa36c47afcbd3acd86fa722f52c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{eldriver__hall_8c_ab4db0768927eb07b0a8d020e0b8957f1}\label{eldriver__hall_8c_ab4db0768927eb07b0a8d020e0b8957f1} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!eldriver\_hall1\_read@{eldriver\_hall1\_read}}
+\index{eldriver\_hall1\_read@{eldriver\_hall1\_read}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{eldriver\_hall1\_read()}{eldriver\_hall1\_read()}}
+{\footnotesize\ttfamily uint8\+\_\+t eldriver\+\_\+hall1\+\_\+read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Reads the current digital state of the Hall sensors. 
+
+\Hypertarget{eldriver__hall_8c_a1d1934bb9285eb6656f63b3a00760a13}\label{eldriver__hall_8c_a1d1934bb9285eb6656f63b3a00760a13} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!eldriver\_hall1\_setComCallback@{eldriver\_hall1\_setComCallback}}
+\index{eldriver\_hall1\_setComCallback@{eldriver\_hall1\_setComCallback}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{eldriver\_hall1\_setComCallback()}{eldriver\_hall1\_setComCallback()}}
+{\footnotesize\ttfamily void eldriver\+\_\+hall1\+\_\+set\+Com\+Callback (\begin{DoxyParamCaption}\item[{void(\texorpdfstring{$\ast$}{*})(void)}]{callback }\end{DoxyParamCaption})}
+
+
+
+Sets the callback function for commutation events. 
+
+\Hypertarget{eldriver__hall_8c_ac24ab8208c13abb59d825b8b6dee843b}\label{eldriver__hall_8c_ac24ab8208c13abb59d825b8b6dee843b} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!eldriver\_hall1\_setComDelay\_uS@{eldriver\_hall1\_setComDelay\_uS}}
+\index{eldriver\_hall1\_setComDelay\_uS@{eldriver\_hall1\_setComDelay\_uS}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{eldriver\_hall1\_setComDelay\_uS()}{eldriver\_hall1\_setComDelay\_uS()}}
+{\footnotesize\ttfamily void eldriver\+\_\+hall1\+\_\+set\+Com\+Delay\+\_\+uS (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{COM\+\_\+delay\+\_\+uS }\end{DoxyParamCaption})}
+
+
+
+Sets the commutation delay in microseconds. 
+
+\Hypertarget{eldriver__hall_8c_a1ea6e86ff52dd2efcec749cc06f872d2}\label{eldriver__hall_8c_a1ea6e86ff52dd2efcec749cc06f872d2} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!hall1\_gpioRead@{hall1\_gpioRead}}
+\index{hall1\_gpioRead@{hall1\_gpioRead}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{hall1\_gpioRead()}{hall1\_gpioRead()}}
+{\footnotesize\ttfamily uint8\+\_\+t hall1\+\_\+gpio\+Read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{eldriver__hall_8c_a1ea6e86ff52dd2efcec749cc06f872d2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{eldriver__hall_8c_a38ad4725462bdc5e86c4ead4f04b9fc2}\label{eldriver__hall_8c_a38ad4725462bdc5e86c4ead4f04b9fc2} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!TIM2\_IRQHandler@{TIM2\_IRQHandler}}
+\index{TIM2\_IRQHandler@{TIM2\_IRQHandler}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{TIM2\_IRQHandler()}{TIM2\_IRQHandler()}}
+{\footnotesize\ttfamily void TIM2\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{eldriver__hall_8c_a38ad4725462bdc5e86c4ead4f04b9fc2_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{eldriver__hall_8c_affb11339fabaa98b30757adf1c1f0339}\label{eldriver__hall_8c_affb11339fabaa98b30757adf1c1f0339} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!commutation\_callback@{commutation\_callback}}
+\index{commutation\_callback@{commutation\_callback}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{commutation\_callback}{commutation\_callback}}
+{\footnotesize\ttfamily void(\texorpdfstring{$\ast$}{*} commutation\+\_\+callback) () (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{eldriver__hall_8c_ace8f43b4408db30391a7650bcaf96ce0}\label{eldriver__hall_8c_ace8f43b4408db30391a7650bcaf96ce0} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!hall1\_period\_uS@{hall1\_period\_uS}}
+\index{hall1\_period\_uS@{hall1\_period\_uS}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{hall1\_period\_uS}{hall1\_period\_uS}}
+{\footnotesize\ttfamily volatile uint32\+\_\+t hall1\+\_\+period\+\_\+uS = 0\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{eldriver__hall_8c_afbd204bab0ca3cb3f818eebb453ae412}\label{eldriver__hall_8c_afbd204bab0ca3cb3f818eebb453ae412} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!hall1\_value@{hall1\_value}}
+\index{hall1\_value@{hall1\_value}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{hall1\_value}{hall1\_value}}
+{\footnotesize\ttfamily volatile uint8\+\_\+t hall1\+\_\+value = 0b000\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{eldriver__hall_8c_ab9ddcfc520a8e5e3755776b05d8596de}\label{eldriver__hall_8c_ab9ddcfc520a8e5e3755776b05d8596de} 
+\index{eldriver\_hall.c@{eldriver\_hall.c}!last\_t@{last\_t}}
+\index{last\_t@{last\_t}!eldriver\_hall.c@{eldriver\_hall.c}}
+\doxysubsubsection{\texorpdfstring{last\_t}{last\_t}}
+{\footnotesize\ttfamily uint32\+\_\+t last\+\_\+t = 0}
+

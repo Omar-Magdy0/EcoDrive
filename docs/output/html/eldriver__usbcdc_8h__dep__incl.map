@@ -1,0 +1,5 @@
+<map id="platform/stm32f4/eldriver/eldriver_usbcdc.h" name="platform/stm32f4/eldriver/eldriver_usbcdc.h">
+<area shape="rect" id="Node000001" title="USB CDC (Communication Device Class) Driver." alt="" coords="5,5,196,45"/>
+<area shape="rect" id="Node000002" href="$eldriver__usbcdc_8c.html" title=" " alt="" coords="5,93,196,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,59,103,93,98,93,98,59"/>
+</map>

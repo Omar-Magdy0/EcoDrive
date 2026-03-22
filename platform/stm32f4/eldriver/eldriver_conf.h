@@ -1,3 +1,11 @@
+/**
+ * @file    eldriver_conf.h
+ * @author  Carol Nasser
+ * @brief   Global Configuration for STM32F4 eldrivers.
+ * @details Defines hardware mappings, buffer sizes, and peripheral enable 
+ * flags for the entire EcoDrive driver suite.
+ */
+
 #ifndef DRV_CONF_H
 #define DRV_CONF_H
 #include "stm32f4xx_ll_adc.h"
@@ -5,6 +13,9 @@
 #include "stm32f4xx_ll_tim.h"
 #include "stm32f4xx_ll_rcc.h"
 
+/** @name Hardware Mapping Reference
+ * Fixed mappings for STM32F4xx series (UART, SWD, USB, CAN, Timers).
+ * @{ */
 //########################################################################
 // FIXED HARDWARE MAPPING FOR STM32F4xx Series MCU's
 //########################################################################
@@ -25,10 +36,9 @@
 //########################################################################
 // FIXED HARDWARE MAPPING FOR STM32F4xx Series MCU's #########END#######
 //########################################################################
+/** @} */
 
-
-
-
+/** @name UART1 Configuration */
 //================================================
 // UART1 CONFIGURATION
 //================================================
@@ -39,12 +49,16 @@
 #define ELDRIVER_UART1_TX_PORT       GPIOB
 #define ELDRIVER_UART1_TX_BUFFER_SIZE 256
 #define ELDRIVER_UART1_RX_BUFFER_SIZE 256
+
+/** @name USB CDC Configuration */
 //================================================
 // USBCDC CONFIGURATION
 //================================================
 #define ELDRIVER_USBCDC_ENABLED
 #define ELDRIVER_USBCDC_TX_BUFFER_SIZE 4096
 #define ELDRIVER_USBCDC_RX_BUFFER_SIZE 1024
+
+/** @name Motor Control (MC3P) Configuration */
 //================================================
 // MCADCPWM3P CONFIGURATION    
 //================================================
@@ -81,18 +95,18 @@
 #define ELDRIVER_MC3P_VS_SCALE 60
 
 
-#define ELDRIVER_MC3P_VSBUS_PIN              LL_GPIO_PIN_0
-#define ELDRIVER_MC3P_VSBUS_PORT             GPIOA
-#define ELDRIVER_MC3P_VSBUS_ADC_CHANNEL      LL_ADC_CHANNEL_0   // PA1 - ADC1_IN2
-#define ELDRIVER_MC3P_VSU_PIN                LL_GPIO_PIN_1
-#define ELDRIVER_MC3P_VSU_PORT               GPIOA
-#define ELDRIVER_MC3P_VSU_ADC_CHANNEL        LL_ADC_CHANNEL_1   // PA1 - ADC1_IN2
-#define ELDRIVER_MC3P_VSV_PIN                LL_GPIO_PIN_2
-#define ELDRIVER_MC3P_VSV_PORT               GPIOA
-#define ELDRIVER_MC3P_VSV_ADC_CHANNEL        LL_ADC_CHANNEL_2   // PA4 - ADC1_IN3
-#define ELDRIVER_MC3P_VSW_PIN                LL_GPIO_PIN_3
-#define ELDRIVER_MC3P_VSW_PORT               GPIOA
-#define ELDRIVER_MC3P_VSW_ADC_CHANNEL        LL_ADC_CHANNEL_3   // PA5 - ADC1_IN3
+#define ELDRIVER_MC3P_VSBUS_PIN               LL_GPIO_PIN_0
+#define ELDRIVER_MC3P_VSBUS_PORT              GPIOA
+#define ELDRIVER_MC3P_VSBUS_ADC_CHANNEL       LL_ADC_CHANNEL_0   // PA1 - ADC1_IN2
+#define ELDRIVER_MC3P_VSU_PIN                 LL_GPIO_PIN_1
+#define ELDRIVER_MC3P_VSU_PORT                GPIOA
+#define ELDRIVER_MC3P_VSU_ADC_CHANNEL         LL_ADC_CHANNEL_1   // PA1 - ADC1_IN2
+#define ELDRIVER_MC3P_VSV_PIN                 LL_GPIO_PIN_2
+#define ELDRIVER_MC3P_VSV_PORT                GPIOA
+#define ELDRIVER_MC3P_VSV_ADC_CHANNEL         LL_ADC_CHANNEL_2   // PA4 - ADC1_IN3
+#define ELDRIVER_MC3P_VSW_PIN                 LL_GPIO_PIN_3
+#define ELDRIVER_MC3P_VSW_PORT                GPIOA
+#define ELDRIVER_MC3P_VSW_ADC_CHANNEL         LL_ADC_CHANNEL_3   // PA5 - ADC1_IN3
 
 #if (ELDRIVER_MC3P_CS == ELDRIVER_MC3P_CS_TRIPLE_SHUNT || ELDRIVER_MC3P_CS == ELDRIVER_MC3P_CS_DOUBLE_SHUNT || ELDRIVER_MC3P_CS == ELDRIVER_MC3P_CS_INLINE)
     // Three shunt resistors - one per phase , (for double shunt and inline comment out unnused sensor)
@@ -165,6 +179,7 @@
 #endif
 
 
+/** @name Hall Sensor Configuration */
 //================================================
 // HALL SENSOR CONFIGURATION    
 //================================================
@@ -180,6 +195,7 @@
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/** @name DMA & NVIC Configuration */
 //================================================
 //DMA CONFIGURATION
 //================================================

@@ -1,0 +1,27 @@
+<map id="platform/stm32f4/eldriver/eldriver_hall.c" name="platform/stm32f4/eldriver/eldriver_hall.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="198,5,389,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,240,155,265"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="255,48,221,69,187,95,157,129,131,165,94,229,89,227,127,162,153,125,184,91,218,64,253,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="179,240,327,265"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="251,48,222,67,200,95,194,112,192,129,200,166,217,200,237,228,232,231,213,203,195,168,187,130,188,111,195,92,218,64,248,43"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="591,240,737,265"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="389,26,477,32,569,43,649,62,679,75,699,92,709,108,714,126,711,163,698,200,682,230,677,227,693,198,706,162,709,126,704,110,695,95,676,80,647,67,568,48,477,37,389,31"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="219,93,368,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="296,46,296,79,291,79,291,46"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="392,93,547,119"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="337,43,432,85,430,90,334,48"/>
+<area shape="rect" id="Node000007" href="$eldriver__hall_8h.html" title="Hall Sensor and Commutation Delay Driver." alt="" coords="571,93,685,119"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="374,43,566,88,565,93,373,48"/>
+<area shape="rect" id="Node000009" href="$eldriver__conf_8h.html" title="Global Configuration for STM32F4 eldrivers." alt="" coords="281,167,399,192"/>
+<area shape="poly" id="edge14_Node000001_Node000009" title=" " alt="" coords="256,48,233,62,214,80,205,98,205,108,209,117,221,131,235,143,269,160,266,165,232,148,217,135,204,120,200,109,199,97,210,76,230,58,253,43"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="510,167,581,192"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="616,121,571,160,568,155,613,117"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="582,121,400,166,399,161,581,116"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="605,167,673,192"/>
+<area shape="poly" id="edge13_Node000007_Node000011" title=" " alt="" coords="632,119,638,153,632,154,627,119"/>
+<area shape="poly" id="edge9_Node000009_Node000002" title=" " alt="" coords="299,195,136,239,135,234,298,189"/>
+<area shape="poly" id="edge11_Node000009_Node000003" title=" " alt="" coords="328,194,280,233,276,229,324,190"/>
+<area shape="poly" id="edge12_Node000009_Node000004" title=" " alt="" coords="393,189,599,234,598,240,391,195"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="352,240,507,265"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="356,190,406,229,402,233,353,194"/>
+</map>

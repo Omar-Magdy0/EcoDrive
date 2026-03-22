@@ -1,0 +1,50 @@
+\doxysection{eldriver\+\_\+uart.\+h}
+\hypertarget{eldriver__uart_8h_source}{}\label{eldriver__uart_8h_source}\index{platform/stm32f4/eldriver/eldriver\_uart.h@{platform/stm32f4/eldriver/eldriver\_uart.h}}
+\mbox{\hyperlink{eldriver__uart_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}elcore.h"{}}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00013\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00019\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00020\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structeldriver__uart__config__t_afdb4f91b6a67f2a7ebc3d2150db3af6a}{baudrate}};\ \ \ \ \ \ }
+\DoxyCodeLine{00021\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structeldriver__uart__config__t_ade9c4fe3ccd5098c846ed9135febd915}{data\_bits}};\ \ \ \ \ }
+\DoxyCodeLine{00022\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structeldriver__uart__config__t_a4318d9580f98fff30348625d6a279096}{stop\_bits}};\ \ \ \ \ }
+\DoxyCodeLine{00023\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structeldriver__uart__config__t_a7d9b2ed5a3b9d280164c81e1d7c73390}{parity}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00024\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structeldriver__uart__config__t_a2e3e5050aeffb362fd8104efeb0fd161}{flow\_control}};\ \ }
+\DoxyCodeLine{00025\ \}\mbox{\hyperlink{structeldriver__uart__config__t}{eldriver\_uart\_config\_t}};}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00030\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00031\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structeldriver__uart__status__t_ae4e19e10c2fdeb251d8708de1c51c7f0}{tx\_busy}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{00032\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structeldriver__uart__status__t_ab97088054800751ff153234a919db816}{rx\_busy}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{00033\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structeldriver__uart__status__t_a1ac81508460385259f97c95208b912b8}{rx\_overflow}};\ \ \ }
+\DoxyCodeLine{00034\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structeldriver__uart__status__t_a2c9dd56694f001e469aa143cd0a95f88}{tx\_overflow}};\ \ \ }
+\DoxyCodeLine{00035\ \}\mbox{\hyperlink{structeldriver__uart__status__t}{eldriver\_uart\_status\_t}};}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00040\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{structeldriver__uart__config__t}{eldriver\_uart\_config\_t}}\ \mbox{\hyperlink{structeldriver__uart__handle__t_aa7cb530b09586e2c98de4c9dbae485d3}{config}};}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{structeldriver__uart__status__t}{eldriver\_uart\_status\_t}}\ \mbox{\hyperlink{structeldriver__uart__handle__t_a22d48795b5ee586f130f196649c2f7ec}{status}};}
+\DoxyCodeLine{00043\ \}\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\_uart\_handle\_t}};}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00049\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{eldriver__uart_8h_a40cff1f203903ba7379cf017d9ba0de2}{eldriver\_uart1\_init}}(\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\_uart\_handle\_t}}\ *handle);}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00058\ uint8\_t\ \mbox{\hyperlink{eldriver__uart_8h_adeab7c59ddeeb443d74404955b9010bc}{eldriver\_uart1\_write}}(\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\_uart\_handle\_t}}\ *handle,\ \textcolor{keyword}{const}\ uint8\_t*\ data,\ uint8\_t\ len);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00067\ uint16\_t\ \mbox{\hyperlink{eldriver__uart_8h_a06f8ab9eddafe1db172d6ed683a5bc7d}{eldriver\_uart1\_read}}(\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\_uart\_handle\_t}}\ *handle,\ uint8\_t*\ data,\ uint8\_t\ len);}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00074\ elcore\_rstream\_stats\_t\ \mbox{\hyperlink{eldriver__uart_8h_ace465c17671e826671c2c92bda24a4ac}{eldriver\_uart1\_rx\_stats}}(\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\_uart\_handle\_t}}\ *handle);}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00081\ elcore\_rstream\_stats\_t\ \mbox{\hyperlink{eldriver__uart_8h_a59cd3d4a4753fa2322ba8e1138cafdf1}{eldriver\_uart1\_tx\_stats}}(\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\_uart\_handle\_t}}\ *handle);}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00087\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{eldriver__uart_8h_ad55a0914b64be8f11332374d927f787e}{eldriver\_uart1\_resetStats}}(\mbox{\hyperlink{structeldriver__uart__handle__t}{eldriver\_uart\_handle\_t}}\ *handle);}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00091\ \}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

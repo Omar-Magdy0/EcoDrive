@@ -1,0 +1,18 @@
+<map id="platform/stm32f4/eldriver/eldriver_conf.h" name="platform/stm32f4/eldriver/eldriver_conf.h">
+<area shape="rect" id="Node000001" title="Global Configuration for STM32F4 eldrivers." alt="" coords="393,5,584,45"/>
+<area shape="rect" id="Node000002" href="$eldriver__hall_8c.html" title=" " alt="" coords="5,181,196,221"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="380,31,288,36,192,47,111,66,81,79,61,95,56,105,54,115,58,137,70,160,85,179,81,183,65,163,53,139,48,115,51,103,57,92,79,75,110,61,192,42,287,31,379,25"/>
+<area shape="rect" id="Node000003" href="$eldriver__hall_8h.html" title="Hall Sensor and Commutation Delay Driver." alt="" coords="72,93,263,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="406,51,238,96,237,91,405,46"/>
+<area shape="rect" id="Node000004" href="$eldriver__mc3p_8c.html" title=" " alt="" coords="287,93,477,133"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="456,56,407,95,404,91,453,52"/>
+<area shape="rect" id="Node000005" href="$eldriver__mc3p__it_8c.html" title=" " alt="" coords="501,93,692,133"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="525,52,574,91,571,95,522,56"/>
+<area shape="rect" id="Node000006" href="$eldriver__uart_8c.html" title=" " alt="" coords="716,93,907,133"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="573,46,741,91,740,96,572,51"/>
+<area shape="rect" id="Node000007" href="$eldriver__usbcdc_8h.html" title="USB CDC (Communication Device Class) Driver." alt="" coords="931,93,1121,133"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="598,40,920,91,931,93,930,98,919,96,597,46"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="146,146,118,183,113,179,142,143"/>
+<area shape="rect" id="Node000008" href="$eldriver__usbcdc_8c.html" title=" " alt="" coords="931,181,1121,221"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="1029,147,1029,181,1023,181,1023,147"/>
+</map>

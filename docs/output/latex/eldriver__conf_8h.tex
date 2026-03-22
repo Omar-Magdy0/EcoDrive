@@ -1,0 +1,633 @@
+\doxysection{platform/stm32f4/eldriver/eldriver\+\_\+conf.h File Reference}
+\hypertarget{eldriver__conf_8h}{}\label{eldriver__conf_8h}\index{platform/stm32f4/eldriver/eldriver\_conf.h@{platform/stm32f4/eldriver/eldriver\_conf.h}}
+
+
+Global Configuration for STM32\+F4 eldrivers.  
+
+
+{\ttfamily \#include "{}stm32f4xx\+\_\+ll\+\_\+adc.\+h"{}}\newline
+{\ttfamily \#include "{}stm32f4xx\+\_\+ll\+\_\+dma.\+h"{}}\newline
+{\ttfamily \#include "{}stm32f4xx\+\_\+ll\+\_\+tim.\+h"{}}\newline
+{\ttfamily \#include "{}stm32f4xx\+\_\+ll\+\_\+rcc.\+h"{}}\newline
+Include dependency graph for eldriver\+\_\+conf.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{eldriver__conf_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{eldriver__conf_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{Indent}\textbf{ UART1 Configuration}\par
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a282ce6af29bf5947c351fe4e39c264b4}{ELDRIVER\+\_\+\+UART1\+\_\+\+RX\+\_\+\+BUFFER\+\_\+\+SIZE}}~256
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_aa67c9a6644239b1ab4a139f7aa6e6b7d}{ELDRIVER\+\_\+\+UART1\+\_\+\+RX\+\_\+\+PIN}}~6
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_ae0fc83f238c2936e03476b707bb596fb}{ELDRIVER\+\_\+\+UART1\+\_\+\+RX\+\_\+\+PORT}}~GPIOB
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_abb192f71d8396b78522d108da88db424}{ELDRIVER\+\_\+\+UART1\+\_\+\+TX\+\_\+\+BUFFER\+\_\+\+SIZE}}~256
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a7edd42dd564303c0ef12ce794a6e7eaf}{ELDRIVER\+\_\+\+UART1\+\_\+\+TX\+\_\+\+PIN}}~7
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a560aee1d6ddf1106adc616af04739524}{ELDRIVER\+\_\+\+UART1\+\_\+\+TX\+\_\+\+PORT}}~GPIOB
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ USB CDC Configuration}\par
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a4c0a9b65d0e4dcf420e1d788e96b0079}{ELDRIVER\+\_\+\+USBCDC\+\_\+\+ENABLED}}
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_aa3a9d84367d595d4b738a4e80e6606e5}{ELDRIVER\+\_\+\+USBCDC\+\_\+\+RX\+\_\+\+BUFFER\+\_\+\+SIZE}}~1024
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_af8466087805e4e33873c03910107dea4}{ELDRIVER\+\_\+\+USBCDC\+\_\+\+TX\+\_\+\+BUFFER\+\_\+\+SIZE}}~4096
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ Motor Control (MC3P) Configuration}\par
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a8da52b4fea1235812746e8d3c8344492}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+ADCRES}}~12
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_abb601c6d4919ac8581c3788110155840}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+BG\+\_\+\+CHANNELS}}~0
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a5b5dd1affba9db19936230397b4f08c7}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS}}~\mbox{\hyperlink{eldriver__conf_8h_a0519f53b6a6284a32024c047eead1512}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+TRIPLE\+\_\+\+SHUNT}}
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_aa0a757a1307f796c6d2dd9941208e0be}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+DOUBLE\+\_\+\+SHUNT}}~2
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a81bcaf6204cb65839118d2e6ffe0e3c3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+INLINE}}~4
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a800b53ad7720ff33f7efd643970511f5}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+NONE}}~0
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_aaaf2abca11923778219e2066ae5437e3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+SCALE}}~50
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a1c34bf20d5715084bcb0a3a082f77599}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+SINGLE\+\_\+\+SHUNT}}~3
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a0519f53b6a6284a32024c047eead1512}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+TRIPLE\+\_\+\+SHUNT}}~1
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_acc26d63dd5d80e638abcdd2e10f632e6}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSU\+\_\+\+ADC\+\_\+\+CHANNEL}}~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+4
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a38cca54f9f60920d111697512deb8e41}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSU\+\_\+\+PIN}}~4
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a2e322c65480b04cc10fb7335b5d54d83}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSU\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a15240b9e0534990e5c542c043c7efae7}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSV\+\_\+\+ADC\+\_\+\+CHANNEL}}~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+5
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a904dc666c7b4366b52efe1c96b4ff588}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSV\+\_\+\+PIN}}~5
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a37d59bd6e5656a16ad5bf135df66f0da}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSV\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a95d6c8af9f27ae491cebd5abe809236c}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSW\+\_\+\+ADC\+\_\+\+CHANNEL}}~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+6
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a4a572b59b1a246a396001632ce887e12}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSW\+\_\+\+PIN}}~6
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a1508f4bc535c9f906359ae66e7a4ec6a}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSW\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_abc191ffe41db2d2e6285ceb1ee4865c8}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+ENABLED}}
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a767497abbe5af3a59f796f1d9a9d4d96}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+HIN\+\_\+\+ACTIVE}}~1
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a375182417bf4de77226e0ef171e1cc9a}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+LIN\+\_\+\+ACTIVE}}~0
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a7a146235ab2a7ea6e031974528037593}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+UH\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+8
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a00879a45950fbf5d5b8bfa0e7b72ad93}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+UH\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a9e1c8796eb693d075b53f019bfc95da7}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+UL\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+13
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a79903a86e62d2257810004815ba1a931}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+UL\+\_\+\+PORT}}~GPIOB
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a6f61946f222a9c1086801b0e9a25e9f7}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VH\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+9
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a70a3d2eac4e6f3d4d4250f93548fe27c}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VH\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_ac50d544e9f69dbb5e013f7b43de7bb9b}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VL\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+14
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a5d39a24553c40911892daf6ff3857401}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VL\+\_\+\+PORT}}~GPIOB
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a6cb053b6faba2c8631a9af1755e984d3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VS\+\_\+\+SCALE}}~60
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_accc133cb81118f6f1c9390a1268a6ea7}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSBUS\+\_\+\+ADC\+\_\+\+CHANNEL}}~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+0
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a76019149b20ba8f63b1ddaf2a5fec30e}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSBUS\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+0
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_ac5d44be0913b17257af5635793f8e523}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSBUS\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_aedea309900b936182e26f13b65054109}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSU\+\_\+\+ADC\+\_\+\+CHANNEL}}~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+1
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a3a1efac2b8fdd42ab82c656bd755dc1d}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSU\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+1
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a6784a2ab18b776b0e896869b27d5da08}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSU\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a7828e4f5bdeda2a4732347caae58fde1}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSV\+\_\+\+ADC\+\_\+\+CHANNEL}}~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+2
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a9cbb702400d4123bcd18b1a647a1e2cf}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSV\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+2
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a89d8c66ab2424cad15931baa3f9fa999}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSV\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_afa7dc9649f21404d814d260da408e415}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSW\+\_\+\+ADC\+\_\+\+CHANNEL}}~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+3
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_ada302cac9be7d417cf5932add12e13a9}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSW\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+3
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a1da19c2ba055c225c2159fe2a5b68bab}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSW\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_aa7447beb8e97b72b6a5e872ff86730a1}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+WH\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+10
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_afd1ebdafe76b4daaa0df97bfbe100f91}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+WH\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_ad4058614d22107b29373d6d0cec1c7a9}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+WL\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+15
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a18b79ea42595b5db0640a056049031c2}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+WL\+\_\+\+PORT}}~GPIOB
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_acaca68e36d927006406aa3c1be9b621c}{ELDRIVER\+\_\+\+XMC3\+P\+\_\+\+TICKFREQ}}~4000
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a2aaae6bb159cc19a63a90f7760bed11d}{ELDRIVER\+\_\+\+XMC3\+P\+\_\+\+TICKPERIOD\+\_\+\+US}}~(1000000/\mbox{\hyperlink{eldriver__conf_8h_acaca68e36d927006406aa3c1be9b621c}{ELDRIVER\+\_\+\+XMC3\+P\+\_\+\+TICKFREQ}})
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ Hall Sensor Configuration}\par
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_ae2ea19d2f448f746289d45889fb1a1f2}{ELDRIVER\+\_\+\+HALL1\+\_\+\+A\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+15
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a5903d12ba87d87c9cc60757a38739455}{ELDRIVER\+\_\+\+HALL1\+\_\+\+A\+\_\+\+PORT}}~GPIOA
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a614c714d2eefbb06e516038473748599}{ELDRIVER\+\_\+\+HALL1\+\_\+\+B\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+3
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_ab1f4c45362c43425f243235b791094d8}{ELDRIVER\+\_\+\+HALL1\+\_\+\+B\+\_\+\+PORT}}~GPIOB
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a2d55ae798da31e63d9e120de41a8b2ca}{ELDRIVER\+\_\+\+HALL1\+\_\+\+C\+\_\+\+PIN}}~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+10
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a4aace08da94e8d8958e2bb5d0c05cf76}{ELDRIVER\+\_\+\+HALL1\+\_\+\+C\+\_\+\+PORT}}~GPIOB
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a097c378d80b02ea1757b27810eb854c5}{ELDRIVER\+\_\+\+HALL1\+\_\+\+ENABLED}}
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ DMA \& NVIC Configuration}\par
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a25451e3a70adae675700b2f2576b3582}{MC3\+P\+\_\+\+DMA\+\_\+\+BACKGROUND\+\_\+\+STREAM}}~LL\+\_\+\+DMA\+\_\+\+STREAM\+\_\+0
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a3734ae4821a47a90e67f8eb022df985e}{MC3\+P\+\_\+\+DMA\+\_\+\+CHANNEL}}~LL\+\_\+\+DMA\+\_\+\+CHANNEL\+\_\+0
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a33706603f63d58ab336e65044b365997}{MC3\+P\+\_\+\+DMA\+\_\+\+INSTANCE}}~DMA2
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a0bf1f04e2f8c7a167a8d06a05995e9b1}{UART1\+\_\+\+DMA\+\_\+\+CHANNEL}}~LL\+\_\+\+DMA\+\_\+\+CHANNEL\+\_\+4
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_aef966b265b082a4504e943cb9a81d773}{UART1\+\_\+\+DMA\+\_\+\+INSTANCE}}~DMA2
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_af3e1966f2ff0dc6caa2369b60c204138}{UART1\+\_\+\+DMA\+\_\+\+RX\+\_\+\+STREAM}}~LL\+\_\+\+DMA\+\_\+\+STREAM\+\_\+5
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a1628a714cc490f0d35638cc502aa4f04}{UART1\+\_\+\+DMA\+\_\+\+TX\+\_\+\+STREAM}}~LL\+\_\+\+DMA\+\_\+\+STREAM\+\_\+7
+\item 
+\#define \mbox{\hyperlink{eldriver__conf_8h_a3f19e27e81d5332dccde2fdaf9346033}{UART1\+\_\+\+NVIC\+\_\+\+PRIORITY}}~4
+\end{DoxyCompactItemize}
+\end{Indent}
+
+
+\doxysubsection{Detailed Description}
+Global Configuration for STM32\+F4 eldrivers. 
+
+\begin{DoxyAuthor}{Author}
+Carol Nasser
+\end{DoxyAuthor}
+Defines hardware mappings, buffer sizes, and peripheral enable flags for the entire Eco\+Drive driver suite. 
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{eldriver__conf_8h_ae2ea19d2f448f746289d45889fb1a1f2}\label{eldriver__conf_8h_ae2ea19d2f448f746289d45889fb1a1f2} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_HALL1\_A\_PIN@{ELDRIVER\_HALL1\_A\_PIN}}
+\index{ELDRIVER\_HALL1\_A\_PIN@{ELDRIVER\_HALL1\_A\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_HALL1\_A\_PIN}{ELDRIVER\_HALL1\_A\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+HALL1\+\_\+\+A\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+15}
+
+\Hypertarget{eldriver__conf_8h_a5903d12ba87d87c9cc60757a38739455}\label{eldriver__conf_8h_a5903d12ba87d87c9cc60757a38739455} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_HALL1\_A\_PORT@{ELDRIVER\_HALL1\_A\_PORT}}
+\index{ELDRIVER\_HALL1\_A\_PORT@{ELDRIVER\_HALL1\_A\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_HALL1\_A\_PORT}{ELDRIVER\_HALL1\_A\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+HALL1\+\_\+\+A\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_a614c714d2eefbb06e516038473748599}\label{eldriver__conf_8h_a614c714d2eefbb06e516038473748599} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_HALL1\_B\_PIN@{ELDRIVER\_HALL1\_B\_PIN}}
+\index{ELDRIVER\_HALL1\_B\_PIN@{ELDRIVER\_HALL1\_B\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_HALL1\_B\_PIN}{ELDRIVER\_HALL1\_B\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+HALL1\+\_\+\+B\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+3}
+
+\Hypertarget{eldriver__conf_8h_ab1f4c45362c43425f243235b791094d8}\label{eldriver__conf_8h_ab1f4c45362c43425f243235b791094d8} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_HALL1\_B\_PORT@{ELDRIVER\_HALL1\_B\_PORT}}
+\index{ELDRIVER\_HALL1\_B\_PORT@{ELDRIVER\_HALL1\_B\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_HALL1\_B\_PORT}{ELDRIVER\_HALL1\_B\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+HALL1\+\_\+\+B\+\_\+\+PORT~GPIOB}
+
+\Hypertarget{eldriver__conf_8h_a2d55ae798da31e63d9e120de41a8b2ca}\label{eldriver__conf_8h_a2d55ae798da31e63d9e120de41a8b2ca} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_HALL1\_C\_PIN@{ELDRIVER\_HALL1\_C\_PIN}}
+\index{ELDRIVER\_HALL1\_C\_PIN@{ELDRIVER\_HALL1\_C\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_HALL1\_C\_PIN}{ELDRIVER\_HALL1\_C\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+HALL1\+\_\+\+C\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+10}
+
+\Hypertarget{eldriver__conf_8h_a4aace08da94e8d8958e2bb5d0c05cf76}\label{eldriver__conf_8h_a4aace08da94e8d8958e2bb5d0c05cf76} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_HALL1\_C\_PORT@{ELDRIVER\_HALL1\_C\_PORT}}
+\index{ELDRIVER\_HALL1\_C\_PORT@{ELDRIVER\_HALL1\_C\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_HALL1\_C\_PORT}{ELDRIVER\_HALL1\_C\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+HALL1\+\_\+\+C\+\_\+\+PORT~GPIOB}
+
+\Hypertarget{eldriver__conf_8h_a097c378d80b02ea1757b27810eb854c5}\label{eldriver__conf_8h_a097c378d80b02ea1757b27810eb854c5} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_HALL1\_ENABLED@{ELDRIVER\_HALL1\_ENABLED}}
+\index{ELDRIVER\_HALL1\_ENABLED@{ELDRIVER\_HALL1\_ENABLED}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_HALL1\_ENABLED}{ELDRIVER\_HALL1\_ENABLED}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+HALL1\+\_\+\+ENABLED}
+
+\Hypertarget{eldriver__conf_8h_a8da52b4fea1235812746e8d3c8344492}\label{eldriver__conf_8h_a8da52b4fea1235812746e8d3c8344492} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_ADCRES@{ELDRIVER\_MC3P\_ADCRES}}
+\index{ELDRIVER\_MC3P\_ADCRES@{ELDRIVER\_MC3P\_ADCRES}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_ADCRES}{ELDRIVER\_MC3P\_ADCRES}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+ADCRES~12}
+
+\Hypertarget{eldriver__conf_8h_abb601c6d4919ac8581c3788110155840}\label{eldriver__conf_8h_abb601c6d4919ac8581c3788110155840} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_BG\_CHANNELS@{ELDRIVER\_MC3P\_BG\_CHANNELS}}
+\index{ELDRIVER\_MC3P\_BG\_CHANNELS@{ELDRIVER\_MC3P\_BG\_CHANNELS}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_BG\_CHANNELS}{ELDRIVER\_MC3P\_BG\_CHANNELS}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+BG\+\_\+\+CHANNELS~0}
+
+\Hypertarget{eldriver__conf_8h_a5b5dd1affba9db19936230397b4f08c7}\label{eldriver__conf_8h_a5b5dd1affba9db19936230397b4f08c7} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CS@{ELDRIVER\_MC3P\_CS}}
+\index{ELDRIVER\_MC3P\_CS@{ELDRIVER\_MC3P\_CS}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CS}{ELDRIVER\_MC3P\_CS}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS~\mbox{\hyperlink{eldriver__conf_8h_a0519f53b6a6284a32024c047eead1512}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+TRIPLE\+\_\+\+SHUNT}}}
+
+\Hypertarget{eldriver__conf_8h_aa0a757a1307f796c6d2dd9941208e0be}\label{eldriver__conf_8h_aa0a757a1307f796c6d2dd9941208e0be} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CS\_DOUBLE\_SHUNT@{ELDRIVER\_MC3P\_CS\_DOUBLE\_SHUNT}}
+\index{ELDRIVER\_MC3P\_CS\_DOUBLE\_SHUNT@{ELDRIVER\_MC3P\_CS\_DOUBLE\_SHUNT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CS\_DOUBLE\_SHUNT}{ELDRIVER\_MC3P\_CS\_DOUBLE\_SHUNT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+DOUBLE\+\_\+\+SHUNT~2}
+
+\Hypertarget{eldriver__conf_8h_a81bcaf6204cb65839118d2e6ffe0e3c3}\label{eldriver__conf_8h_a81bcaf6204cb65839118d2e6ffe0e3c3} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CS\_INLINE@{ELDRIVER\_MC3P\_CS\_INLINE}}
+\index{ELDRIVER\_MC3P\_CS\_INLINE@{ELDRIVER\_MC3P\_CS\_INLINE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CS\_INLINE}{ELDRIVER\_MC3P\_CS\_INLINE}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+INLINE~4}
+
+\Hypertarget{eldriver__conf_8h_a800b53ad7720ff33f7efd643970511f5}\label{eldriver__conf_8h_a800b53ad7720ff33f7efd643970511f5} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CS\_NONE@{ELDRIVER\_MC3P\_CS\_NONE}}
+\index{ELDRIVER\_MC3P\_CS\_NONE@{ELDRIVER\_MC3P\_CS\_NONE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CS\_NONE}{ELDRIVER\_MC3P\_CS\_NONE}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+NONE~0}
+
+\Hypertarget{eldriver__conf_8h_aaaf2abca11923778219e2066ae5437e3}\label{eldriver__conf_8h_aaaf2abca11923778219e2066ae5437e3} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CS\_SCALE@{ELDRIVER\_MC3P\_CS\_SCALE}}
+\index{ELDRIVER\_MC3P\_CS\_SCALE@{ELDRIVER\_MC3P\_CS\_SCALE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CS\_SCALE}{ELDRIVER\_MC3P\_CS\_SCALE}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+SCALE~50}
+
+\Hypertarget{eldriver__conf_8h_a1c34bf20d5715084bcb0a3a082f77599}\label{eldriver__conf_8h_a1c34bf20d5715084bcb0a3a082f77599} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CS\_SINGLE\_SHUNT@{ELDRIVER\_MC3P\_CS\_SINGLE\_SHUNT}}
+\index{ELDRIVER\_MC3P\_CS\_SINGLE\_SHUNT@{ELDRIVER\_MC3P\_CS\_SINGLE\_SHUNT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CS\_SINGLE\_SHUNT}{ELDRIVER\_MC3P\_CS\_SINGLE\_SHUNT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+SINGLE\+\_\+\+SHUNT~3}
+
+\Hypertarget{eldriver__conf_8h_a0519f53b6a6284a32024c047eead1512}\label{eldriver__conf_8h_a0519f53b6a6284a32024c047eead1512} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CS\_TRIPLE\_SHUNT@{ELDRIVER\_MC3P\_CS\_TRIPLE\_SHUNT}}
+\index{ELDRIVER\_MC3P\_CS\_TRIPLE\_SHUNT@{ELDRIVER\_MC3P\_CS\_TRIPLE\_SHUNT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CS\_TRIPLE\_SHUNT}{ELDRIVER\_MC3P\_CS\_TRIPLE\_SHUNT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+TRIPLE\+\_\+\+SHUNT~1}
+
+\Hypertarget{eldriver__conf_8h_acc26d63dd5d80e638abcdd2e10f632e6}\label{eldriver__conf_8h_acc26d63dd5d80e638abcdd2e10f632e6} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CSU\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_CSU\_ADC\_CHANNEL}}
+\index{ELDRIVER\_MC3P\_CSU\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_CSU\_ADC\_CHANNEL}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CSU\_ADC\_CHANNEL}{ELDRIVER\_MC3P\_CSU\_ADC\_CHANNEL}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSU\+\_\+\+ADC\+\_\+\+CHANNEL~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+4}
+
+\Hypertarget{eldriver__conf_8h_a38cca54f9f60920d111697512deb8e41}\label{eldriver__conf_8h_a38cca54f9f60920d111697512deb8e41} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CSU\_PIN@{ELDRIVER\_MC3P\_CSU\_PIN}}
+\index{ELDRIVER\_MC3P\_CSU\_PIN@{ELDRIVER\_MC3P\_CSU\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CSU\_PIN}{ELDRIVER\_MC3P\_CSU\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSU\+\_\+\+PIN~4}
+
+\Hypertarget{eldriver__conf_8h_a2e322c65480b04cc10fb7335b5d54d83}\label{eldriver__conf_8h_a2e322c65480b04cc10fb7335b5d54d83} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CSU\_PORT@{ELDRIVER\_MC3P\_CSU\_PORT}}
+\index{ELDRIVER\_MC3P\_CSU\_PORT@{ELDRIVER\_MC3P\_CSU\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CSU\_PORT}{ELDRIVER\_MC3P\_CSU\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSU\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_a15240b9e0534990e5c542c043c7efae7}\label{eldriver__conf_8h_a15240b9e0534990e5c542c043c7efae7} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CSV\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_CSV\_ADC\_CHANNEL}}
+\index{ELDRIVER\_MC3P\_CSV\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_CSV\_ADC\_CHANNEL}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CSV\_ADC\_CHANNEL}{ELDRIVER\_MC3P\_CSV\_ADC\_CHANNEL}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSV\+\_\+\+ADC\+\_\+\+CHANNEL~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+5}
+
+\Hypertarget{eldriver__conf_8h_a904dc666c7b4366b52efe1c96b4ff588}\label{eldriver__conf_8h_a904dc666c7b4366b52efe1c96b4ff588} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CSV\_PIN@{ELDRIVER\_MC3P\_CSV\_PIN}}
+\index{ELDRIVER\_MC3P\_CSV\_PIN@{ELDRIVER\_MC3P\_CSV\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CSV\_PIN}{ELDRIVER\_MC3P\_CSV\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSV\+\_\+\+PIN~5}
+
+\Hypertarget{eldriver__conf_8h_a37d59bd6e5656a16ad5bf135df66f0da}\label{eldriver__conf_8h_a37d59bd6e5656a16ad5bf135df66f0da} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CSV\_PORT@{ELDRIVER\_MC3P\_CSV\_PORT}}
+\index{ELDRIVER\_MC3P\_CSV\_PORT@{ELDRIVER\_MC3P\_CSV\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CSV\_PORT}{ELDRIVER\_MC3P\_CSV\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSV\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_a95d6c8af9f27ae491cebd5abe809236c}\label{eldriver__conf_8h_a95d6c8af9f27ae491cebd5abe809236c} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CSW\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_CSW\_ADC\_CHANNEL}}
+\index{ELDRIVER\_MC3P\_CSW\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_CSW\_ADC\_CHANNEL}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CSW\_ADC\_CHANNEL}{ELDRIVER\_MC3P\_CSW\_ADC\_CHANNEL}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSW\+\_\+\+ADC\+\_\+\+CHANNEL~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+6}
+
+\Hypertarget{eldriver__conf_8h_a4a572b59b1a246a396001632ce887e12}\label{eldriver__conf_8h_a4a572b59b1a246a396001632ce887e12} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CSW\_PIN@{ELDRIVER\_MC3P\_CSW\_PIN}}
+\index{ELDRIVER\_MC3P\_CSW\_PIN@{ELDRIVER\_MC3P\_CSW\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CSW\_PIN}{ELDRIVER\_MC3P\_CSW\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSW\+\_\+\+PIN~6}
+
+\Hypertarget{eldriver__conf_8h_a1508f4bc535c9f906359ae66e7a4ec6a}\label{eldriver__conf_8h_a1508f4bc535c9f906359ae66e7a4ec6a} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_CSW\_PORT@{ELDRIVER\_MC3P\_CSW\_PORT}}
+\index{ELDRIVER\_MC3P\_CSW\_PORT@{ELDRIVER\_MC3P\_CSW\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CSW\_PORT}{ELDRIVER\_MC3P\_CSW\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSW\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_abc191ffe41db2d2e6285ceb1ee4865c8}\label{eldriver__conf_8h_abc191ffe41db2d2e6285ceb1ee4865c8} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_ENABLED@{ELDRIVER\_MC3P\_ENABLED}}
+\index{ELDRIVER\_MC3P\_ENABLED@{ELDRIVER\_MC3P\_ENABLED}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_ENABLED}{ELDRIVER\_MC3P\_ENABLED}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+ENABLED}
+
+\Hypertarget{eldriver__conf_8h_a767497abbe5af3a59f796f1d9a9d4d96}\label{eldriver__conf_8h_a767497abbe5af3a59f796f1d9a9d4d96} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_HIN\_ACTIVE@{ELDRIVER\_MC3P\_HIN\_ACTIVE}}
+\index{ELDRIVER\_MC3P\_HIN\_ACTIVE@{ELDRIVER\_MC3P\_HIN\_ACTIVE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_HIN\_ACTIVE}{ELDRIVER\_MC3P\_HIN\_ACTIVE}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+HIN\+\_\+\+ACTIVE~1}
+
+\Hypertarget{eldriver__conf_8h_a375182417bf4de77226e0ef171e1cc9a}\label{eldriver__conf_8h_a375182417bf4de77226e0ef171e1cc9a} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_LIN\_ACTIVE@{ELDRIVER\_MC3P\_LIN\_ACTIVE}}
+\index{ELDRIVER\_MC3P\_LIN\_ACTIVE@{ELDRIVER\_MC3P\_LIN\_ACTIVE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_LIN\_ACTIVE}{ELDRIVER\_MC3P\_LIN\_ACTIVE}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+LIN\+\_\+\+ACTIVE~0}
+
+\Hypertarget{eldriver__conf_8h_a7a146235ab2a7ea6e031974528037593}\label{eldriver__conf_8h_a7a146235ab2a7ea6e031974528037593} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_UH\_PIN@{ELDRIVER\_MC3P\_UH\_PIN}}
+\index{ELDRIVER\_MC3P\_UH\_PIN@{ELDRIVER\_MC3P\_UH\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_UH\_PIN}{ELDRIVER\_MC3P\_UH\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+UH\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+8}
+
+\Hypertarget{eldriver__conf_8h_a00879a45950fbf5d5b8bfa0e7b72ad93}\label{eldriver__conf_8h_a00879a45950fbf5d5b8bfa0e7b72ad93} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_UH\_PORT@{ELDRIVER\_MC3P\_UH\_PORT}}
+\index{ELDRIVER\_MC3P\_UH\_PORT@{ELDRIVER\_MC3P\_UH\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_UH\_PORT}{ELDRIVER\_MC3P\_UH\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+UH\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_a9e1c8796eb693d075b53f019bfc95da7}\label{eldriver__conf_8h_a9e1c8796eb693d075b53f019bfc95da7} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_UL\_PIN@{ELDRIVER\_MC3P\_UL\_PIN}}
+\index{ELDRIVER\_MC3P\_UL\_PIN@{ELDRIVER\_MC3P\_UL\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_UL\_PIN}{ELDRIVER\_MC3P\_UL\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+UL\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+13}
+
+\Hypertarget{eldriver__conf_8h_a79903a86e62d2257810004815ba1a931}\label{eldriver__conf_8h_a79903a86e62d2257810004815ba1a931} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_UL\_PORT@{ELDRIVER\_MC3P\_UL\_PORT}}
+\index{ELDRIVER\_MC3P\_UL\_PORT@{ELDRIVER\_MC3P\_UL\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_UL\_PORT}{ELDRIVER\_MC3P\_UL\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+UL\+\_\+\+PORT~GPIOB}
+
+\Hypertarget{eldriver__conf_8h_a6f61946f222a9c1086801b0e9a25e9f7}\label{eldriver__conf_8h_a6f61946f222a9c1086801b0e9a25e9f7} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VH\_PIN@{ELDRIVER\_MC3P\_VH\_PIN}}
+\index{ELDRIVER\_MC3P\_VH\_PIN@{ELDRIVER\_MC3P\_VH\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VH\_PIN}{ELDRIVER\_MC3P\_VH\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VH\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+9}
+
+\Hypertarget{eldriver__conf_8h_a70a3d2eac4e6f3d4d4250f93548fe27c}\label{eldriver__conf_8h_a70a3d2eac4e6f3d4d4250f93548fe27c} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VH\_PORT@{ELDRIVER\_MC3P\_VH\_PORT}}
+\index{ELDRIVER\_MC3P\_VH\_PORT@{ELDRIVER\_MC3P\_VH\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VH\_PORT}{ELDRIVER\_MC3P\_VH\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VH\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_ac50d544e9f69dbb5e013f7b43de7bb9b}\label{eldriver__conf_8h_ac50d544e9f69dbb5e013f7b43de7bb9b} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VL\_PIN@{ELDRIVER\_MC3P\_VL\_PIN}}
+\index{ELDRIVER\_MC3P\_VL\_PIN@{ELDRIVER\_MC3P\_VL\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VL\_PIN}{ELDRIVER\_MC3P\_VL\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VL\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+14}
+
+\Hypertarget{eldriver__conf_8h_a5d39a24553c40911892daf6ff3857401}\label{eldriver__conf_8h_a5d39a24553c40911892daf6ff3857401} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VL\_PORT@{ELDRIVER\_MC3P\_VL\_PORT}}
+\index{ELDRIVER\_MC3P\_VL\_PORT@{ELDRIVER\_MC3P\_VL\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VL\_PORT}{ELDRIVER\_MC3P\_VL\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VL\+\_\+\+PORT~GPIOB}
+
+\Hypertarget{eldriver__conf_8h_a6cb053b6faba2c8631a9af1755e984d3}\label{eldriver__conf_8h_a6cb053b6faba2c8631a9af1755e984d3} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VS\_SCALE@{ELDRIVER\_MC3P\_VS\_SCALE}}
+\index{ELDRIVER\_MC3P\_VS\_SCALE@{ELDRIVER\_MC3P\_VS\_SCALE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VS\_SCALE}{ELDRIVER\_MC3P\_VS\_SCALE}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VS\+\_\+\+SCALE~60}
+
+\Hypertarget{eldriver__conf_8h_accc133cb81118f6f1c9390a1268a6ea7}\label{eldriver__conf_8h_accc133cb81118f6f1c9390a1268a6ea7} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSBUS\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_VSBUS\_ADC\_CHANNEL}}
+\index{ELDRIVER\_MC3P\_VSBUS\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_VSBUS\_ADC\_CHANNEL}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSBUS\_ADC\_CHANNEL}{ELDRIVER\_MC3P\_VSBUS\_ADC\_CHANNEL}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSBUS\+\_\+\+ADC\+\_\+\+CHANNEL~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+0}
+
+\Hypertarget{eldriver__conf_8h_a76019149b20ba8f63b1ddaf2a5fec30e}\label{eldriver__conf_8h_a76019149b20ba8f63b1ddaf2a5fec30e} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSBUS\_PIN@{ELDRIVER\_MC3P\_VSBUS\_PIN}}
+\index{ELDRIVER\_MC3P\_VSBUS\_PIN@{ELDRIVER\_MC3P\_VSBUS\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSBUS\_PIN}{ELDRIVER\_MC3P\_VSBUS\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSBUS\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+0}
+
+\Hypertarget{eldriver__conf_8h_ac5d44be0913b17257af5635793f8e523}\label{eldriver__conf_8h_ac5d44be0913b17257af5635793f8e523} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSBUS\_PORT@{ELDRIVER\_MC3P\_VSBUS\_PORT}}
+\index{ELDRIVER\_MC3P\_VSBUS\_PORT@{ELDRIVER\_MC3P\_VSBUS\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSBUS\_PORT}{ELDRIVER\_MC3P\_VSBUS\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSBUS\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_aedea309900b936182e26f13b65054109}\label{eldriver__conf_8h_aedea309900b936182e26f13b65054109} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSU\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_VSU\_ADC\_CHANNEL}}
+\index{ELDRIVER\_MC3P\_VSU\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_VSU\_ADC\_CHANNEL}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSU\_ADC\_CHANNEL}{ELDRIVER\_MC3P\_VSU\_ADC\_CHANNEL}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSU\+\_\+\+ADC\+\_\+\+CHANNEL~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+1}
+
+\Hypertarget{eldriver__conf_8h_a3a1efac2b8fdd42ab82c656bd755dc1d}\label{eldriver__conf_8h_a3a1efac2b8fdd42ab82c656bd755dc1d} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSU\_PIN@{ELDRIVER\_MC3P\_VSU\_PIN}}
+\index{ELDRIVER\_MC3P\_VSU\_PIN@{ELDRIVER\_MC3P\_VSU\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSU\_PIN}{ELDRIVER\_MC3P\_VSU\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSU\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+1}
+
+\Hypertarget{eldriver__conf_8h_a6784a2ab18b776b0e896869b27d5da08}\label{eldriver__conf_8h_a6784a2ab18b776b0e896869b27d5da08} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSU\_PORT@{ELDRIVER\_MC3P\_VSU\_PORT}}
+\index{ELDRIVER\_MC3P\_VSU\_PORT@{ELDRIVER\_MC3P\_VSU\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSU\_PORT}{ELDRIVER\_MC3P\_VSU\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSU\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_a7828e4f5bdeda2a4732347caae58fde1}\label{eldriver__conf_8h_a7828e4f5bdeda2a4732347caae58fde1} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSV\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_VSV\_ADC\_CHANNEL}}
+\index{ELDRIVER\_MC3P\_VSV\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_VSV\_ADC\_CHANNEL}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSV\_ADC\_CHANNEL}{ELDRIVER\_MC3P\_VSV\_ADC\_CHANNEL}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSV\+\_\+\+ADC\+\_\+\+CHANNEL~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+2}
+
+\Hypertarget{eldriver__conf_8h_a9cbb702400d4123bcd18b1a647a1e2cf}\label{eldriver__conf_8h_a9cbb702400d4123bcd18b1a647a1e2cf} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSV\_PIN@{ELDRIVER\_MC3P\_VSV\_PIN}}
+\index{ELDRIVER\_MC3P\_VSV\_PIN@{ELDRIVER\_MC3P\_VSV\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSV\_PIN}{ELDRIVER\_MC3P\_VSV\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSV\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+2}
+
+\Hypertarget{eldriver__conf_8h_a89d8c66ab2424cad15931baa3f9fa999}\label{eldriver__conf_8h_a89d8c66ab2424cad15931baa3f9fa999} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSV\_PORT@{ELDRIVER\_MC3P\_VSV\_PORT}}
+\index{ELDRIVER\_MC3P\_VSV\_PORT@{ELDRIVER\_MC3P\_VSV\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSV\_PORT}{ELDRIVER\_MC3P\_VSV\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSV\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_afa7dc9649f21404d814d260da408e415}\label{eldriver__conf_8h_afa7dc9649f21404d814d260da408e415} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSW\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_VSW\_ADC\_CHANNEL}}
+\index{ELDRIVER\_MC3P\_VSW\_ADC\_CHANNEL@{ELDRIVER\_MC3P\_VSW\_ADC\_CHANNEL}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSW\_ADC\_CHANNEL}{ELDRIVER\_MC3P\_VSW\_ADC\_CHANNEL}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSW\+\_\+\+ADC\+\_\+\+CHANNEL~LL\+\_\+\+ADC\+\_\+\+CHANNEL\+\_\+3}
+
+\Hypertarget{eldriver__conf_8h_ada302cac9be7d417cf5932add12e13a9}\label{eldriver__conf_8h_ada302cac9be7d417cf5932add12e13a9} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSW\_PIN@{ELDRIVER\_MC3P\_VSW\_PIN}}
+\index{ELDRIVER\_MC3P\_VSW\_PIN@{ELDRIVER\_MC3P\_VSW\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSW\_PIN}{ELDRIVER\_MC3P\_VSW\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSW\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+3}
+
+\Hypertarget{eldriver__conf_8h_a1da19c2ba055c225c2159fe2a5b68bab}\label{eldriver__conf_8h_a1da19c2ba055c225c2159fe2a5b68bab} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_VSW\_PORT@{ELDRIVER\_MC3P\_VSW\_PORT}}
+\index{ELDRIVER\_MC3P\_VSW\_PORT@{ELDRIVER\_MC3P\_VSW\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VSW\_PORT}{ELDRIVER\_MC3P\_VSW\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSW\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_aa7447beb8e97b72b6a5e872ff86730a1}\label{eldriver__conf_8h_aa7447beb8e97b72b6a5e872ff86730a1} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_WH\_PIN@{ELDRIVER\_MC3P\_WH\_PIN}}
+\index{ELDRIVER\_MC3P\_WH\_PIN@{ELDRIVER\_MC3P\_WH\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_WH\_PIN}{ELDRIVER\_MC3P\_WH\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+WH\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+10}
+
+\Hypertarget{eldriver__conf_8h_afd1ebdafe76b4daaa0df97bfbe100f91}\label{eldriver__conf_8h_afd1ebdafe76b4daaa0df97bfbe100f91} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_WH\_PORT@{ELDRIVER\_MC3P\_WH\_PORT}}
+\index{ELDRIVER\_MC3P\_WH\_PORT@{ELDRIVER\_MC3P\_WH\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_WH\_PORT}{ELDRIVER\_MC3P\_WH\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+WH\+\_\+\+PORT~GPIOA}
+
+\Hypertarget{eldriver__conf_8h_ad4058614d22107b29373d6d0cec1c7a9}\label{eldriver__conf_8h_ad4058614d22107b29373d6d0cec1c7a9} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_WL\_PIN@{ELDRIVER\_MC3P\_WL\_PIN}}
+\index{ELDRIVER\_MC3P\_WL\_PIN@{ELDRIVER\_MC3P\_WL\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_WL\_PIN}{ELDRIVER\_MC3P\_WL\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+WL\+\_\+\+PIN~LL\+\_\+\+GPIO\+\_\+\+PIN\+\_\+15}
+
+\Hypertarget{eldriver__conf_8h_a18b79ea42595b5db0640a056049031c2}\label{eldriver__conf_8h_a18b79ea42595b5db0640a056049031c2} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_MC3P\_WL\_PORT@{ELDRIVER\_MC3P\_WL\_PORT}}
+\index{ELDRIVER\_MC3P\_WL\_PORT@{ELDRIVER\_MC3P\_WL\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_WL\_PORT}{ELDRIVER\_MC3P\_WL\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+WL\+\_\+\+PORT~GPIOB}
+
+\Hypertarget{eldriver__conf_8h_a282ce6af29bf5947c351fe4e39c264b4}\label{eldriver__conf_8h_a282ce6af29bf5947c351fe4e39c264b4} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_UART1\_RX\_BUFFER\_SIZE@{ELDRIVER\_UART1\_RX\_BUFFER\_SIZE}}
+\index{ELDRIVER\_UART1\_RX\_BUFFER\_SIZE@{ELDRIVER\_UART1\_RX\_BUFFER\_SIZE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_UART1\_RX\_BUFFER\_SIZE}{ELDRIVER\_UART1\_RX\_BUFFER\_SIZE}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+UART1\+\_\+\+RX\+\_\+\+BUFFER\+\_\+\+SIZE~256}
+
+\Hypertarget{eldriver__conf_8h_aa67c9a6644239b1ab4a139f7aa6e6b7d}\label{eldriver__conf_8h_aa67c9a6644239b1ab4a139f7aa6e6b7d} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_UART1\_RX\_PIN@{ELDRIVER\_UART1\_RX\_PIN}}
+\index{ELDRIVER\_UART1\_RX\_PIN@{ELDRIVER\_UART1\_RX\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_UART1\_RX\_PIN}{ELDRIVER\_UART1\_RX\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+UART1\+\_\+\+RX\+\_\+\+PIN~6}
+
+\Hypertarget{eldriver__conf_8h_ae0fc83f238c2936e03476b707bb596fb}\label{eldriver__conf_8h_ae0fc83f238c2936e03476b707bb596fb} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_UART1\_RX\_PORT@{ELDRIVER\_UART1\_RX\_PORT}}
+\index{ELDRIVER\_UART1\_RX\_PORT@{ELDRIVER\_UART1\_RX\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_UART1\_RX\_PORT}{ELDRIVER\_UART1\_RX\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+UART1\+\_\+\+RX\+\_\+\+PORT~GPIOB}
+
+\Hypertarget{eldriver__conf_8h_abb192f71d8396b78522d108da88db424}\label{eldriver__conf_8h_abb192f71d8396b78522d108da88db424} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_UART1\_TX\_BUFFER\_SIZE@{ELDRIVER\_UART1\_TX\_BUFFER\_SIZE}}
+\index{ELDRIVER\_UART1\_TX\_BUFFER\_SIZE@{ELDRIVER\_UART1\_TX\_BUFFER\_SIZE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_UART1\_TX\_BUFFER\_SIZE}{ELDRIVER\_UART1\_TX\_BUFFER\_SIZE}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+UART1\+\_\+\+TX\+\_\+\+BUFFER\+\_\+\+SIZE~256}
+
+\Hypertarget{eldriver__conf_8h_a7edd42dd564303c0ef12ce794a6e7eaf}\label{eldriver__conf_8h_a7edd42dd564303c0ef12ce794a6e7eaf} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_UART1\_TX\_PIN@{ELDRIVER\_UART1\_TX\_PIN}}
+\index{ELDRIVER\_UART1\_TX\_PIN@{ELDRIVER\_UART1\_TX\_PIN}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_UART1\_TX\_PIN}{ELDRIVER\_UART1\_TX\_PIN}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+UART1\+\_\+\+TX\+\_\+\+PIN~7}
+
+\Hypertarget{eldriver__conf_8h_a560aee1d6ddf1106adc616af04739524}\label{eldriver__conf_8h_a560aee1d6ddf1106adc616af04739524} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_UART1\_TX\_PORT@{ELDRIVER\_UART1\_TX\_PORT}}
+\index{ELDRIVER\_UART1\_TX\_PORT@{ELDRIVER\_UART1\_TX\_PORT}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_UART1\_TX\_PORT}{ELDRIVER\_UART1\_TX\_PORT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+UART1\+\_\+\+TX\+\_\+\+PORT~GPIOB}
+
+\Hypertarget{eldriver__conf_8h_a4c0a9b65d0e4dcf420e1d788e96b0079}\label{eldriver__conf_8h_a4c0a9b65d0e4dcf420e1d788e96b0079} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_USBCDC\_ENABLED@{ELDRIVER\_USBCDC\_ENABLED}}
+\index{ELDRIVER\_USBCDC\_ENABLED@{ELDRIVER\_USBCDC\_ENABLED}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_USBCDC\_ENABLED}{ELDRIVER\_USBCDC\_ENABLED}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+USBCDC\+\_\+\+ENABLED}
+
+\Hypertarget{eldriver__conf_8h_aa3a9d84367d595d4b738a4e80e6606e5}\label{eldriver__conf_8h_aa3a9d84367d595d4b738a4e80e6606e5} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_USBCDC\_RX\_BUFFER\_SIZE@{ELDRIVER\_USBCDC\_RX\_BUFFER\_SIZE}}
+\index{ELDRIVER\_USBCDC\_RX\_BUFFER\_SIZE@{ELDRIVER\_USBCDC\_RX\_BUFFER\_SIZE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_USBCDC\_RX\_BUFFER\_SIZE}{ELDRIVER\_USBCDC\_RX\_BUFFER\_SIZE}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+USBCDC\+\_\+\+RX\+\_\+\+BUFFER\+\_\+\+SIZE~1024}
+
+\Hypertarget{eldriver__conf_8h_af8466087805e4e33873c03910107dea4}\label{eldriver__conf_8h_af8466087805e4e33873c03910107dea4} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_USBCDC\_TX\_BUFFER\_SIZE@{ELDRIVER\_USBCDC\_TX\_BUFFER\_SIZE}}
+\index{ELDRIVER\_USBCDC\_TX\_BUFFER\_SIZE@{ELDRIVER\_USBCDC\_TX\_BUFFER\_SIZE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_USBCDC\_TX\_BUFFER\_SIZE}{ELDRIVER\_USBCDC\_TX\_BUFFER\_SIZE}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+USBCDC\+\_\+\+TX\+\_\+\+BUFFER\+\_\+\+SIZE~4096}
+
+\Hypertarget{eldriver__conf_8h_acaca68e36d927006406aa3c1be9b621c}\label{eldriver__conf_8h_acaca68e36d927006406aa3c1be9b621c} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_XMC3P\_TICKFREQ@{ELDRIVER\_XMC3P\_TICKFREQ}}
+\index{ELDRIVER\_XMC3P\_TICKFREQ@{ELDRIVER\_XMC3P\_TICKFREQ}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_XMC3P\_TICKFREQ}{ELDRIVER\_XMC3P\_TICKFREQ}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+XMC3\+P\+\_\+\+TICKFREQ~4000}
+
+\Hypertarget{eldriver__conf_8h_a2aaae6bb159cc19a63a90f7760bed11d}\label{eldriver__conf_8h_a2aaae6bb159cc19a63a90f7760bed11d} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!ELDRIVER\_XMC3P\_TICKPERIOD\_US@{ELDRIVER\_XMC3P\_TICKPERIOD\_US}}
+\index{ELDRIVER\_XMC3P\_TICKPERIOD\_US@{ELDRIVER\_XMC3P\_TICKPERIOD\_US}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_XMC3P\_TICKPERIOD\_US}{ELDRIVER\_XMC3P\_TICKPERIOD\_US}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+XMC3\+P\+\_\+\+TICKPERIOD\+\_\+\+US~(1000000/\mbox{\hyperlink{eldriver__conf_8h_acaca68e36d927006406aa3c1be9b621c}{ELDRIVER\+\_\+\+XMC3\+P\+\_\+\+TICKFREQ}})}
+
+\Hypertarget{eldriver__conf_8h_a25451e3a70adae675700b2f2576b3582}\label{eldriver__conf_8h_a25451e3a70adae675700b2f2576b3582} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!MC3P\_DMA\_BACKGROUND\_STREAM@{MC3P\_DMA\_BACKGROUND\_STREAM}}
+\index{MC3P\_DMA\_BACKGROUND\_STREAM@{MC3P\_DMA\_BACKGROUND\_STREAM}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{MC3P\_DMA\_BACKGROUND\_STREAM}{MC3P\_DMA\_BACKGROUND\_STREAM}}
+{\footnotesize\ttfamily \#define MC3\+P\+\_\+\+DMA\+\_\+\+BACKGROUND\+\_\+\+STREAM~LL\+\_\+\+DMA\+\_\+\+STREAM\+\_\+0}
+
+\Hypertarget{eldriver__conf_8h_a3734ae4821a47a90e67f8eb022df985e}\label{eldriver__conf_8h_a3734ae4821a47a90e67f8eb022df985e} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!MC3P\_DMA\_CHANNEL@{MC3P\_DMA\_CHANNEL}}
+\index{MC3P\_DMA\_CHANNEL@{MC3P\_DMA\_CHANNEL}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{MC3P\_DMA\_CHANNEL}{MC3P\_DMA\_CHANNEL}}
+{\footnotesize\ttfamily \#define MC3\+P\+\_\+\+DMA\+\_\+\+CHANNEL~LL\+\_\+\+DMA\+\_\+\+CHANNEL\+\_\+0}
+
+\Hypertarget{eldriver__conf_8h_a33706603f63d58ab336e65044b365997}\label{eldriver__conf_8h_a33706603f63d58ab336e65044b365997} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!MC3P\_DMA\_INSTANCE@{MC3P\_DMA\_INSTANCE}}
+\index{MC3P\_DMA\_INSTANCE@{MC3P\_DMA\_INSTANCE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{MC3P\_DMA\_INSTANCE}{MC3P\_DMA\_INSTANCE}}
+{\footnotesize\ttfamily \#define MC3\+P\+\_\+\+DMA\+\_\+\+INSTANCE~DMA2}
+
+\Hypertarget{eldriver__conf_8h_a0bf1f04e2f8c7a167a8d06a05995e9b1}\label{eldriver__conf_8h_a0bf1f04e2f8c7a167a8d06a05995e9b1} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!UART1\_DMA\_CHANNEL@{UART1\_DMA\_CHANNEL}}
+\index{UART1\_DMA\_CHANNEL@{UART1\_DMA\_CHANNEL}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{UART1\_DMA\_CHANNEL}{UART1\_DMA\_CHANNEL}}
+{\footnotesize\ttfamily \#define UART1\+\_\+\+DMA\+\_\+\+CHANNEL~LL\+\_\+\+DMA\+\_\+\+CHANNEL\+\_\+4}
+
+\Hypertarget{eldriver__conf_8h_aef966b265b082a4504e943cb9a81d773}\label{eldriver__conf_8h_aef966b265b082a4504e943cb9a81d773} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!UART1\_DMA\_INSTANCE@{UART1\_DMA\_INSTANCE}}
+\index{UART1\_DMA\_INSTANCE@{UART1\_DMA\_INSTANCE}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{UART1\_DMA\_INSTANCE}{UART1\_DMA\_INSTANCE}}
+{\footnotesize\ttfamily \#define UART1\+\_\+\+DMA\+\_\+\+INSTANCE~DMA2}
+
+\Hypertarget{eldriver__conf_8h_af3e1966f2ff0dc6caa2369b60c204138}\label{eldriver__conf_8h_af3e1966f2ff0dc6caa2369b60c204138} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!UART1\_DMA\_RX\_STREAM@{UART1\_DMA\_RX\_STREAM}}
+\index{UART1\_DMA\_RX\_STREAM@{UART1\_DMA\_RX\_STREAM}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{UART1\_DMA\_RX\_STREAM}{UART1\_DMA\_RX\_STREAM}}
+{\footnotesize\ttfamily \#define UART1\+\_\+\+DMA\+\_\+\+RX\+\_\+\+STREAM~LL\+\_\+\+DMA\+\_\+\+STREAM\+\_\+5}
+
+\Hypertarget{eldriver__conf_8h_a1628a714cc490f0d35638cc502aa4f04}\label{eldriver__conf_8h_a1628a714cc490f0d35638cc502aa4f04} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!UART1\_DMA\_TX\_STREAM@{UART1\_DMA\_TX\_STREAM}}
+\index{UART1\_DMA\_TX\_STREAM@{UART1\_DMA\_TX\_STREAM}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{UART1\_DMA\_TX\_STREAM}{UART1\_DMA\_TX\_STREAM}}
+{\footnotesize\ttfamily \#define UART1\+\_\+\+DMA\+\_\+\+TX\+\_\+\+STREAM~LL\+\_\+\+DMA\+\_\+\+STREAM\+\_\+7}
+
+\Hypertarget{eldriver__conf_8h_a3f19e27e81d5332dccde2fdaf9346033}\label{eldriver__conf_8h_a3f19e27e81d5332dccde2fdaf9346033} 
+\index{eldriver\_conf.h@{eldriver\_conf.h}!UART1\_NVIC\_PRIORITY@{UART1\_NVIC\_PRIORITY}}
+\index{UART1\_NVIC\_PRIORITY@{UART1\_NVIC\_PRIORITY}!eldriver\_conf.h@{eldriver\_conf.h}}
+\doxysubsubsection{\texorpdfstring{UART1\_NVIC\_PRIORITY}{UART1\_NVIC\_PRIORITY}}
+{\footnotesize\ttfamily \#define UART1\+\_\+\+NVIC\+\_\+\+PRIORITY~4}
+

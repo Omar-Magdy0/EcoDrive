@@ -1,0 +1,206 @@
+\doxysection{eldriver\+\_\+conf.\+h}
+\hypertarget{eldriver__conf_8h_source}{}\label{eldriver__conf_8h_source}\index{platform/stm32f4/eldriver/eldriver\_conf.h@{platform/stm32f4/eldriver/eldriver\_conf.h}}
+\mbox{\hyperlink{eldriver__conf_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#ifndef\ DRV\_CONF\_H}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ DRV\_CONF\_H}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}stm32f4xx\_ll\_adc.h"{}}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ "{}stm32f4xx\_ll\_dma.h"{}}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ "{}stm32f4xx\_ll\_tim.h"{}}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#include\ "{}stm32f4xx\_ll\_rcc.h"{}}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00019\ \textcolor{comment}{//\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}}
+\DoxyCodeLine{00020\ \textcolor{comment}{//\ FIXED\ HARDWARE\ MAPPING\ FOR\ STM32F4xx\ Series\ MCU's}}
+\DoxyCodeLine{00021\ \textcolor{comment}{//\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}}
+\DoxyCodeLine{00022\ \textcolor{comment}{//\ UART1\ for\ Serial\ (B6,\ B7)}}
+\DoxyCodeLine{00023\ \textcolor{comment}{//\ SWD\ (A13,\ A14)}}
+\DoxyCodeLine{00024\ \textcolor{comment}{//\ USB1\ (A11,\ A12)}}
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ CAN1\ (B8,\ B9)\ (if\ exists\ (doesnt\ exist\ for\ F401,\ F411))}}
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ TIM1\ for\ complementary\ PWM\ generation\ (A8,\ A9,\ A10,\ B13,\ B14,\ B15)}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ TIM2\ for\ Hall\ sensor\ interface\ /\ sensorless\ commutation\ timing\ (mocked\ triggers)\ (A15,\ B3,\ B10)}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ TIM3\ for\ encoder\ interface(B4,\ B5)}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ ANALOG\ PINS(A0,\ A1,\ A2,\ A3,\ A4,\ A5,\ A6,\ A7,\ B0,\ B1,\ C0,\ C1,\ C2,\ C3,\ C4,\ C5)\ \ }}
+\DoxyCodeLine{00031\ \textcolor{comment}{//Will\ Need\ 9\ Pins\ Min\ For\ the\ Case\ of\ Triple\ Shunt\ +\ Phase\ Voltages\ +\ Bus\ Voltage\ +\ 1\ Temperature\ +\ 1\ Throttle}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ USED\ ANALOG\ PINS\ (A0,\ A1,\ A2,\ A3,\ A4,\ A5,\ A6,\ A7,\ B0,\ B1)}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ (BLACKPILL\_F401\ :\ FREE)\ :\ C13,\ C14,\ C15,\ B2.\ B12}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ FIXED\ HARDWARE\ MAPPING\ FOR\ STM32F4xx\ Series\ MCU's\ \#\#\#\#\#\#\#\#\#END\#\#\#\#\#\#\#}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}}
+\DoxyCodeLine{00042\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ UART1\ CONFIGURATION}}
+\DoxyCodeLine{00044\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\#define\ ELDRIVER\_UART1\_ENABLED}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ ELDRIVER\_UART1\_RX\_PIN\ \ \ \ \ \ \ \ 6}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#define\ ELDRIVER\_UART1\_RX\_PORT\ \ \ \ \ \ \ GPIOB}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#define\ ELDRIVER\_UART1\_TX\_PIN\ \ \ \ \ \ \ \ 7}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#define\ ELDRIVER\_UART1\_TX\_PORT\ \ \ \ \ \ \ GPIOB}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#define\ ELDRIVER\_UART1\_TX\_BUFFER\_SIZE\ 256}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#define\ ELDRIVER\_UART1\_RX\_BUFFER\_SIZE\ 256}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00054\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00055\ \textcolor{comment}{//\ USBCDC\ CONFIGURATION}}
+\DoxyCodeLine{00056\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#define\ ELDRIVER\_USBCDC\_ENABLED}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ ELDRIVER\_USBCDC\_TX\_BUFFER\_SIZE\ 4096}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#define\ ELDRIVER\_USBCDC\_RX\_BUFFER\_SIZE\ 1024}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00062\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ MCADCPWM3P\ CONFIGURATION\ \ \ \ }}
+\DoxyCodeLine{00064\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_ENABLED\ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_CS\_NONE\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_CS\_TRIPLE\_SHUNT\ \ \ \ \ \ \ 1}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_CS\_DOUBLE\_SHUNT\ \ \ \ \ \ \ 2}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_CS\_SINGLE\_SHUNT\ \ \ \ \ \ \ 3}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_CS\_INLINE\ \ \ \ \ \ \ \ \ \ \ \ \ 4}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_CS\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ELDRIVER\_MC3P\_CS\_TRIPLE\_SHUNT}}
+\DoxyCodeLine{00072\ \textcolor{comment}{//Motor\ control\ tasking\ frequency}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#define\ ELDRIVER\_XMC3P\_TICKFREQ\ \ \ \ \ \ \ \ \ \ \ \ \ \ 4000}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#define\ ELDRIVER\_XMC3P\_TICKPERIOD\_US\ \ \ \ \ \ \ \ \ \ (1000000/ELDRIVER\_XMC3P\_TICKFREQ)}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_ADCRES\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 12}}
+\DoxyCodeLine{00076\ \textcolor{comment}{//\#define\ ELDRIVER\_MC3P\_VREFEXT\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2.495f}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_HIN\_ACTIVE\ \ \ \ \ \ \ \ \ \ \ \ 1}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_LIN\_ACTIVE\ \ \ \ \ \ \ \ \ \ \ \ 0}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_UH\_PIN\ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_8}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_UH\_PORT\ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_UL\_PIN\ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_13}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_UL\_PORT\ \ \ \ \ \ \ \ GPIOB}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VH\_PIN\ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_9}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VH\_PORT\ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VL\_PIN\ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_14}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VL\_PORT\ \ \ \ \ \ \ \ GPIOB}}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_WH\_PIN\ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_10}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_WH\_PORT\ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_WL\_PIN\ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_15}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_WL\_PORT\ \ \ \ \ \ \ \ GPIOB}}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_CS\_SCALE\ 50}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VS\_SCALE\ 60}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSBUS\_PIN\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_0}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSBUS\_PORT\ \ \ \ \ \ \ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSBUS\_ADC\_CHANNEL\ \ \ \ \ \ \ LL\_ADC\_CHANNEL\_0\ \ \ }\textcolor{comment}{//\ PA1\ -\/\ ADC1\_IN2}}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSU\_PIN\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_1}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSU\_PORT\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSU\_ADC\_CHANNEL\ \ \ \ \ \ \ \ \ LL\_ADC\_CHANNEL\_1\ \ \ }\textcolor{comment}{//\ PA1\ -\/\ ADC1\_IN2}}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSV\_PIN\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_2}}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSV\_PORT\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSV\_ADC\_CHANNEL\ \ \ \ \ \ \ \ \ LL\_ADC\_CHANNEL\_2\ \ \ }\textcolor{comment}{//\ PA4\ -\/\ ADC1\_IN3}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSW\_PIN\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_3}}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSW\_PORT\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_VSW\_ADC\_CHANNEL\ \ \ \ \ \ \ \ \ LL\_ADC\_CHANNEL\_3\ \ \ }\textcolor{comment}{//\ PA5\ -\/\ ADC1\_IN3}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\#if\ (ELDRIVER\_MC3P\_CS\ ==\ ELDRIVER\_MC3P\_CS\_TRIPLE\_SHUNT\ ||\ ELDRIVER\_MC3P\_CS\ ==\ ELDRIVER\_MC3P\_CS\_DOUBLE\_SHUNT\ ||\ ELDRIVER\_MC3P\_CS\ ==\ ELDRIVER\_MC3P\_CS\_INLINE)}}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{comment}{//\ Three\ shunt\ resistors\ -\/\ one\ per\ phase\ ,\ (for\ double\ shunt\ and\ inline\ comment\ out\ unnused\ sensor)}}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSU\_PIN\ \ \ \ \ \ \ \ \ \ \ \ 4}}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSU\_PORT\ \ \ \ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSU\_ADC\_CHANNEL\ \ \ \ LL\_ADC\_CHANNEL\_4\ \ \ }\textcolor{comment}{//\ PA3\ -\/\ ADC1\_IN4}}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSV\_PIN\ \ \ \ \ \ \ \ \ \ \ \ 5}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSV\_PORT\ \ \ \ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSV\_ADC\_CHANNEL\ \ \ \ LL\_ADC\_CHANNEL\_5\ \ \ }\textcolor{comment}{//\ PA4\ -\/\ ADC1\_IN5}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSW\_PIN\ \ \ \ \ \ \ \ \ \ \ \ 6}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSW\_PORT\ \ \ \ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSW\_ADC\_CHANNEL\ \ \ \ LL\_ADC\_CHANNEL\_6\ \ \ }\textcolor{comment}{//\ PA5\ -\/\ ADC1\_IN6}}
+\DoxyCodeLine{00122\ \ \ \ \ }
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\#elif\ (ELDRIVER\_MC3P\_CS\ ==\ ELDRIVER\_MC3P\_CS\_SINGLE\_SHUNT)}}
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{comment}{//\ Single\ shunt\ resistor\ on\ DC\ bus}}
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSBUS\_PIN\ \ \ \ \ \ \ \ \ \ \ \ 3}}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSBUS\_PORT\ \ \ \ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_CSBUS\_ADC\_CHANNEL\ \ \ \ LL\_ADC\_CHANNEL\_5\ \ \ }\textcolor{comment}{//\ PA3\ -\/\ ADC1\_IN4}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\#define\ ELDRIVER\_MC3P\_BG\_CHANNELS\ 0}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\#if\ ELDRIVER\_MC3P\_BG\_CHANNELS\ >\ 0}}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_PIN}}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_PORT}}
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_ADC\_CHANNEL}}
+\DoxyCodeLine{00136\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_RANK}}
+\DoxyCodeLine{00137\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00138\ \textcolor{preprocessor}{\#if\ ELDRIVER\_MC3P\_BG\_CHANNELS\ >\ 1}}
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_PIN}}
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_PORT}}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_ADC\_CHANNEL}}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_RANK}}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\#if\ ELDRIVER\_MC3P\_BG\_CHANNELS\ >\ 2}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_PIN}}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_PORT}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_ADC\_CHANNEL}}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_RANK}}
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00150\ \textcolor{preprocessor}{\#if\ ELDRIVER\_MC3P\_BG\_CHANNELS\ >\ 3}}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_PIN}}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_PORT}}
+\DoxyCodeLine{00153\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_ADC\_CHANNEL}}
+\DoxyCodeLine{00154\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_RANK}}
+\DoxyCodeLine{00155\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\#if\ ELDRIVER\_MC3P\_BG\_CHANNELS\ >\ 4}}
+\DoxyCodeLine{00157\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_PIN}}
+\DoxyCodeLine{00158\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_PORT}}
+\DoxyCodeLine{00159\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_ADC\_CHANNEL}}
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG1\_RANK}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\#if\ ELDRIVER\_MC3P\_BG\_CHANNELS\ >\ 5}}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_PIN}}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_PORT}}
+\DoxyCodeLine{00165\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_ADC\_CHANNEL}}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_RANK}}
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\#if\ ELDRIVER\_MC3P\_BG\_CHANNELS\ >\ 6}}
+\DoxyCodeLine{00169\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_PIN}}
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_PORT}}
+\DoxyCodeLine{00171\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_ADC\_CHANNEL}}
+\DoxyCodeLine{00172\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_RANK}}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00174\ \textcolor{preprocessor}{\#if\ ELDRIVER\_MC3P\_BG\_CHANNELS\ >\ 7}}
+\DoxyCodeLine{00175\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_PIN}}
+\DoxyCodeLine{00176\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_PORT}}
+\DoxyCodeLine{00177\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_ADC\_CHANNEL}}
+\DoxyCodeLine{00178\ \textcolor{preprocessor}{\ \ \ \ \#define\ ELDRIVER\_MC3P\_BG2\_RANK}}
+\DoxyCodeLine{00179\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00183\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00184\ \textcolor{comment}{//\ HALL\ SENSOR\ CONFIGURATION\ \ \ \ }}
+\DoxyCodeLine{00185\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\#define\ ELDRIVER\_HALL1\_ENABLED\ \ \ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00187\ \textcolor{preprocessor}{\#define\ ELDRIVER\_HALL1\_A\_PIN\ \ \ \ \ \ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_15}}
+\DoxyCodeLine{00188\ \textcolor{preprocessor}{\#define\ ELDRIVER\_HALL1\_A\_PORT\ \ \ \ \ \ \ \ \ \ \ \ \ GPIOA}}
+\DoxyCodeLine{00189\ \textcolor{preprocessor}{\#define\ ELDRIVER\_HALL1\_B\_PIN\ \ \ \ \ \ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_3}}
+\DoxyCodeLine{00190\ \textcolor{preprocessor}{\#define\ ELDRIVER\_HALL1\_B\_PORT\ \ \ \ \ \ \ \ \ \ \ \ \ GPIOB}}
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\#define\ ELDRIVER\_HALL1\_C\_PIN\ \ \ \ \ \ \ \ \ \ \ \ \ \ LL\_GPIO\_PIN\_10}}
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\#define\ ELDRIVER\_HALL1\_C\_PORT\ \ \ \ \ \ \ \ \ \ \ \ \ GPIOB}}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ }
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \textcolor{comment}{//\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%}}
+\DoxyCodeLine{00197\ \textcolor{comment}{//\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%}}
+\DoxyCodeLine{00199\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00200\ \textcolor{comment}{//DMA\ CONFIGURATION}}
+\DoxyCodeLine{00201\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00202\ \textcolor{comment}{//NEVER\ FORGET\ }}
+\DoxyCodeLine{00203\ \textcolor{comment}{//THAT\ YOU\ EVER\ CHANGE\ THESE\ VALUES\ FOR\ DMA\ YOU\ STILL\ HAVE\ TO\ CHANGE\ IMPLEMENTATION\ AND\ IRQ\ APPROPIATELY}}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\#define\ UART1\_DMA\_TX\_STREAM\ \ \ \ \ \ \ \ \ \ \ \ \ LL\_DMA\_STREAM\_7}}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{\#define\ UART1\_DMA\_RX\_STREAM\ \ \ \ \ \ \ \ \ \ \ \ \ LL\_DMA\_STREAM\_5}}
+\DoxyCodeLine{00206\ \textcolor{preprocessor}{\#define\ UART1\_DMA\_INSTANCE\ \ \ \ \ \ \ \ \ \ \ \ \ \ DMA2}}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\#define\ UART1\_DMA\_CHANNEL\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ LL\_DMA\_CHANNEL\_4}}
+\DoxyCodeLine{00208\ \textcolor{preprocessor}{\#define\ MC3P\_DMA\_BACKGROUND\_STREAM\ \ \ \ \ \ LL\_DMA\_STREAM\_0}}
+\DoxyCodeLine{00209\ \textcolor{preprocessor}{\#define\ MC3P\_DMA\_INSTANCE\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ DMA2}}
+\DoxyCodeLine{00210\ \textcolor{preprocessor}{\#define\ MC3P\_DMA\_CHANNEL\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ LL\_DMA\_CHANNEL\_0}}
+\DoxyCodeLine{00211\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00212\ \textcolor{comment}{//\ NVIC\ CONFIGURATION}}
+\DoxyCodeLine{00213\ \textcolor{comment}{//================================================}}
+\DoxyCodeLine{00214\ \textcolor{preprocessor}{\#define\ UART1\_NVIC\_PRIORITY\ 4}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\#endif}\textcolor{comment}{//eldriver\_conf.h}}
+
+\end{DoxyCode}

@@ -1,0 +1,546 @@
+\doxysection{platform/stm32f4/eldriver/eldriver\+\_\+mc3p.h File Reference}
+\hypertarget{eldriver__mc3p_8h}{}\label{eldriver__mc3p_8h}\index{platform/stm32f4/eldriver/eldriver\_mc3p.h@{platform/stm32f4/eldriver/eldriver\_mc3p.h}}
+
+
+Header file for 3-\/Phase Motor Controller (MC3P) Driver.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for eldriver\+\_\+mc3p.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{eldriver__mc3p_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{eldriver__mc3p_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structeldriver__mc3p__config__t}{eldriver\+\_\+mc3p\+\_\+config\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Configuration structure for MC3P PWM and duty limits. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structeldriver__mc3p__svm__data__t}{eldriver\+\_\+mc3p\+\_\+svm\+\_\+data\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Data structure for SVM-\/specific measurements. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Main handle structure for the MC3P driver instance. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structeldriver__mc3p__trap__data__t}{eldriver\+\_\+mc3p\+\_\+trap\+\_\+data\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Data structure for Trapezoidal-\/specific measurements. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{eldriver__mc3p_8h_a0a5a110950b988db66665291ac0ecf1b}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+TO\+\_\+\+FLOAT}}(cs)~((float)(((int64\+\_\+t)(cs)\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{eldriver__conf_8h_aaaf2abca11923778219e2066ae5437e3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+SCALE}})  $>$$>$ 31 ))
+\item 
+\#define \mbox{\hyperlink{eldriver__mc3p_8h_a48bfe225f466632b88fe2c398a20ceb5}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+FLOAT\+\_\+\+TO\+\_\+\+CS}}(f)~((int32\+\_\+t)(((float)(f)/\mbox{\hyperlink{eldriver__conf_8h_aaaf2abca11923778219e2066ae5437e3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+SCALE}}) \texorpdfstring{$\ast$}{*} INT32\+\_\+\+MAX ))
+\item 
+\#define \mbox{\hyperlink{eldriver__mc3p_8h_af21185e431512143a701fe15b2c220a7}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+FLOAT\+\_\+\+TO\+\_\+\+VS}}(f)~((int32\+\_\+t)(((float)(f)/\mbox{\hyperlink{eldriver__conf_8h_a6cb053b6faba2c8631a9af1755e984d3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VS\+\_\+\+SCALE}}) \texorpdfstring{$\ast$}{*} INT32\+\_\+\+MAX ))
+\item 
+\#define \mbox{\hyperlink{eldriver__mc3p_8h_acdb8fc04edbe366edf0adcacf0fff359}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VS\+\_\+\+TO\+\_\+\+FLOAT}}(vs)~((float)(((int64\+\_\+t)(vs)\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{eldriver__conf_8h_a6cb053b6faba2c8631a9af1755e984d3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VS\+\_\+\+SCALE}})  $>$$>$ 31 ))
+\item 
+\#define \mbox{\hyperlink{eldriver__mc3p_8h_a102fa17b74481e4cf9f04506285af1ab}{IS\+\_\+\+SVM\+\_\+\+SECTOR}}(sector)~(sector $>$= \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dabc43878e918f85bf3c1ca60cea857920}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM1}} \&\& sector $<$= \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da73e78c769557398271630f905f10daff}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM6}})
+\begin{DoxyCompactList}\small\item\em Check if sector is within Space Vector Modulation range. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{eldriver__mc3p_8h_a47506520049251eaa8ebce4b07ac4198}{IS\+\_\+\+TRAP\+\_\+\+SECTOR}}(sector)~(sector $>$= \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da8e2d7cc38fb2b0609a1a3b7d22961a38}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP1}} \&\& sector $<$= \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dac0599157bc6b63bb415a53e372cdd14c}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP6}})
+\begin{DoxyCompactList}\small\item\em Check if sector is within Trapezoidal range. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{eldriver__mc3p_8h_aa76078217c75b0dd7c3a14003c56aac3}{MC3\+P\+\_\+\+SYNC\+\_\+\+CHANNELS}}~7
+\begin{DoxyCompactList}\small\item\em Number of synchronized ADC channels for MC3P. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934}{eldriver\+\_\+mc3p\+\_\+mode\+\_\+t}} \{ \mbox{\hyperlink{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934a7876e87357af3514b3ace59768efcb78}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+MODE\+\_\+\+NONE}} = 0
+, \mbox{\hyperlink{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934a60cb5616fd6b2e4a015b63348608aaf1}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+MODE\+\_\+\+TRAP}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934a447fc7c555efa96b8f0d72d2d371cc57}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+MODE\+\_\+\+SVM}}
+ \}
+\begin{DoxyCompactList}\small\item\em Enumeration for motor control modulation modes. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351b}{eldriver\+\_\+mc3p\+\_\+phase\+\_\+state\+\_\+t}} \{ \newline
+\mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351bae7f5233ae5aef1281b9f5f3c83e7c05f}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+FLOAT}} = 0
+, \mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba6092ec902c684e04718f6b7e3111561d}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+H\+\_\+\+PWM}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba84ab689266d3097a9ed1099978b3aa22}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+L\+\_\+\+PWM}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba686e81b3400d14fbea6369970201be0c}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+COMP}}
+, \newline
+\mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351babb9345e8beca3093d4b7616678177ecf}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+H\+\_\+\+ON}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba95c805378f08b938ba80e5b5de0a74df}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+L\+\_\+\+ON}}
+ \}
+\begin{DoxyCompactList}\small\item\em Enumeration for the state of each motor phase. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5d}{eldriver\+\_\+mc3p\+\_\+sector\+\_\+t}} \{ \newline
+\mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da67fd1ed4f7f993e55c8b410c92f4411e}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+FLOAT}} = 0
+, \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da8e2d7cc38fb2b0609a1a3b7d22961a38}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP1}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da18137cfde2baa766e017e486109bdca4}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP2}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae15a2818d21f45027f6705e389d62601}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP3}}
+, \newline
+\mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5daa8eba09206be5b3ddb3bd8b846bfb6d3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP4}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae52f1c70b5386e261302945739079527}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP5}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dac0599157bc6b63bb415a53e372cdd14c}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP6}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dabc43878e918f85bf3c1ca60cea857920}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM1}}
+, \newline
+\mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae6cba09f4b18bc419a99c69735c4f807}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM2}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da049dfcc9f2f6f625c6dda86070ba2057}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM3}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae022052d726587f4d7530268e3673535}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM4}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da7d815f101ae64d67b18d925ab02a0831}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM5}}
+, \newline
+\mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da73e78c769557398271630f905f10daff}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM6}}
+ \}
+\begin{DoxyCompactList}\small\item\em Enumeration for motor control sectors (Trapezoidal and SVM). \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7a}{eldriver\+\_\+mc3p\+\_\+sync}} \{ \newline
+\mbox{\hyperlink{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aaf24bf4aea0994127d676efbf066e8f97}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSBUS}} = 0
+, \mbox{\hyperlink{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa11e09ac08ac5e2e46fe650dc3e98d00d}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSU}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aab5e324878688d37419c00766cffcf131}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSV}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa9de0de738e9a5bb8e68ef830e48a2000}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSW}}
+, \newline
+\mbox{\hyperlink{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aab67e64fccc8a854827f55b497665725b}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSU}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa35a12caff37b531ac4bc2e11815cb842}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSV}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa807f6c2286c4eb8eb2cb73c68626ca22}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSW}}
+, \mbox{\hyperlink{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa0f34b94d5180c715dad3d72bee842d48}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSBUS}} = ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSU
+ \}
+\begin{DoxyCompactList}\small\item\em Mapping for synchronized ADC measurements. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{eldriver__mc3p_8h_ab2d8c76ac9217e860e167c1bc2438025}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}} ((weak)) void eldriver\+\_\+xmc3p\+\_\+ticker\+Callback(void)
+\begin{DoxyCompactList}\small\item\em Weak callback for system ticker. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{eldriver__mc3p_8h_accca93e63a1244a6ad4beae3a94dcb68}{eldriver\+\_\+mc3p\+\_\+bg\+\_\+channels}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h)
+\begin{DoxyCompactList}\small\item\em Returns number of active background channels. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{eldriver__mc3p_8h_aac91f01fa0a28d655b1559810f29de35}{eldriver\+\_\+mc3p\+\_\+bg\+\_\+is\+Ready}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h)
+\begin{DoxyCompactList}\small\item\em Check if background ADC data is ready. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__mc3p_8h_a6ac85549fd9970e9e62f00d535941539}{eldriver\+\_\+mc3p\+\_\+bg\+\_\+start\+Conv}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h)
+\begin{DoxyCompactList}\small\item\em Start background ADC conversion. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__mc3p_8h_af936864200e65317ca8fd7c6af2e95ba}{eldriver\+\_\+mc3p\+\_\+init}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h, const float scales\mbox{[}\mbox{\hyperlink{eldriver__mc3p_8h_aa76078217c75b0dd7c3a14003c56aac3}{MC3\+P\+\_\+\+SYNC\+\_\+\+CHANNELS}}\mbox{]}\mbox{[}2\mbox{]})
+\begin{DoxyCompactList}\small\item\em Initialize MC3P driver and ADC scales. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{eldriver__mc3p_8h_a28e0717553f1cc42fda96e3316e94653}{eldriver\+\_\+mc3p\+\_\+read\+\_\+bg}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h, float \texorpdfstring{$\ast$}{*}scan\+Data)
+\begin{DoxyCompactList}\small\item\em Reads background scan data into buffer. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__mc3p_8h_a8bc3b15a05dd42a1da47b82851e3106e}{eldriver\+\_\+mc3p\+\_\+read\+\_\+sync}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h, void \texorpdfstring{$\ast$}{*}scan\+Data)
+\begin{DoxyCompactList}\small\item\em Reads synchronized ADC data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__mc3p_8h_ae2234aacc24783e19b8d828335af202c}{eldriver\+\_\+mc3p\+\_\+set\+Scales}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h, const float scales\mbox{[}\mbox{\hyperlink{eldriver__mc3p_8h_aa76078217c75b0dd7c3a14003c56aac3}{MC3\+P\+\_\+\+SYNC\+\_\+\+CHANNELS}}\mbox{]}\mbox{[}2\mbox{]})
+\begin{DoxyCompactList}\small\item\em Set/\+Update ADC scaling factors. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__mc3p_8h_a95ea7b48e71a73f0aba00562785bedb1}{eldriver\+\_\+mc3p\+\_\+write\+\_\+float}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h)
+\begin{DoxyCompactList}\small\item\em Set all phases to floating state. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__mc3p_8h_ab7044c4cd3b0a755f0fef2bd0e25f9f0}{eldriver\+\_\+mc3p\+\_\+write\+\_\+phase\+\_\+duty}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h, uint16\+\_\+t duty\+\_\+u\+\_\+q15, uint16\+\_\+t duty\+\_\+v\+\_\+q15, uint16\+\_\+t duty\+\_\+w\+\_\+q15)
+\begin{DoxyCompactList}\small\item\em Manually set PWM duty cycle for each phase in Q15. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__mc3p_8h_a624709df5a24e9de6cdf3912e590efa3}{eldriver\+\_\+mc3p\+\_\+write\+\_\+phase\+\_\+state}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h, \mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351b}{eldriver\+\_\+mc3p\+\_\+phase\+\_\+state\+\_\+t}} state\+\_\+u, \mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351b}{eldriver\+\_\+mc3p\+\_\+phase\+\_\+state\+\_\+t}} state\+\_\+v, \mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351b}{eldriver\+\_\+mc3p\+\_\+phase\+\_\+state\+\_\+t}} state\+\_\+w)
+\begin{DoxyCompactList}\small\item\em Set specific phase states (U, V, W). \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__mc3p_8h_acf8ceec801fe8bf5e009a59a592d6951}{eldriver\+\_\+mc3p\+\_\+write\+\_\+svm}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h, int16\+\_\+t alpha\+\_\+q15, int16\+\_\+t beta\+\_\+q15)
+\begin{DoxyCompactList}\small\item\em Set Alpha/\+Beta components for SVM control. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{eldriver__mc3p_8h_abc1ded4dcb7b91fe9815fe3ee0bc74a8}{eldriver\+\_\+mc3p\+\_\+write\+\_\+trap}} (\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}h, \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5d}{eldriver\+\_\+mc3p\+\_\+sector\+\_\+t}} sector, uint16\+\_\+t duty\+\_\+q15)
+\begin{DoxyCompactList}\small\item\em Set sector and duty for Trapezoidal control. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Header file for 3-\/Phase Motor Controller (MC3P) Driver. 
+
+\begin{DoxyAuthor}{Author}
+Carol Nasser
+\end{DoxyAuthor}
+This driver manages PWM generation, sector switching (Trap/\+SVM), and ADC synchronization for motor control in the Eco\+Drive system. 
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{eldriver__mc3p_8h_a0a5a110950b988db66665291ac0ecf1b}\label{eldriver__mc3p_8h_a0a5a110950b988db66665291ac0ecf1b} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_CS\_TO\_FLOAT@{ELDRIVER\_MC3P\_CS\_TO\_FLOAT}}
+\index{ELDRIVER\_MC3P\_CS\_TO\_FLOAT@{ELDRIVER\_MC3P\_CS\_TO\_FLOAT}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_CS\_TO\_FLOAT}{ELDRIVER\_MC3P\_CS\_TO\_FLOAT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+TO\+\_\+\+FLOAT(\begin{DoxyParamCaption}\item[{}]{cs }\end{DoxyParamCaption})~((float)(((int64\+\_\+t)(cs)\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{eldriver__conf_8h_aaaf2abca11923778219e2066ae5437e3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+SCALE}})  $>$$>$ 31 ))}
+
+\Hypertarget{eldriver__mc3p_8h_a48bfe225f466632b88fe2c398a20ceb5}\label{eldriver__mc3p_8h_a48bfe225f466632b88fe2c398a20ceb5} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_FLOAT\_TO\_CS@{ELDRIVER\_MC3P\_FLOAT\_TO\_CS}}
+\index{ELDRIVER\_MC3P\_FLOAT\_TO\_CS@{ELDRIVER\_MC3P\_FLOAT\_TO\_CS}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_FLOAT\_TO\_CS}{ELDRIVER\_MC3P\_FLOAT\_TO\_CS}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+FLOAT\+\_\+\+TO\+\_\+\+CS(\begin{DoxyParamCaption}\item[{}]{f }\end{DoxyParamCaption})~((int32\+\_\+t)(((float)(f)/\mbox{\hyperlink{eldriver__conf_8h_aaaf2abca11923778219e2066ae5437e3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CS\+\_\+\+SCALE}}) \texorpdfstring{$\ast$}{*} INT32\+\_\+\+MAX ))}
+
+\Hypertarget{eldriver__mc3p_8h_af21185e431512143a701fe15b2c220a7}\label{eldriver__mc3p_8h_af21185e431512143a701fe15b2c220a7} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_FLOAT\_TO\_VS@{ELDRIVER\_MC3P\_FLOAT\_TO\_VS}}
+\index{ELDRIVER\_MC3P\_FLOAT\_TO\_VS@{ELDRIVER\_MC3P\_FLOAT\_TO\_VS}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_FLOAT\_TO\_VS}{ELDRIVER\_MC3P\_FLOAT\_TO\_VS}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+FLOAT\+\_\+\+TO\+\_\+\+VS(\begin{DoxyParamCaption}\item[{}]{f }\end{DoxyParamCaption})~((int32\+\_\+t)(((float)(f)/\mbox{\hyperlink{eldriver__conf_8h_a6cb053b6faba2c8631a9af1755e984d3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VS\+\_\+\+SCALE}}) \texorpdfstring{$\ast$}{*} INT32\+\_\+\+MAX ))}
+
+\Hypertarget{eldriver__mc3p_8h_acdb8fc04edbe366edf0adcacf0fff359}\label{eldriver__mc3p_8h_acdb8fc04edbe366edf0adcacf0fff359} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_VS\_TO\_FLOAT@{ELDRIVER\_MC3P\_VS\_TO\_FLOAT}}
+\index{ELDRIVER\_MC3P\_VS\_TO\_FLOAT@{ELDRIVER\_MC3P\_VS\_TO\_FLOAT}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{ELDRIVER\_MC3P\_VS\_TO\_FLOAT}{ELDRIVER\_MC3P\_VS\_TO\_FLOAT}}
+{\footnotesize\ttfamily \#define ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VS\+\_\+\+TO\+\_\+\+FLOAT(\begin{DoxyParamCaption}\item[{}]{vs }\end{DoxyParamCaption})~((float)(((int64\+\_\+t)(vs)\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{eldriver__conf_8h_a6cb053b6faba2c8631a9af1755e984d3}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VS\+\_\+\+SCALE}})  $>$$>$ 31 ))}
+
+\Hypertarget{eldriver__mc3p_8h_a102fa17b74481e4cf9f04506285af1ab}\label{eldriver__mc3p_8h_a102fa17b74481e4cf9f04506285af1ab} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!IS\_SVM\_SECTOR@{IS\_SVM\_SECTOR}}
+\index{IS\_SVM\_SECTOR@{IS\_SVM\_SECTOR}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{IS\_SVM\_SECTOR}{IS\_SVM\_SECTOR}}
+{\footnotesize\ttfamily \#define IS\+\_\+\+SVM\+\_\+\+SECTOR(\begin{DoxyParamCaption}\item[{}]{sector }\end{DoxyParamCaption})~(sector $>$= \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dabc43878e918f85bf3c1ca60cea857920}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM1}} \&\& sector $<$= \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da73e78c769557398271630f905f10daff}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM6}})}
+
+
+
+Check if sector is within Space Vector Modulation range. 
+
+\Hypertarget{eldriver__mc3p_8h_a47506520049251eaa8ebce4b07ac4198}\label{eldriver__mc3p_8h_a47506520049251eaa8ebce4b07ac4198} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!IS\_TRAP\_SECTOR@{IS\_TRAP\_SECTOR}}
+\index{IS\_TRAP\_SECTOR@{IS\_TRAP\_SECTOR}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{IS\_TRAP\_SECTOR}{IS\_TRAP\_SECTOR}}
+{\footnotesize\ttfamily \#define IS\+\_\+\+TRAP\+\_\+\+SECTOR(\begin{DoxyParamCaption}\item[{}]{sector }\end{DoxyParamCaption})~(sector $>$= \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da8e2d7cc38fb2b0609a1a3b7d22961a38}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP1}} \&\& sector $<$= \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dac0599157bc6b63bb415a53e372cdd14c}{ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP6}})}
+
+
+
+Check if sector is within Trapezoidal range. 
+
+\Hypertarget{eldriver__mc3p_8h_aa76078217c75b0dd7c3a14003c56aac3}\label{eldriver__mc3p_8h_aa76078217c75b0dd7c3a14003c56aac3} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!MC3P\_SYNC\_CHANNELS@{MC3P\_SYNC\_CHANNELS}}
+\index{MC3P\_SYNC\_CHANNELS@{MC3P\_SYNC\_CHANNELS}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{MC3P\_SYNC\_CHANNELS}{MC3P\_SYNC\_CHANNELS}}
+{\footnotesize\ttfamily \#define MC3\+P\+\_\+\+SYNC\+\_\+\+CHANNELS~7}
+
+
+
+Number of synchronized ADC channels for MC3P. 
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934}\label{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_mode\_t@{eldriver\_mc3p\_mode\_t}}
+\index{eldriver\_mc3p\_mode\_t@{eldriver\_mc3p\_mode\_t}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_mode\_t}{eldriver\_mc3p\_mode\_t}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934}{eldriver\+\_\+mc3p\+\_\+mode\+\_\+t}}}
+
+
+
+Enumeration for motor control modulation modes. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_MODE\_NONE@{ELDRIVER\_MC3P\_MODE\_NONE}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_MODE\_NONE@{ELDRIVER\_MC3P\_MODE\_NONE}}}\Hypertarget{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934a7876e87357af3514b3ace59768efcb78}\label{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934a7876e87357af3514b3ace59768efcb78} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+MODE\+\_\+\+NONE&No active modulation. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_MODE\_TRAP@{ELDRIVER\_MC3P\_MODE\_TRAP}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_MODE\_TRAP@{ELDRIVER\_MC3P\_MODE\_TRAP}}}\Hypertarget{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934a60cb5616fd6b2e4a015b63348608aaf1}\label{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934a60cb5616fd6b2e4a015b63348608aaf1} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+MODE\+\_\+\+TRAP&Trapezoidal modulation mode. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_MODE\_SVM@{ELDRIVER\_MC3P\_MODE\_SVM}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_MODE\_SVM@{ELDRIVER\_MC3P\_MODE\_SVM}}}\Hypertarget{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934a447fc7c555efa96b8f0d72d2d371cc57}\label{eldriver__mc3p_8h_aa3e6c7aef9b60d524efc534baaa91934a447fc7c555efa96b8f0d72d2d371cc57} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+MODE\+\_\+\+SVM&Space Vector Modulation mode. \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351b}\label{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351b} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_phase\_state\_t@{eldriver\_mc3p\_phase\_state\_t}}
+\index{eldriver\_mc3p\_phase\_state\_t@{eldriver\_mc3p\_phase\_state\_t}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_phase\_state\_t}{eldriver\_mc3p\_phase\_state\_t}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351b}{eldriver\+\_\+mc3p\+\_\+phase\+\_\+state\+\_\+t}}}
+
+
+
+Enumeration for the state of each motor phase. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_PHASE\_FLOAT@{ELDRIVER\_MC3P\_PHASE\_FLOAT}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_PHASE\_FLOAT@{ELDRIVER\_MC3P\_PHASE\_FLOAT}}}\Hypertarget{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351bae7f5233ae5aef1281b9f5f3c83e7c05f}\label{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351bae7f5233ae5aef1281b9f5f3c83e7c05f} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+FLOAT&Phase is floating. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_PHASE\_H\_PWM@{ELDRIVER\_MC3P\_PHASE\_H\_PWM}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_PHASE\_H\_PWM@{ELDRIVER\_MC3P\_PHASE\_H\_PWM}}}\Hypertarget{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba6092ec902c684e04718f6b7e3111561d}\label{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba6092ec902c684e04718f6b7e3111561d} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+H\+\_\+\+PWM&High-\/side PWM active. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_PHASE\_L\_PWM@{ELDRIVER\_MC3P\_PHASE\_L\_PWM}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_PHASE\_L\_PWM@{ELDRIVER\_MC3P\_PHASE\_L\_PWM}}}\Hypertarget{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba84ab689266d3097a9ed1099978b3aa22}\label{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba84ab689266d3097a9ed1099978b3aa22} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+L\+\_\+\+PWM&Low-\/side PWM active. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_PHASE\_COMP@{ELDRIVER\_MC3P\_PHASE\_COMP}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_PHASE\_COMP@{ELDRIVER\_MC3P\_PHASE\_COMP}}}\Hypertarget{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba686e81b3400d14fbea6369970201be0c}\label{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba686e81b3400d14fbea6369970201be0c} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+COMP&Complementary PWM active. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_PHASE\_H\_ON@{ELDRIVER\_MC3P\_PHASE\_H\_ON}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_PHASE\_H\_ON@{ELDRIVER\_MC3P\_PHASE\_H\_ON}}}\Hypertarget{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351babb9345e8beca3093d4b7616678177ecf}\label{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351babb9345e8beca3093d4b7616678177ecf} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+H\+\_\+\+ON&High-\/side strictly ON. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_PHASE\_L\_ON@{ELDRIVER\_MC3P\_PHASE\_L\_ON}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_PHASE\_L\_ON@{ELDRIVER\_MC3P\_PHASE\_L\_ON}}}\Hypertarget{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba95c805378f08b938ba80e5b5de0a74df}\label{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351ba95c805378f08b938ba80e5b5de0a74df} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+PHASE\+\_\+\+L\+\_\+\+ON&Low-\/side strictly ON. \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5d}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5d} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_sector\_t@{eldriver\_mc3p\_sector\_t}}
+\index{eldriver\_mc3p\_sector\_t@{eldriver\_mc3p\_sector\_t}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_sector\_t}{eldriver\_mc3p\_sector\_t}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5d}{eldriver\+\_\+mc3p\+\_\+sector\+\_\+t}}}
+
+
+
+Enumeration for motor control sectors (Trapezoidal and SVM). 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_FLOAT@{ELDRIVER\_MC3P\_SECTOR\_FLOAT}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_FLOAT@{ELDRIVER\_MC3P\_SECTOR\_FLOAT}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da67fd1ed4f7f993e55c8b410c92f4411e}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da67fd1ed4f7f993e55c8b410c92f4411e} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+FLOAT&Floating state (all MOSFETs OFF) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_TRAP1@{ELDRIVER\_MC3P\_SECTOR\_TRAP1}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_TRAP1@{ELDRIVER\_MC3P\_SECTOR\_TRAP1}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da8e2d7cc38fb2b0609a1a3b7d22961a38}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da8e2d7cc38fb2b0609a1a3b7d22961a38} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP1&Trapezoidal Sector 1. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_TRAP2@{ELDRIVER\_MC3P\_SECTOR\_TRAP2}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_TRAP2@{ELDRIVER\_MC3P\_SECTOR\_TRAP2}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da18137cfde2baa766e017e486109bdca4}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da18137cfde2baa766e017e486109bdca4} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP2&Trapezoidal Sector 2. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_TRAP3@{ELDRIVER\_MC3P\_SECTOR\_TRAP3}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_TRAP3@{ELDRIVER\_MC3P\_SECTOR\_TRAP3}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae15a2818d21f45027f6705e389d62601}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae15a2818d21f45027f6705e389d62601} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP3&Trapezoidal Sector 3. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_TRAP4@{ELDRIVER\_MC3P\_SECTOR\_TRAP4}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_TRAP4@{ELDRIVER\_MC3P\_SECTOR\_TRAP4}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5daa8eba09206be5b3ddb3bd8b846bfb6d3}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5daa8eba09206be5b3ddb3bd8b846bfb6d3} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP4&Trapezoidal Sector 4. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_TRAP5@{ELDRIVER\_MC3P\_SECTOR\_TRAP5}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_TRAP5@{ELDRIVER\_MC3P\_SECTOR\_TRAP5}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae52f1c70b5386e261302945739079527}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae52f1c70b5386e261302945739079527} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP5&Trapezoidal Sector 5. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_TRAP6@{ELDRIVER\_MC3P\_SECTOR\_TRAP6}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_TRAP6@{ELDRIVER\_MC3P\_SECTOR\_TRAP6}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dac0599157bc6b63bb415a53e372cdd14c}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dac0599157bc6b63bb415a53e372cdd14c} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+TRAP6&Trapezoidal Sector 6. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_SVM1@{ELDRIVER\_MC3P\_SECTOR\_SVM1}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_SVM1@{ELDRIVER\_MC3P\_SECTOR\_SVM1}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dabc43878e918f85bf3c1ca60cea857920}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dabc43878e918f85bf3c1ca60cea857920} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM1&SVM Sector 1. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_SVM2@{ELDRIVER\_MC3P\_SECTOR\_SVM2}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_SVM2@{ELDRIVER\_MC3P\_SECTOR\_SVM2}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae6cba09f4b18bc419a99c69735c4f807}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae6cba09f4b18bc419a99c69735c4f807} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM2&SVM Sector 2. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_SVM3@{ELDRIVER\_MC3P\_SECTOR\_SVM3}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_SVM3@{ELDRIVER\_MC3P\_SECTOR\_SVM3}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da049dfcc9f2f6f625c6dda86070ba2057}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da049dfcc9f2f6f625c6dda86070ba2057} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM3&SVM Sector 3. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_SVM4@{ELDRIVER\_MC3P\_SECTOR\_SVM4}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_SVM4@{ELDRIVER\_MC3P\_SECTOR\_SVM4}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae022052d726587f4d7530268e3673535}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5dae022052d726587f4d7530268e3673535} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM4&SVM Sector 4. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_SVM5@{ELDRIVER\_MC3P\_SECTOR\_SVM5}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_SVM5@{ELDRIVER\_MC3P\_SECTOR\_SVM5}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da7d815f101ae64d67b18d925ab02a0831}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da7d815f101ae64d67b18d925ab02a0831} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM5&SVM Sector 5. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_SECTOR\_SVM6@{ELDRIVER\_MC3P\_SECTOR\_SVM6}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_SECTOR\_SVM6@{ELDRIVER\_MC3P\_SECTOR\_SVM6}}}\Hypertarget{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da73e78c769557398271630f905f10daff}\label{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5da73e78c769557398271630f905f10daff} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+SECTOR\+\_\+\+SVM6&SVM Sector 6. \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7a}\label{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7a} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_sync@{eldriver\_mc3p\_sync}}
+\index{eldriver\_mc3p\_sync@{eldriver\_mc3p\_sync}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_sync}{eldriver\_mc3p\_sync}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7a}{eldriver\+\_\+mc3p\+\_\+sync}}}
+
+
+
+Mapping for synchronized ADC measurements. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_VSBUS@{ELDRIVER\_MC3P\_VSBUS}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_VSBUS@{ELDRIVER\_MC3P\_VSBUS}}}\Hypertarget{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aaf24bf4aea0994127d676efbf066e8f97}\label{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aaf24bf4aea0994127d676efbf066e8f97} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSBUS&DC Bus Voltage. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_VSU@{ELDRIVER\_MC3P\_VSU}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_VSU@{ELDRIVER\_MC3P\_VSU}}}\Hypertarget{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa11e09ac08ac5e2e46fe650dc3e98d00d}\label{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa11e09ac08ac5e2e46fe650dc3e98d00d} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSU&Phase U Voltage. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_VSV@{ELDRIVER\_MC3P\_VSV}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_VSV@{ELDRIVER\_MC3P\_VSV}}}\Hypertarget{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aab5e324878688d37419c00766cffcf131}\label{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aab5e324878688d37419c00766cffcf131} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSV&Phase V Voltage. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_VSW@{ELDRIVER\_MC3P\_VSW}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_VSW@{ELDRIVER\_MC3P\_VSW}}}\Hypertarget{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa9de0de738e9a5bb8e68ef830e48a2000}\label{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa9de0de738e9a5bb8e68ef830e48a2000} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+VSW&Phase W Voltage. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_CSU@{ELDRIVER\_MC3P\_CSU}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_CSU@{ELDRIVER\_MC3P\_CSU}}}\Hypertarget{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aab67e64fccc8a854827f55b497665725b}\label{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aab67e64fccc8a854827f55b497665725b} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSU&Phase U Current. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_CSV@{ELDRIVER\_MC3P\_CSV}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_CSV@{ELDRIVER\_MC3P\_CSV}}}\Hypertarget{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa35a12caff37b531ac4bc2e11815cb842}\label{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa35a12caff37b531ac4bc2e11815cb842} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSV&Phase V Current. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_CSW@{ELDRIVER\_MC3P\_CSW}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_CSW@{ELDRIVER\_MC3P\_CSW}}}\Hypertarget{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa807f6c2286c4eb8eb2cb73c68626ca22}\label{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa807f6c2286c4eb8eb2cb73c68626ca22} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSW&Phase W Current. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ELDRIVER\_MC3P\_CSBUS@{ELDRIVER\_MC3P\_CSBUS}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!ELDRIVER\_MC3P\_CSBUS@{ELDRIVER\_MC3P\_CSBUS}}}\Hypertarget{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa0f34b94d5180c715dad3d72bee842d48}\label{eldriver__mc3p_8h_a8ed55dfd40e1fd2a7b60ec7e2242af7aa0f34b94d5180c715dad3d72bee842d48} 
+ELDRIVER\+\_\+\+MC3\+P\+\_\+\+CSBUS&DC Bus Current. \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{eldriver__mc3p_8h_ab2d8c76ac9217e860e167c1bc2438025}\label{eldriver__mc3p_8h_ab2d8c76ac9217e860e167c1bc2438025} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!\_\_attribute\_\_@{\_\_attribute\_\_}}
+\index{\_\_attribute\_\_@{\_\_attribute\_\_}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{\_\_attribute\_\_()}{\_\_attribute\_\_()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+attribute\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{(weak)}]{ }\end{DoxyParamCaption})}
+
+
+
+Weak callback for system ticker. 
+
+Weak callback after synchronized ADC scan completion. \Hypertarget{eldriver__mc3p_8h_accca93e63a1244a6ad4beae3a94dcb68}\label{eldriver__mc3p_8h_accca93e63a1244a6ad4beae3a94dcb68} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_bg\_channels@{eldriver\_mc3p\_bg\_channels}}
+\index{eldriver\_mc3p\_bg\_channels@{eldriver\_mc3p\_bg\_channels}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_bg\_channels()}{eldriver\_mc3p\_bg\_channels()}}
+{\footnotesize\ttfamily uint8\+\_\+t eldriver\+\_\+mc3p\+\_\+bg\+\_\+channels (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h }\end{DoxyParamCaption})}
+
+
+
+Returns number of active background channels. 
+
+\Hypertarget{eldriver__mc3p_8h_aac91f01fa0a28d655b1559810f29de35}\label{eldriver__mc3p_8h_aac91f01fa0a28d655b1559810f29de35} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_bg\_isReady@{eldriver\_mc3p\_bg\_isReady}}
+\index{eldriver\_mc3p\_bg\_isReady@{eldriver\_mc3p\_bg\_isReady}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_bg\_isReady()}{eldriver\_mc3p\_bg\_isReady()}}
+{\footnotesize\ttfamily uint8\+\_\+t eldriver\+\_\+mc3p\+\_\+bg\+\_\+is\+Ready (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h }\end{DoxyParamCaption})}
+
+
+
+Check if background ADC data is ready. 
+
+\Hypertarget{eldriver__mc3p_8h_a6ac85549fd9970e9e62f00d535941539}\label{eldriver__mc3p_8h_a6ac85549fd9970e9e62f00d535941539} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_bg\_startConv@{eldriver\_mc3p\_bg\_startConv}}
+\index{eldriver\_mc3p\_bg\_startConv@{eldriver\_mc3p\_bg\_startConv}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_bg\_startConv()}{eldriver\_mc3p\_bg\_startConv()}}
+{\footnotesize\ttfamily void eldriver\+\_\+mc3p\+\_\+bg\+\_\+start\+Conv (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h }\end{DoxyParamCaption})}
+
+
+
+Start background ADC conversion. 
+
+\Hypertarget{eldriver__mc3p_8h_af936864200e65317ca8fd7c6af2e95ba}\label{eldriver__mc3p_8h_af936864200e65317ca8fd7c6af2e95ba} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_init@{eldriver\_mc3p\_init}}
+\index{eldriver\_mc3p\_init@{eldriver\_mc3p\_init}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_init()}{eldriver\_mc3p\_init()}}
+{\footnotesize\ttfamily void eldriver\+\_\+mc3p\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h,  }\item[{const float}]{scales\mbox{[}\+MC3\+P\+\_\+\+SYNC\+\_\+\+CHANNELS\mbox{]}\mbox{[}2\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+Initialize MC3P driver and ADC scales. 
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{eldriver__mc3p_8h_af936864200e65317ca8fd7c6af2e95ba_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{eldriver__mc3p_8h_a28e0717553f1cc42fda96e3316e94653}\label{eldriver__mc3p_8h_a28e0717553f1cc42fda96e3316e94653} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_read\_bg@{eldriver\_mc3p\_read\_bg}}
+\index{eldriver\_mc3p\_read\_bg@{eldriver\_mc3p\_read\_bg}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_read\_bg()}{eldriver\_mc3p\_read\_bg()}}
+{\footnotesize\ttfamily uint8\+\_\+t eldriver\+\_\+mc3p\+\_\+read\+\_\+bg (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h,  }\item[{float \texorpdfstring{$\ast$}{*}}]{scan\+Data }\end{DoxyParamCaption})}
+
+
+
+Reads background scan data into buffer. 
+
+\Hypertarget{eldriver__mc3p_8h_a8bc3b15a05dd42a1da47b82851e3106e}\label{eldriver__mc3p_8h_a8bc3b15a05dd42a1da47b82851e3106e} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_read\_sync@{eldriver\_mc3p\_read\_sync}}
+\index{eldriver\_mc3p\_read\_sync@{eldriver\_mc3p\_read\_sync}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_read\_sync()}{eldriver\_mc3p\_read\_sync()}}
+{\footnotesize\ttfamily void eldriver\+\_\+mc3p\+\_\+read\+\_\+sync (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h,  }\item[{void \texorpdfstring{$\ast$}{*}}]{scan\+Data }\end{DoxyParamCaption})}
+
+
+
+Reads synchronized ADC data. 
+
+\Hypertarget{eldriver__mc3p_8h_ae2234aacc24783e19b8d828335af202c}\label{eldriver__mc3p_8h_ae2234aacc24783e19b8d828335af202c} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_setScales@{eldriver\_mc3p\_setScales}}
+\index{eldriver\_mc3p\_setScales@{eldriver\_mc3p\_setScales}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_setScales()}{eldriver\_mc3p\_setScales()}}
+{\footnotesize\ttfamily void eldriver\+\_\+mc3p\+\_\+set\+Scales (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h,  }\item[{const float}]{scales\mbox{[}\+MC3\+P\+\_\+\+SYNC\+\_\+\+CHANNELS\mbox{]}\mbox{[}2\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+Set/\+Update ADC scaling factors. 
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{eldriver__mc3p_8h_ae2234aacc24783e19b8d828335af202c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{eldriver__mc3p_8h_a95ea7b48e71a73f0aba00562785bedb1}\label{eldriver__mc3p_8h_a95ea7b48e71a73f0aba00562785bedb1} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_write\_float@{eldriver\_mc3p\_write\_float}}
+\index{eldriver\_mc3p\_write\_float@{eldriver\_mc3p\_write\_float}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_write\_float()}{eldriver\_mc3p\_write\_float()}}
+{\footnotesize\ttfamily void eldriver\+\_\+mc3p\+\_\+write\+\_\+float (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h }\end{DoxyParamCaption})}
+
+
+
+Set all phases to floating state. 
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{eldriver__mc3p_8h_a95ea7b48e71a73f0aba00562785bedb1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{eldriver__mc3p_8h_ab7044c4cd3b0a755f0fef2bd0e25f9f0}\label{eldriver__mc3p_8h_ab7044c4cd3b0a755f0fef2bd0e25f9f0} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_write\_phase\_duty@{eldriver\_mc3p\_write\_phase\_duty}}
+\index{eldriver\_mc3p\_write\_phase\_duty@{eldriver\_mc3p\_write\_phase\_duty}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_write\_phase\_duty()}{eldriver\_mc3p\_write\_phase\_duty()}}
+{\footnotesize\ttfamily void eldriver\+\_\+mc3p\+\_\+write\+\_\+phase\+\_\+duty (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h,  }\item[{uint16\+\_\+t}]{duty\+\_\+u\+\_\+q15,  }\item[{uint16\+\_\+t}]{duty\+\_\+v\+\_\+q15,  }\item[{uint16\+\_\+t}]{duty\+\_\+w\+\_\+q15 }\end{DoxyParamCaption})}
+
+
+
+Manually set PWM duty cycle for each phase in Q15. 
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{eldriver__mc3p_8h_ab7044c4cd3b0a755f0fef2bd0e25f9f0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{eldriver__mc3p_8h_a624709df5a24e9de6cdf3912e590efa3}\label{eldriver__mc3p_8h_a624709df5a24e9de6cdf3912e590efa3} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_write\_phase\_state@{eldriver\_mc3p\_write\_phase\_state}}
+\index{eldriver\_mc3p\_write\_phase\_state@{eldriver\_mc3p\_write\_phase\_state}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_write\_phase\_state()}{eldriver\_mc3p\_write\_phase\_state()}}
+{\footnotesize\ttfamily void eldriver\+\_\+mc3p\+\_\+write\+\_\+phase\+\_\+state (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h,  }\item[{\mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351b}{eldriver\+\_\+mc3p\+\_\+phase\+\_\+state\+\_\+t}}}]{state\+\_\+u,  }\item[{\mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351b}{eldriver\+\_\+mc3p\+\_\+phase\+\_\+state\+\_\+t}}}]{state\+\_\+v,  }\item[{\mbox{\hyperlink{eldriver__mc3p_8h_ab5c33a3f3c7a0df5b1662b41e21b351b}{eldriver\+\_\+mc3p\+\_\+phase\+\_\+state\+\_\+t}}}]{state\+\_\+w }\end{DoxyParamCaption})}
+
+
+
+Set specific phase states (U, V, W). 
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{eldriver__mc3p_8h_a624709df5a24e9de6cdf3912e590efa3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{eldriver__mc3p_8h_acf8ceec801fe8bf5e009a59a592d6951}\label{eldriver__mc3p_8h_acf8ceec801fe8bf5e009a59a592d6951} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_write\_svm@{eldriver\_mc3p\_write\_svm}}
+\index{eldriver\_mc3p\_write\_svm@{eldriver\_mc3p\_write\_svm}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_write\_svm()}{eldriver\_mc3p\_write\_svm()}}
+{\footnotesize\ttfamily void eldriver\+\_\+mc3p\+\_\+write\+\_\+svm (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h,  }\item[{int16\+\_\+t}]{alpha\+\_\+q15,  }\item[{int16\+\_\+t}]{beta\+\_\+q15 }\end{DoxyParamCaption})}
+
+
+
+Set Alpha/\+Beta components for SVM control. 
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{eldriver__mc3p_8h_acf8ceec801fe8bf5e009a59a592d6951_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{eldriver__mc3p_8h_abc1ded4dcb7b91fe9815fe3ee0bc74a8}\label{eldriver__mc3p_8h_abc1ded4dcb7b91fe9815fe3ee0bc74a8} 
+\index{eldriver\_mc3p.h@{eldriver\_mc3p.h}!eldriver\_mc3p\_write\_trap@{eldriver\_mc3p\_write\_trap}}
+\index{eldriver\_mc3p\_write\_trap@{eldriver\_mc3p\_write\_trap}!eldriver\_mc3p.h@{eldriver\_mc3p.h}}
+\doxysubsubsection{\texorpdfstring{eldriver\_mc3p\_write\_trap()}{eldriver\_mc3p\_write\_trap()}}
+{\footnotesize\ttfamily void eldriver\+\_\+mc3p\+\_\+write\+\_\+trap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structeldriver__mc3p__t}{eldriver\+\_\+mc3p\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{h,  }\item[{\mbox{\hyperlink{eldriver__mc3p_8h_ad1299dbb7fd3ef5ec77c6a84e74f3a5d}{eldriver\+\_\+mc3p\+\_\+sector\+\_\+t}}}]{sector,  }\item[{uint16\+\_\+t}]{duty\+\_\+q15 }\end{DoxyParamCaption})}
+
+
+
+Set sector and duty for Trapezoidal control. 
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{eldriver__mc3p_8h_abc1ded4dcb7b91fe9815fe3ee0bc74a8_cgraph}
+\end{center}
+\end{figure}

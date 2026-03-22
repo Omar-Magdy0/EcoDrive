@@ -51,7 +51,13 @@ include_directories(
 
 
 # Link with platform EARLY to get include paths
-add_subdirectory(platform/${PLATFORM_NAME})
+if(PLATFORM_NAME STREQUAL "host")
+   
+    add_subdirectory(platform/host)
+else()
+   
+    add_subdirectory(platform/stm32f4)
+endif()
 #add_library(tinycbor STATIC IMPORTED)
 #set_target_properties(tinycbor PROPERTIES
 #    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/middleware/tinycbor/build/libtinycbor.a

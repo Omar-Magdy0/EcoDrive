@@ -1,0 +1,9 @@
+<map id="eldriver_mc3p_write_phase_duty" name="eldriver_mc3p_write_phase_duty">
+<area shape="rect" id="Node000001" title="Manually set PWM duty cycle for each phase in Q15." alt="" coords="244,63,399,103"/>
+<area shape="rect" id="Node000002" href="$eldriver__mc3p_8c.html#a95ea7b48e71a73f0aba00562785bedb1" title="Set all phases to floating state." alt="" coords="23,5,178,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="230,62,178,48,179,43,231,57"/>
+<area shape="rect" id="Node000003" href="$eldriver__mc3p_8c.html#acf8ceec801fe8bf5e009a59a592d6951" title="Set Alpha/Beta components for SVM control." alt="" coords="5,70,196,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="230,85,196,85,196,80,230,80"/>
+<area shape="rect" id="Node000004" href="$eldriver__mc3p_8c.html#abc1ded4dcb7b91fe9815fe3ee0bc74a8" title="Set sector and duty for Trapezoidal control." alt="" coords="7,119,195,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="231,105,159,122,158,117,230,100"/>
+</map>

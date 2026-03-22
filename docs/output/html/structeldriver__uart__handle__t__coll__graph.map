@@ -1,0 +1,7 @@
+<map id="eldriver_uart_handle_t" name="eldriver_uart_handle_t">
+<area shape="rect" id="Node000001" title="UART Handle structure containing config and status." alt="" coords="96,93,264,119"/>
+<area shape="rect" id="Node000002" href="$structeldriver__uart__config__t.html" title="UART Configuration structure." alt="" coords="5,5,168,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,38,169,91,165,95,108,42"/>
+<area shape="rect" id="Node000003" href="$structeldriver__uart__status__t.html" title="UART Status structure to track transmission and errors." alt="" coords="193,5,357,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="253,42,195,95,191,91,250,38"/>
+</map>

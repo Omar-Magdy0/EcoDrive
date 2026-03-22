@@ -1,0 +1,42 @@
+file(REMOVE_RECURSE
+  "/home/carol_nasser/EcoDrive/build/bin/EcoDrive.elf"
+  "/home/carol_nasser/EcoDrive/build/bin/EcoDrive.pdb"
+  "CMakeFiles/EcoDrive.dir/application/elmotor_pmsm.c.obj"
+  "CMakeFiles/EcoDrive.dir/application/elmotor_pmsm.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/application/main.cpp.obj"
+  "CMakeFiles/EcoDrive.dir/application/main.cpp.obj.d"
+  "CMakeFiles/EcoDrive.dir/application/sensor.c.obj"
+  "CMakeFiles/EcoDrive.dir/application/sensor.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/application/sys.cpp.obj"
+  "CMakeFiles/EcoDrive.dir/application/sys.cpp.obj.d"
+  "CMakeFiles/EcoDrive.dir/middleware/aebfStream.c.obj"
+  "CMakeFiles/EcoDrive.dir/middleware/aebfStream.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_core.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_core.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_hall.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_hall.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_mc3p.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_mc3p.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_mc3p_it.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_mc3p_it.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_uart.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_uart.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_usbcdc.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/eldriver/eldriver_usbcdc.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/platform.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/platform.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/startup_stm32f401xc.s.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/stm32f4xx_it.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/stm32f4xx_it.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/syscalls.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/syscalls.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/sysmem.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/sysmem.c.obj.d"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/system_stm32f4xx.c.obj"
+  "CMakeFiles/EcoDrive.dir/platform/stm32f4/system_stm32f4xx.c.obj.d"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang ASM C CXX)
+  include(CMakeFiles/EcoDrive.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

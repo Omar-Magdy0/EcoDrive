@@ -1,0 +1,29 @@
+file(REMOVE_RECURSE
+  "/home/carol_nasser/EcoDrive/build/lib/libhost_platform.a"
+  "/home/carol_nasser/EcoDrive/build/lib/libhost_platform.pdb"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/croutine.c.o"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/croutine.c.o.d"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/event_groups.c.o"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/event_groups.c.o.d"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/list.c.o"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/list.c.o.d"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/portable/MemMang/heap_4.c.o"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/portable/MemMang/heap_4.c.o.d"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/port.c.o"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/port.c.o.d"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c.o"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c.o.d"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/queue.c.o"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/queue.c.o.d"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/stream_buffer.c.o"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/stream_buffer.c.o.d"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/tasks.c.o"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/tasks.c.o.d"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/timers.c.o"
+  "CMakeFiles/host_platform.dir/FreeRTOS/Source/timers.c.o.d"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang C)
+  include(CMakeFiles/host_platform.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

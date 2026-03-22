@@ -1,3 +1,11 @@
+/**
+ * @file    eldriver_core.h
+ * @author  Carol Nasser
+ * @brief   Core Hardware Abstraction Layer for STM32F4.
+ * @details This file contains core definitions, profiling utilities, and 
+ * GPIO low-level driver implementations for the EcoDrive platform.
+ */
+
 #pragma once
 
 #include <stdint.h>
@@ -8,25 +16,37 @@
 extern "C"{
 #endif
 
+/**
+ * @brief Core handle structure for eldriver state management.
+ */
 typedef struct{
-
-
 
 }eldriver_core_t;
 
+/**
+ * @brief  Initializes the core driver handle.
+ * @param  h: Pointer to eldriver_core_t handle.
+ */
 void eldriver_core_init(eldriver_core_t *h);
 
-
+/**
+ * @brief  Starts a profiling tick using the DWT Cycle Count Register.
+ * @retval uint32_t: Current cycle count.
+ */
 static inline uint32_t eldriver_core_prof_tick()
 {
     return DWT->CYCCNT;
 };
 
+/**
+ * @brief  Calculates cycles elapsed since the start tick.
+ * @param  start: The initial cycle count from prof_tick.
+ * @retval uint32_t: Elapsed cycles.
+ */
 static inline uint32_t eldriver_core_prof_tock(uint32_t start)
 {
     return (DWT->CYCCNT - start);
 };
-
 
 
 #ifndef ELDRIVER_STM32_LL_GPIO_H
@@ -65,8 +85,10 @@ static inline uint32_t eldriver_core_prof_tock(uint32_t start)
 #define ELDRIVER_GPIO_TO_PIN(n) (1 << ((n) % 16))
 
 /* Types */
+/** @brief Type definition for global pin indexing. */
 typedef uint16_t eldriver_pin_t;
 
+/** @brief GPIO Mode enumeration mapped to LL Driver. */
 typedef enum {
     ELDRIVER_GPIO_MODE_INPUT  = LL_GPIO_MODE_INPUT,
     ELDRIVER_GPIO_MODE_OUTPUT = LL_GPIO_MODE_OUTPUT,
@@ -74,6 +96,7 @@ typedef enum {
     ELDRIVER_GPIO_MODE_ANALOG = LL_GPIO_MODE_ANALOG
 } eldriver_gpio_mode_t;
 
+/** @brief Logic state enumeration for GPIO pins. */
 typedef enum {
     ELDRIVER_GPIO_LOW  = 0,
     ELDRIVER_GPIO_HIGH = 1
@@ -82,7 +105,7 @@ typedef enum {
 /* Static Inline Implementation */
 
 /**
- * @brief Sets the pin mode.
+ * @brief Sets the pin mode for a specific global pin number.
  */
 static inline void eldriver_gpio_mode(eldriver_pin_t pin_num, eldriver_gpio_mode_t mode) {
     LL_GPIO_SetPinMode(ELDRIVER_GPIO_TO_PORT(pin_num), 
@@ -117,7 +140,7 @@ static inline void eldriver_gpio_toggle(eldriver_pin_t pin_num) {
  */
 static inline eldriver_gpio_state_t eldriver_gpio_read(eldriver_pin_t pin_num) {
     return (eldriver_gpio_state_t)LL_GPIO_IsInputPinSet(ELDRIVER_GPIO_TO_PORT(pin_num), 
-                                                 ELDRIVER_GPIO_TO_PIN(pin_num));
+                                                       ELDRIVER_GPIO_TO_PIN(pin_num));
 }
 
 #endif // ELDRIVER_STM32_LL_GPIO_H
