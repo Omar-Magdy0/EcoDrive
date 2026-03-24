@@ -9,14 +9,13 @@
 
 extern float vtime;
 
-
-void eldriver_mc3p_init(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2])
+float eldriver_mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel){}
+void eldriver_mc3p_init(eldriver_mc3p_t *h)
 {
     register_timer(&timer_manager, eldriver_mc3p_sync_postScanCallback, (uint64_t)(1e9/h->config.pwm_Hz));
 }
 
 
-void eldriver_mc3p_setScales(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2]){}
 void eldriver_mc3p_bg_startConv(eldriver_mc3p_t *h){}
 uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_t *h){}
 uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float* scanData){}
@@ -131,7 +130,6 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
     h->dutyw_q15 = (-(int32_t)Q15_HALF * alpha_q15
          - (int32_t)Q15_SQRT3_BY_2 * beta_q15) >> 15;
 
-    /* SVPWM zero-sequence injection */
     uint8_t b0 = (h->dutyu_q15 >= 0);
     uint8_t b1 = (h->dutyv_q15 >= 0);
     uint8_t b2 = (h->dutyw_q15 >= 0);
@@ -150,6 +148,7 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
         default: sector = 0; break; // should not happen
     }
     
+    /* SVPWM zero-sequence injection */
     vmax = h->dutyu_q15;
     if (h->dutyv_q15 > vmax) vmax = h->dutyv_q15;
     if (h->dutyw_q15 > vmax) vmax = h->dutyw_q15;
@@ -166,3 +165,5 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
     eldriver_mc3p_write_phase_duty(h, h->dutyu_q15, h->dutyv_q15, h->dutyw_q15);
     h->sector_last = sector;
 }
+
+void eldriver_mc3p_setGain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain){}

@@ -11,23 +11,14 @@
 void bemfzc_ComCallback();
 void hall1_ComCallback();
 
-static constexpr float mc3p_sync_scales[][2] = 
-{
-    {((47+2.2)/(2.2)) ,0},
-    {((47+2.2)/(2.2)) ,0},
-    {((47+2.2)/(2.2)) ,0},
-    {((47+2.2)/(2.2)) ,0},
-    {(50) , (3.3/2)},
-    {(50) , (3.3/2)},
-    {(50) , (3.3/2)}
-};
 
 PmsmControl motor_c;
 
-void PmsmControl::init(const elmotor_pmsm_stup_config_t& stup_cfg)
+void PmsmControl::init(const StupConfig& stup_cfg)
 {
-    xmc_ticks = 0;
-    mc3p.config.pwm_Hz = PWM_FREQ;
+    pwmTicks = 0;
+    set_pwm_freq(PWM_FREQ_DEFAULT);
+    mc3p.config.pwm_Hz = pwm_freq_hz;
     mc3p.config.duty_max = 0.95;
     mc3p.config.duty_min = 0.05;
     mc3p.config.deadtime_nS = 1500;
@@ -35,27 +26,41 @@ void PmsmControl::init(const elmotor_pmsm_stup_config_t& stup_cfg)
     stup.cfg    = stup_cfg;
     stup.comm_ticks = 0;
     elec.sector     = ELDRIVER_MC3P_SECTOR_FLOAT;
-    stup.comm_timer.tick_period = XCPWM_TICKPERIOD_US;
-    stup.stage_timer.tick_period = XCPWM_TICKPERIOD_US;
-    state = PmsmMode::StartupTrap;
+    stup.comm_timer.tick_period = tick_period_us;
+    stup.stage_timer.tick_period = tick_period_us;
+    mode = PmsmMode::StartupTrap;
     stup.stage_current = pmsm_stup_stage_t::Reset;
-    pos_sensor.init(XCPWM_TICKFREQ);
-    eldriver_mc3p_init(&mc3p, mc3p_sync_scales);
+    pos_sensor.init(pwm_freq_hz);
+    mc3p.offset_calibration = true;
+    eldriver_mc3p_init(&mc3p);
     initialized = true;
 }
 
+void PmsmControl::set_pwm_freq(uint32_t pwm_hz)
+{
+    if(pwm_hz == 0) return;
+    pwm_freq_hz = pwm_hz;
+    tick_period_us = 1'000'000.0f / static_cast<float>(pwm_freq_hz);
+    tick_period_ms = tick_period_us / 1000.0f;
+    mc3p.config.pwm_Hz = pwm_freq_hz;
+    stup.comm_timer.tick_period = tick_period_us;
+    stup.stage_timer.tick_period = tick_period_us;
+    pos_sensor.init(pwm_freq_hz);
+}
 
 /// @brief 
 void PmsmControl::pwmLoop()
 {
     if(!initialized)return;
     uint32_t start = eldriver_core_prof_tick();
-    eldriver_mc3p_read_sync(&mc3p, &mc3p_sync_data);
-    
-    switch (state)
+    eldriver_mc3p_read_sync(&mc3p, &mc3p_sync_meas);
+    elec.vbus = mc3p_sync_meas.svm.vbus_q31;
+
+
+    switch (mode)
     {
     case PmsmMode::Idle:
-        /* code */
+        Idle_pwmLoop();
         break;   
     case PmsmMode::StartupTrap:
         StupTrap_pwmLoop();
@@ -67,24 +72,45 @@ void PmsmControl::pwmLoop()
         OpenTrap_pwmLoop();
         break;
     case PmsmMode::Commission:
-        Commission_pwmLoop();
+        SelfCommission_pwmLoop();
         break;
 
     default:
         break;
     }
-    xmc_ticks++;
+    pwmTicks++;
     uint8_t len;
     
     pwmSample_t *sample_ptr = pwmDataBuffer.sample(&len);
     if(mc3p.mode == ELDRIVER_MC3P_MODE_TRAP && sample_ptr){
-        (*sample_ptr)[0] = (int16_t)(((int64_t)(mc3p_sync_data.trap.vbus_q31 ) * ELDRIVER_MC3P_VS_SCALE * 1000) >> 31);
-        (*sample_ptr)[1] = (int16_t)(((int64_t)(mc3p_sync_data.trap.vbemf_q31) * ELDRIVER_MC3P_VS_SCALE * 1000) >> 31);
-        (*sample_ptr)[2] = (int16_t)(((int64_t)(mc3p_sync_data.trap.cbus_q31) * ELDRIVER_MC3P_CS_SCALE * 1000) >> 31);
+        (*sample_ptr)[0] = (int16_t)(((int64_t)(mc3p_sync_meas.trap.vbus_q31 ) * ELDRIVER_MC3P_VS_SCALE * 1000) >> 31);
+        (*sample_ptr)[1] = (int16_t)(((int64_t)(mc3p_sync_meas.trap.vbemf_q31) * ELDRIVER_MC3P_VS_SCALE * 1000) >> 31);
+        (*sample_ptr)[2] = (int16_t)(((int64_t)(mc3p_sync_meas.trap.cbus_q31) * ELDRIVER_MC3P_CS_SCALE * 1000) >> 31);
         (*sample_ptr)[4] = (int16_t)elec.speed_hz;
     }
     pwmDataBuffer.pushSample();
     volatile uint32_t elapsed = eldriver_core_prof_tock(start);
+}
+
+void PmsmControl::xmcLoop()
+{
+    switch (mode)
+    {
+    case PmsmMode::Idle:
+        break;   
+    case PmsmMode::StartupTrap:
+        break;
+    case PmsmMode::ClosedTrap:
+        break;
+    case PmsmMode::OpenTrap:
+        break;
+    case PmsmMode::Commission:
+        SelfCommission_xmcLoop();
+        break;
+
+    default:
+        break;
+    }
 }
 
 //======================================================
@@ -97,7 +123,7 @@ void eldriver_mc3p_sync_postScanCallback()
 
 void eldriver_xmc3p_tickerCallback()
 {
-
+    motor_c.xmcLoop();
 }
 
 //========================================================

@@ -13,17 +13,9 @@
 // CONFIG
 //==================================================
 
-constexpr uint32_t PWM_FREQ = 40000;
+constexpr uint32_t PWM_FREQ_DEFAULT = 25000;
 constexpr float STUP_BEMFZC_ERROR_MARGIN = 0.05f;
 constexpr uint8_t STUP_BEMFZC_GOOD_EST_COUNT = 10;
-
-constexpr uint32_t XCPWM_TICKFREQ = PWM_FREQ;
-constexpr float XCPWM_TICKPERIOD_US = 1'000'000.0f / static_cast<float>(XCPWM_TICKFREQ);
-constexpr float XCPWM_TICKPERIOD_MS = XCPWM_TICKPERIOD_US / 1000.0f;
-constexpr float XCPWM_US_TO_TICKS(float us) { return us / XCPWM_TICKPERIOD_US; }
-constexpr float XCPWM_MS_TO_TICKS(float ms) { return XCPWM_US_TO_TICKS(ms * 1000.0f); }
-constexpr float XCPWM_TICKS_TO_US(float ticks) { return ticks * XCPWM_TICKPERIOD_US; }
-constexpr float XCPWM_TICKS_TO_MS(float ticks) { return ticks * XCPWM_TICKPERIOD_MS; }
 
 constexpr size_t STUP_TABLE_SIZE = 4;
 
@@ -37,17 +29,6 @@ static constexpr std::array<eldriver_mc3p_sector_t, 8> HALL_TO_TRAP_TABLE =
     ELDRIVER_MC3P_SECTOR_TRAP6,
     ELDRIVER_MC3P_SECTOR_TRAP2,
     ELDRIVER_MC3P_SECTOR_FLOAT
-};
-
-
-struct elmotor_pmsm_stup_config_t {
-    uint16_t align_duration_ms{};
-    eldriver_mc3p_sector_t align_sector{ELDRIVER_MC3P_SECTOR_FLOAT};
-    float bus_V{};
-    float align_V{};
-    std::array<float, STUP_TABLE_SIZE> time_mS{};
-    std::array<float, STUP_TABLE_SIZE> volt_V{};
-    std::array<float, STUP_TABLE_SIZE> freq_Hz{};
 };
 
 enum class pmsm_stup_stage_t : uint8_t {
@@ -84,19 +65,32 @@ enum class PmsmMode : uint8_t {
 };
 
 struct PmsmControl {
-    uint32_t xmc_ticks{};
+    uint32_t pwmTicks{};
     bool initialized{false};
-    PmsmMode state{PmsmMode::Idle};
+    PmsmMode mode{PmsmMode::Idle};
+    uint32_t pwm_freq_hz{PWM_FREQ_DEFAULT};
+    float tick_period_us{1'000'000.0f / static_cast<float>(PWM_FREQ_DEFAULT)};
+    float tick_period_ms{tick_period_us / 1000.0f};
     eldriver_mc3p_t mc3p{};
     PosSensor pos_sensor{};
 
     union {
         eldriver_mc3p_svm_data_t svm;
         eldriver_mc3p_trap_data_t trap;
-    } mc3p_sync_data{};
+    } mc3p_sync_meas{};
+
+    struct StupConfig {
+        uint16_t align_duration_ms{};
+        eldriver_mc3p_sector_t align_sector{ELDRIVER_MC3P_SECTOR_FLOAT};
+        float bus_V{};
+        float align_V{};
+        std::array<float, STUP_TABLE_SIZE> time_mS{};
+        std::array<float, STUP_TABLE_SIZE> volt_V{};
+        std::array<float, STUP_TABLE_SIZE> freq_Hz{};
+    };
 
     struct {
-        elmotor_pmsm_stup_config_t cfg{};
+        StupConfig cfg{};
         elcore_swttimer_t stage_timer{};
         elcore_swttimer_t comm_timer{};
         uint32_t          comm_ticks{};
@@ -114,6 +108,7 @@ struct PmsmControl {
         q15_t trap_duty_q15{};
         eldriver_mc3p_sector_t sector{ELDRIVER_MC3P_SECTOR_FLOAT};
         float speed_hz{};
+        float theta;
     } elec{};
     
     struct {
@@ -122,14 +117,57 @@ struct PmsmControl {
         volatile float         speed_sp_rpm{};
     } mech{};
 
+    struct {
+        float Rs;
+        float Ld;
+        float Lq;
+        float Ke;
+        float J;
+        float B;
+    } model;
+
+    enum class SCommStage{
+        RESET = 0,
+        DAXIS_ALIGN,
+        RS_ID,
+        LD_ID,
+        LQ_ID,
+        KE_ID
+    };
+
+    struct {
+        SCommStage stage;
+        SCommStage stage_last;
+        elcore_swttimer_t timer{};
+        uint8_t remaining_id_samples;
+        float id_sin_prod_2;
+        float id_cos_prod_2;
+        float iq_sin_prod_2;
+        float iq_cos_prod_2;
+        uint16_t iir_filtered_cnt;
+        float hfi_angle;
+    }SComm;
+
     uint8_t pole_pairs{};
 
-    void init(const elmotor_pmsm_stup_config_t& stup_cfg);
+    void init(const StupConfig& stup_cfg);
+    void set_pwm_freq(uint32_t pwm_hz);
+    uint32_t pwm_freq() const { return pwm_freq_hz; }
+    float pwm_tick_period_us() const { return tick_period_us; }
+    float pwm_tick_period_ms() const { return tick_period_ms; }
+    float us_to_ticks(float us) const { return us / tick_period_us; }
+    float ms_to_ticks(float ms) const { return us_to_ticks(ms * 1000.0f); }
+    float ticks_to_us(float ticks) const { return ticks * tick_period_us; }
+    float ticks_to_ms(float ticks) const { return ticks * tick_period_ms; }
+    void Idle_pwmLoop();
     void ClosedTrap_pwmLoop();
     void OpenTrap_pwmLoop();
     void StupTrap_pwmLoop();
-    void Commission_pwmLoop();
+    void SelfCommission_init();
+    void SelfCommission_pwmLoop();
+    void SelfCommission_xmcLoop();
     void pwmLoop();
+    void xmcLoop();
     void set_speed(uint16_t speed_rpm);
     void freewheel();
 };

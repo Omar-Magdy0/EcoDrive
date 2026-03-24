@@ -16,10 +16,7 @@ extern "C" {
 
 /** @brief Number of synchronized ADC channels for MC3P. */
 #define MC3P_SYNC_CHANNELS 7
-
-/**
- * @brief Enumeration for motor control sectors (Trapezoidal and SVM).
- */
+#include <stdbool.h>
 typedef enum {
     ELDRIVER_MC3P_SECTOR_FLOAT = 0, /**< Floating state (all MOSFETs OFF) */
     ELDRIVER_MC3P_SECTOR_TRAP1,     /**< Trapezoidal Sector 1 */
@@ -40,9 +37,10 @@ typedef enum {
  * @brief Enumeration for motor control modulation modes.
  */
 typedef enum {
-    ELDRIVER_MC3P_MODE_NONE = 0,    /**< No active modulation */
-    ELDRIVER_MC3P_MODE_TRAP,        /**< Trapezoidal modulation mode */
-    ELDRIVER_MC3P_MODE_SVM          /**< Space Vector Modulation mode */
+    ELDRIVER_MC3P_MODE_NONE = 0,
+    ELDRIVER_MC3P_MODE_TRAP,
+    ELDRIVER_MC3P_MODE_SVM,
+    ELDRIVER_MC3P_MODE_CALIB
 } eldriver_mc3p_mode_t;
 
 /** @brief Check if sector is within Space Vector Modulation range. */
@@ -90,20 +88,23 @@ typedef struct{
  * @brief Main handle structure for the MC3P driver instance.
  */
 typedef struct{
-    eldriver_mc3p_config_t config;  /**< Driver configuration */
-    int16_t adc_to_uV;             /**< ADC to micro-volts conversion factor */
-    float adc_ref_V;               /**< ADC reference voltage */
-    float internal_ref_V;          /**< MCU internal reference voltage */
-    volatile eldriver_mc3p_mode_t mode; /**< Current active modulation mode */
-    volatile eldriver_mc3p_sector_t sector_last; /**< Last active sector */
-    uint32_t timer_max_q15;         /**< Timer count value for full scale */
-    uint16_t duty_max_q15;          /**< Max duty in Q15 format */
-    uint16_t duty_min_q15;          /**< Min duty in Q15 format */
-    uint16_t dutyu_q15;             /**< Phase U duty in Q15 */
-    uint16_t dutyv_q15;             /**< Phase V duty in Q15 */
-    uint16_t dutyw_q15;             /**< Phase W duty in Q15 */
-    int32_t sync_scale_q31[MC3P_SYNC_CHANNELS][2]; /**< Scaling factors for ADC sync */
-    uint8_t sync_rank_scale[4];     /**< Ranking/scaling priority */
+    eldriver_mc3p_config_t config;
+    int16_t adc_to_uV;
+    float adc_ref_V;
+    float internal_ref_V;
+    volatile eldriver_mc3p_mode_t mode;
+    volatile eldriver_mc3p_sector_t sector_last;
+    uint32_t timer_max_q15;
+    uint16_t duty_max_q15;
+    uint16_t duty_min_q15;
+    uint16_t dutyu_q15;
+    uint16_t dutyv_q15;
+    uint16_t dutyw_q15;
+    int32_t sync_scale_q31[MC3P_SYNC_CHANNELS][2];
+    uint8_t sync_rank_scale[4];
+    bool offset_calibration;
+    volatile uint8_t offset_calibration_remaining_samples;
+    volatile uint16_t offset_calibration_sum[4];
 }eldriver_mc3p_t;
 
 /** @brief Data structure for SVM-specific measurements. */
@@ -128,13 +129,11 @@ typedef struct{
 #define ELDRIVER_MC3P_FLOAT_TO_VS(f)((int32_t)(((float)(f)/ELDRIVER_MC3P_VS_SCALE) * INT32_MAX ))
 #define ELDRIVER_MC3P_FLOAT_TO_CS(f)((int32_t)(((float)(f)/ELDRIVER_MC3P_CS_SCALE) * INT32_MAX ))
 
-/** @brief Initialize MC3P driver and ADC scales. */
-void eldriver_mc3p_init(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2]);
 
-/** @brief Set/Update ADC scaling factors. */
-void eldriver_mc3p_setScales(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2]);
-
-/** @brief Start background ADC conversion. */
+//TODO  FINISH ADC IMPLEMENTATION FOR 1)TRAP & 2)SVM
+void mc3p_irq_bind(eldriver_mc3p_t *h);
+void eldriver_mc3p_init(eldriver_mc3p_t *h);
+void eldriver_mc3p_setGain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain);
 void eldriver_mc3p_bg_startConv(eldriver_mc3p_t *h);
 
 /** @brief Returns number of active background channels. */
@@ -148,6 +147,7 @@ uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_t *h);
 
 /** @brief Reads synchronized ADC data. */
 void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void* scanData);
+float eldriver_mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel);
 
 /** @brief Set specific phase states (U, V, W). */
 void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_state_t state_u, eldriver_mc3p_phase_state_t state_v, eldriver_mc3p_phase_state_t state_w);

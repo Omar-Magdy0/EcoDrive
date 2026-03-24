@@ -78,6 +78,7 @@ volatile uint8_t isReady = 0;
 void mc3p_adc_svm_update(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector);
 void mc3p_adc_trap_update(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector);
 void mc3p_adc_mode(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector);
+void mc3p_offset_calibration(eldriver_mc3p_t *h);
 
 //=========================================
 // Adc Single Sample Function
@@ -404,7 +405,7 @@ static void mc3p_tim1_init(eldriver_mc3p_t *h){
 }
 
 
-void eldriver_mc3p_init(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2])
+void eldriver_mc3p_init(eldriver_mc3p_t *h)
 {
     mc3p_gpio_init();
     mc3p_tim1_init(h);
@@ -415,28 +416,14 @@ void eldriver_mc3p_init(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS
     mc3p_dma_init();
     h->sector_last = ELDRIVER_MC3P_SECTOR_FLOAT;
     h->mode        = ELDRIVER_MC3P_MODE_NONE;
-    eldriver_mc3p_setScales(h, scales);
+    mc3p_irq_bind(h);
     mc3p_interrupt_init();
-}
-
-void eldriver_mc3p_setScales(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2])
-{
-    for(int i = ELDRIVER_MC3P_VSBUS; i <= ELDRIVER_MC3P_VSW; i++){
-        h->sync_scale_q31[i][0] = ((scales[i][0] * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * ELDRIVER_MC3P_VS_SCALE));
-        h->sync_scale_q31[i][1] = (scales[i][1])/(ELDRIVER_MC3P_VS_SCALE);
-    }
-    for(int i = ELDRIVER_MC3P_CSBUS; i <= ELDRIVER_MC3P_CSW; i++){
-        h->sync_scale_q31[i][0] = (scales[i][0] * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * ELDRIVER_MC3P_VS_SCALE);
-        h->sync_scale_q31[i][1] = (scales[i][1])/(ELDRIVER_MC3P_VS_SCALE);
-    }
+    if(h->offset_calibration)mc3p_offset_calibration(h);
 }
 
 //======================================================
 // Phase Ouptut functions
 //======================================================
-
-
-
 void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_state_t state_u, eldriver_mc3p_phase_state_t state_v, eldriver_mc3p_phase_state_t state_w)
 {
     uint32_t ccer_shadow = TIM1->CCER;
@@ -574,7 +561,7 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
         case 0b101: sector = 6; break;
         default: sector = 0; break; // should not happen
     }
-    
+     /* SVPWM zero-sequence injection */
     vmax = h->dutyu_q15;
     if (h->dutyv_q15 > vmax) vmax = h->dutyv_q15;
     if (h->dutyw_q15 > vmax) vmax = h->dutyw_q15;
@@ -719,3 +706,71 @@ void DMA2_Stream0_IRQHandler(void)
 }
 
 
+void eldriver_mc3p_setGain(eldriver_mc3p_t *h,  eldriver_mc3p_sync s, float gain)
+{
+    float scale = (s >= ELDRIVER_MC3P_CSU && s <= ELDRIVER_MC3P_CSW)? ELDRIVER_MC3P_CS_SCALE : ELDRIVER_MC3P_VS_SCALE;
+    h->sync_scale_q31[s][0] = ((gain * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * scale));
+}
+
+void mc3p_offset_calibration(eldriver_mc3p_t *h)
+{
+    // Set all phases to Loww (0,0,0)
+    // Set mode to calibration
+    h->mode = ELDRIVER_MC3P_MODE_CALIB;
+    eldriver_mc3p_write_phase_state(h, ELDRIVER_MC3P_PHASE_L_ON, ELDRIVER_MC3P_PHASE_L_ON, ELDRIVER_MC3P_PHASE_L_ON);
+    eldriver_mc3p_write_phase_duty(h, 0, 0, 0);
+    // Read current sensor values (the reading is your offset) (make the injected sequence suitable)
+    LL_ADC_INJ_SetSequencerLength(ADC1, LL_ADC_INJ_SEQ_SCAN_ENABLE_4RANKS);
+    LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_INJ_RANK_1, ELDRIVER_MC3P_VSBUS_ADC_CHANNEL);
+    LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_INJ_RANK_2, ELDRIVER_MC3P_CSU_ADC_CHANNEL);
+    LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_INJ_RANK_3, ELDRIVER_MC3P_CSV_ADC_CHANNEL);
+    LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_INJ_RANK_4, ELDRIVER_MC3P_CSW_ADC_CHANNEL);
+    for(int i = 0; i < 4; i++)h->offset_calibration_sum[i] = 0;
+    h->offset_calibration_remaining_samples = ELDRIVER_MC3P_OFFSET_CALIBRATION_SAMPLES;
+    while(h->offset_calibration_remaining_samples);
+    // Now we have the offsets
+    for(int i = 0; i < 4; i++)h->offset_calibration_sum[i] = h->offset_calibration_sum[i]/ELDRIVER_MC3P_OFFSET_CALIBRATION_SAMPLES;
+    //assign the averaged adc value after Q31 scaling
+    h->sync_scale_q31[ELDRIVER_MC3P_CSU][1] =  ((h->offset_calibration_sum[1] * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * ELDRIVER_MC3P_CS_SCALE));
+    h->sync_scale_q31[ELDRIVER_MC3P_CSV][1] =  ((h->offset_calibration_sum[2] * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * ELDRIVER_MC3P_CS_SCALE));
+    h->sync_scale_q31[ELDRIVER_MC3P_CSW][1] =  ((h->offset_calibration_sum[3] * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * ELDRIVER_MC3P_CS_SCALE));
+
+    // Read phase voltage sensor values (the reading is your offset) (make the injected sequence suitable)
+    LL_ADC_INJ_SetSequencerLength(ADC1, LL_ADC_INJ_SEQ_SCAN_ENABLE_4RANKS);
+    LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_INJ_RANK_1, ELDRIVER_MC3P_VSBUS_ADC_CHANNEL);
+    LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_INJ_RANK_2, ELDRIVER_MC3P_VSU_ADC_CHANNEL);
+    LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_INJ_RANK_3, ELDRIVER_MC3P_VSV_ADC_CHANNEL);
+    LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_INJ_RANK_4, ELDRIVER_MC3P_VSW_ADC_CHANNEL);
+    for(int i = 0; i < 4; i++)h->offset_calibration_sum[i] = 0;
+    h->offset_calibration_remaining_samples = ELDRIVER_MC3P_OFFSET_CALIBRATION_SAMPLES;
+    while(h->offset_calibration_remaining_samples);
+    // Now we have the offsets
+    for(int i = 0; i < 4; i++)h->offset_calibration_sum[i] = h->offset_calibration_sum[i]/ELDRIVER_MC3P_OFFSET_CALIBRATION_SAMPLES;
+    //assign the averaged adc value after Q31 scaling
+    h->sync_scale_q31[ELDRIVER_MC3P_VSU][1] =  ((h->offset_calibration_sum[1] * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * ELDRIVER_MC3P_VS_SCALE));
+    h->sync_scale_q31[ELDRIVER_MC3P_VSV][1] =  ((h->offset_calibration_sum[2] * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * ELDRIVER_MC3P_VS_SCALE));
+    h->sync_scale_q31[ELDRIVER_MC3P_VSW][1] =  ((h->offset_calibration_sum[3] * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * ELDRIVER_MC3P_VS_SCALE));
+
+    //Set phases to High-Z and call it a day
+    h->mode = ELDRIVER_MC3P_MODE_NONE;
+    eldriver_mc3p_write_float(h);
+}
+
+void INTERNAL_mc3p_ADC_JEOS_IRQ(eldriver_mc3p_t *h)
+{
+    switch (h->mode)
+    {
+    case ELDRIVER_MC3P_MODE_CALIB:
+    if(h->offset_calibration_remaining_samples){
+        h->offset_calibration_sum[0] += LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1);
+        h->offset_calibration_sum[1] += LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_2);
+        h->offset_calibration_sum[2] += LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_3);
+        h->offset_calibration_sum[3] += LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_4);
+        h->offset_calibration_remaining_samples--;
+    }
+        break;
+    
+    default:
+        break;
+    }
+}

@@ -233,7 +233,7 @@ void sys_init()
         NULL
     );
 
-    elmotor_pmsm_stup_config_t stup_cfg = {
+    PmsmControl::StupConfig stup_cfg = {
         .align_duration_ms  = 100,
         .align_sector       = ELDRIVER_MC3P_SECTOR_TRAP3,
         .bus_V              = 12,

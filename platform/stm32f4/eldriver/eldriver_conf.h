@@ -178,6 +178,7 @@
     #define ELDRIVER_MC3P_BG2_RANK
 #endif
 
+#define ELDRIVER_MC3P_OFFSET_CALIBRATION_SAMPLES 20
 
 /** @name Hall Sensor Configuration */
 //================================================

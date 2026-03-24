@@ -4,6 +4,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_tim.h"
+#include "eldriver_mc3p.h"
 #include "eldriver_conf.h"
 TIM_HandleTypeDef        htim11;
 
@@ -106,21 +107,21 @@ void HAL_ResumeTick(void)
 
 //==============================================================================
 
-__attribute__((weak)) void eldriver_xmc3p_tickerCallback(void)
-{
-    // Empty - user can override this
-}
+__attribute__((weak)) void eldriver_xmc3p_tickerCallback(void){}
+__attribute__((weak)) void eldriver_mc3p_sync_postScanCallback(void){}
 
-__attribute__((weak)) void eldriver_mc3p_sync_postScanCallback(void)
+static eldriver_mc3p_t* s_mc3p = NULL;
+void mc3p_irq_bind(eldriver_mc3p_t* h)
 {
-    // Empty - user can override this
+    s_mc3p = h;
 }
-
+__attribute__((weak)) void INTERNAL_mc3p_ADC_JEOS_IRQ(eldriver_mc3p_t *h){}
 
 void ADC_IRQHandler(void)
 {
 if (LL_ADC_IsActiveFlag_JEOS(ADC1)) {
     LL_ADC_ClearFlag_JEOS(ADC1);
+    INTERNAL_mc3p_ADC_JEOS_IRQ(s_mc3p);
     eldriver_mc3p_sync_postScanCallback();
 }
 }
