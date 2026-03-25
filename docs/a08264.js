@@ -1,0 +1,28 @@
+var a08264 =
+[
+    [ "GL_SILENCE_DEPRECATION", "a08264.html#a1ce7c516538704e5b04a99450edc572f", null ],
+    [ "freeRtos_init", "a08264.html#aed011d953c46ab33cc27d1992a76b257", null ],
+    [ "freertos_thread", "a08264.html#afa31c41a3970ddf77581bd208c94175e", null ],
+    [ "glfw_error_callback", "a08264.html#a14c3332320afb7420f44fd067c1a7c9f", null ],
+    [ "gui_deinit", "a08264.html#aacf741d4a92704de5814207fc8b5cd2b", null ],
+    [ "gui_init", "a08264.html#a8fac5dc0f0c18318a9c5a70c69d39f6f", null ],
+    [ "gui_loop", "a08264.html#a74bf36021dd77e5fef1955eb1253f15f", null ],
+    [ "now_ns", "a08264.html#a76216c2b088e0c1b1cac18f413ba848c", null ],
+    [ "platform_init", "a08264.html#a390c450e83ddc7807da2e9f0a894d8d1", null ],
+    [ "register_timer", "a08264.html#a35e25c70311ac5d9742584f3f36ee4e0", null ],
+    [ "tick_thread", "a08264.html#a9eff4b827ab419ca7a633906256ea2fb", null ],
+    [ "vApplicationDaemonTaskStartupHook", "a08264.html#ab9ec7b1bf1b922c22bca56c92e2d4c62", null ],
+    [ "vApplicationIdleHook", "a08264.html#a97fd430f36f8b065226e2bff9bad1de5", null ],
+    [ "vApplicationMallocFailedHook", "a08264.html#ab7e5c95cf72a3f819bc4462a7fb62ca3", null ],
+    [ "vApplicationStackOverflowHook", "a08264.html#a54b14b665d04a631991869b21065bf90", null ],
+    [ "vApplicationTickHook", "a08264.html#a9ca051aa77e17583aa5a85d5de5c199a", null ],
+    [ "vAssertCalled", "a08264.html#a68ef99acadce6ddf7c6976ef0fbbb293", null ],
+    [ "window_close_callback", "a08264.html#aa895f35a492b5f8283dcf1d30d7fd403", null ],
+    [ "display_h", "a08264.html#aa9a095edaf59ff7c887e42c73e732d64", null ],
+    [ "display_w", "a08264.html#aa5326abcef435ef90393432c0b518f6c", null ],
+    [ "t", "a08264.html#aa49d6a06775253352589280dc7f30018", null ],
+    [ "timer_manager", "a08264.html#ae98f147439061b61d453fb91250a6014", null ],
+    [ "virtual_tick", "a08264.html#a5cd85b1f6d6b14887c1c8095530e56cd", null ],
+    [ "vtime", "a08264.html#a5f71b514bb3617888402a5e5278b726d", null ],
+    [ "window", "a08264.html#a80de27bd7dc4e2b2ad3d5895b97a70f0", null ]
+];

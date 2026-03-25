@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PmsmController.h"
+#include "PmsmControl.h"
 #include "platform.h"
 #include "middleware/aebfStream.h"
 #include "FreeRTOS.h"

@@ -1,0 +1,31 @@
+digraph "PmsmControl::SelfCommission_pwmLoop"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="PmsmControl::SelfCommission\l_pwmLoop",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="elcore_swttimer_reset",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a03404.html#afab273a6d480495bebe96e7c4ab4e1ad",tooltip=" "];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="elcore_swttimer_timout",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a03404.html#ab6de0c7e2503ce17c18fe79f799f1a6f",tooltip=" "];
+  Node3 -> Node4 [id="edge3_Node000003_Node000004",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="elcore_swttimer_elapsed\l_ticks",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a03404.html#ae2773678a6060e12eac6a9fed6c6e74f",tooltip=" "];
+  Node1 -> Node5 [id="edge4_Node000001_Node000005",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="eldriver_mc3p_write\l_float",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a03738.html#a95ea7b48e71a73f0aba00562785bedb1",tooltip="Set all phases to float (high-Z) with zero duty."];
+  Node5 -> Node6 [id="edge5_Node000005_Node000006",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="eldriver_mc3p_write\l_phase_duty",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a03738.html#ab7044c4cd3b0a755f0fef2bd0e25f9f0",tooltip="Update PWM duty for each phase (Q15)."];
+  Node5 -> Node7 [id="edge6_Node000005_Node000007",color="steelblue1",style="solid",tooltip=" "];
+  Node7 [id="Node000007",label="eldriver_mc3p_write\l_phase_state",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a03738.html#a624709df5a24e9de6cdf3912e590efa3",tooltip="Set per-phase drive state (float, low, high, complementary PWM)."];
+  Node1 -> Node8 [id="edge7_Node000001_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node8 [id="Node000008",label="eldriver_mc3p_write_svm",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a03738.html#acf8ceec801fe8bf5e009a59a592d6951",tooltip="Apply SVM duty from alpha/beta inputs (Q15)."];
+  Node8 -> Node6 [id="edge8_Node000008_Node000006",color="steelblue1",style="solid",tooltip=" "];
+  Node8 -> Node7 [id="edge9_Node000008_Node000007",color="steelblue1",style="solid",tooltip=" "];
+  Node1 -> Node9 [id="edge10_Node000001_Node000009",color="steelblue1",style="solid",tooltip=" "];
+  Node9 [id="Node000009",label="PmsmControl::ms_to\l_ticks",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a03545.html#a628857455bae69b6c0ae9edba798b60e",tooltip=" "];
+  Node9 -> Node10 [id="edge11_Node000009_Node000010",color="steelblue1",style="solid",tooltip=" "];
+  Node10 [id="Node000010",label="PmsmControl::us_to\l_ticks",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a03545.html#a4882dbbb78caa3038583d4047dd2c96a",tooltip=" "];
+  Node1 -> Node11 [id="edge12_Node000001_Node000011",color="steelblue1",style="solid",tooltip=" "];
+  Node11 [id="Node000011",label="PmsmControl::ticks\l_to_ms",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a03545.html#a593c9812e0563b6d2270ee5dae89b13e",tooltip=" "];
+}

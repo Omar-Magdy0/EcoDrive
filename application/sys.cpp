@@ -32,7 +32,6 @@ eldriver_uart_handle_t serial;
 #include "eldriver/eldriver_core.h"
 eldriver_core_t core;
 
-
 QueueHandle_t aebf_queue_prio1;
 
 enum class AebfMsgType : uint8_t {
@@ -96,7 +95,6 @@ void dummyTask_log(void* argument){
     }
 }
 
-
 #define HOST
 
 #ifndef HOST
@@ -145,7 +143,6 @@ void dummyTask_debug(void* argument){
     }
 }
 
-
 void xAEBF(void* argument)
 {
     while(1)
@@ -191,7 +188,6 @@ void xAEBF(void* argument)
                          1);  // Wait 4ms        
     }
 }
-
 
 void sys_init()
 {
@@ -242,7 +238,7 @@ void sys_init()
         .volt_V             = {2 , 2.25, 2.5, 2.75},
         .freq_Hz            = {100, 125, 200, 250}
     };
-    motor_c.init(stup_cfg);
+    motor_c1.init(stup_cfg);
     #ifndef PLATFORM_HOST
     vTaskStartScheduler();
     #else

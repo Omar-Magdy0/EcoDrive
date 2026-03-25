@@ -80,9 +80,6 @@ void mc3p_adc_trap_update(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector);
 void mc3p_adc_mode(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector);
 void mc3p_offset_calibration(eldriver_mc3p_t *h);
 
-//=========================================
-// Adc Single Sample Function
-//==========================================
 uint16_t adc1_Sample_Single_Channel_Temporary(uint32_t channel)
 {
     // Save current configuration
@@ -114,9 +111,6 @@ float mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel)
   return ((float)(readVal)/( 1<< ELDRIVER_MC3P_ADCRES)) * h->adc_ref_V;
 }
 
-//=========================================
-// AdcCalibrate Function
-//==========================================
 void mc3p_adc_calibrate(eldriver_mc3p_t *h)
 {
     //Enable VREFINT and internalTEMP sensor

@@ -1,7 +1,0 @@
-<map id="hall1_gpioRead" name="hall1_gpioRead">
-<area shape="rect" id="Node000001" title=" " alt="" coords="192,31,315,56"/>
-<area shape="rect" id="Node000002" href="$eldriver__hall_8c.html#a22da6aa36c47afcbd3acd86fa722f52c" title="Initializes the Hall sensor interface." alt="" coords="5,5,144,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,35,144,30,145,25,179,30"/>
-<area shape="rect" id="Node000003" href="$eldriver__hall_8c.html#a38ad4725462bdc5e86c4ead4f04b9fc2" title=" " alt="" coords="7,55,142,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,56,143,61,142,56,178,51"/>
-</map>

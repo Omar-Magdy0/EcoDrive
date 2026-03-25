@@ -1,5 +1,0 @@
-<map id="eldriver_mc3p_t" name="eldriver_mc3p_t">
-<area shape="rect" id="Node000001" title="Main handle structure for the MC3P driver instance." alt="" coords="29,93,155,119"/>
-<area shape="rect" id="Node000002" href="$structeldriver__mc3p__config__t.html" title="Configuration structure for MC3P PWM and duty limits." alt="" coords="5,5,179,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,45,95,93,89,93,89,45"/>
-</map>

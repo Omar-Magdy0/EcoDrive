@@ -1,7 +1,7 @@
 #include "sensor.h"
 #include "eldriver/eldriver_mc3p.h"
 #include "eldriver/eldriver_core.h"
-#include "PmsmController.h"
+#include "PmsmControl.h"
 
 void BemfZc::init(float threshold_low_V, float threshold_high_V, float phase_delay, uint16_t tick_freq)
 {

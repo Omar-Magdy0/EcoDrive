@@ -1,5 +1,22 @@
 var searchData=
 [
-  ['q15_5fhalf_0',['Q15_HALF',['../eldriver__mc3p_8c.html#a0b46a2b22db6b8b573e57b1b3627a86e',1,'eldriver_mc3p.c']]],
-  ['q15_5fsqrt3_5fby_5f2_1',['Q15_SQRT3_BY_2',['../eldriver__mc3p_8c.html#aa150bb7e9158e04fe55f1122fe352aa5',1,'eldriver_mc3p.c']]]
+  ['in_5frange_0',['IN_RANGE',['../a08162.html#adce2e1fae8ce1b970f87470fd02a9fa2',1,'elmath.h']]],
+  ['include_5fetaskgetstate_1',['INCLUDE_eTaskGetState',['../a08514.html#a4fd1d67d54044ac86e8ffc890180f9f6',1,'FreeRTOSConfig.h']]],
+  ['include_5fuxtaskgetstackhighwatermark_2',['include_uxtaskgetstackhighwatermark',['../a08511.html#a23c7b4b41fe9b575cf2329c7cbe78b86',1,'INCLUDE_uxTaskGetStackHighWaterMark:&#160;FreeRTOSConfig.h'],['../a08514.html#a23c7b4b41fe9b575cf2329c7cbe78b86',1,'INCLUDE_uxTaskGetStackHighWaterMark:&#160;FreeRTOSConfig.h']]],
+  ['include_5fuxtaskpriorityget_3',['INCLUDE_uxTaskPriorityGet',['../a08514.html#a1279eb797355460aeeec06aa524e91df',1,'FreeRTOSConfig.h']]],
+  ['include_5fvtaskcleanupresources_4',['INCLUDE_vTaskCleanUpResources',['../a08514.html#a7ee138825e57f243c8ee5fd4207b9e26',1,'FreeRTOSConfig.h']]],
+  ['include_5fvtaskdelay_5',['include_vtaskdelay',['../a08511.html#a24361a6eb816a965f1ee4e2e08e364f8',1,'INCLUDE_vTaskDelay:&#160;FreeRTOSConfig.h'],['../a08514.html#a24361a6eb816a965f1ee4e2e08e364f8',1,'INCLUDE_vTaskDelay:&#160;FreeRTOSConfig.h']]],
+  ['include_5fvtaskdelayuntil_6',['INCLUDE_vTaskDelayUntil',['../a08514.html#ae8459bfd5b428319bb10de9f504a53aa',1,'FreeRTOSConfig.h']]],
+  ['include_5fvtaskdelete_7',['INCLUDE_vTaskDelete',['../a08514.html#a5ae1434fdf995108dc749ff9329f53bd',1,'FreeRTOSConfig.h']]],
+  ['include_5fvtaskpriorityset_8',['INCLUDE_vTaskPrioritySet',['../a08514.html#ad6858ac8aaf726007fd19752956ef1bd',1,'FreeRTOSConfig.h']]],
+  ['include_5fvtasksuspend_9',['include_vtasksuspend',['../a08511.html#aef8fbb97819ad3d962f334ac298206d1',1,'INCLUDE_vTaskSuspend:&#160;FreeRTOSConfig.h'],['../a08514.html#aef8fbb97819ad3d962f334ac298206d1',1,'INCLUDE_vTaskSuspend:&#160;FreeRTOSConfig.h']]],
+  ['include_5fxqueuegetmutexholder_10',['INCLUDE_xQueueGetMutexHolder',['../a08514.html#a4e2902143b6abf777065c15940321911',1,'FreeRTOSConfig.h']]],
+  ['include_5fxtaskabortdelay_11',['INCLUDE_xTaskAbortDelay',['../a08511.html#ac54efb28edcc1d3b9d0844005ea20674',1,'FreeRTOSConfig.h']]],
+  ['include_5fxtaskgetcurrenttaskhandle_12',['include_xtaskgetcurrenttaskhandle',['../a08511.html#ac96b6a6e70667f266db4278be71cbd78',1,'INCLUDE_xTaskGetCurrentTaskHandle:&#160;FreeRTOSConfig.h'],['../a08514.html#ac96b6a6e70667f266db4278be71cbd78',1,'INCLUDE_xTaskGetCurrentTaskHandle:&#160;FreeRTOSConfig.h']]],
+  ['include_5fxtaskgetidletaskhandle_13',['INCLUDE_xTaskGetIdleTaskHandle',['../a08511.html#ae8811def4dd6983011fed9ef8686f18f',1,'FreeRTOSConfig.h']]],
+  ['include_5fxtaskgetschedulerstate_14',['include_xtaskgetschedulerstate',['../a08511.html#a9ed60ede556830584e6bfd4a3ab4f9de',1,'INCLUDE_xTaskGetSchedulerState:&#160;FreeRTOSConfig.h'],['../a08514.html#a9ed60ede556830584e6bfd4a3ab4f9de',1,'INCLUDE_xTaskGetSchedulerState:&#160;FreeRTOSConfig.h']]],
+  ['include_5fxtimerpendfunctioncall_15',['INCLUDE_xTimerPendFunctionCall',['../a08514.html#a4b4336acd61a8e513ca2376be84326b5',1,'FreeRTOSConfig.h']]],
+  ['instruction_5fcache_5fenable_16',['INSTRUCTION_CACHE_ENABLE',['../a08267.html#a3379989d46599c7e19a43f42e9145a4a',1,'stm32f4xx_hal_conf.h']]],
+  ['is_5fsvm_5fsector_17',['is_svm_sector',['../a08481.html#a102fa17b74481e4cf9f04506285af1ab',1,'IS_SVM_SECTOR:&#160;eldriver_mc3p.h'],['../a08484.html#a102fa17b74481e4cf9f04506285af1ab',1,'IS_SVM_SECTOR:&#160;eldriver_mc3p.h']]],
+  ['is_5ftrap_5fsector_18',['is_trap_sector',['../a08481.html#a47506520049251eaa8ebce4b07ac4198',1,'IS_TRAP_SECTOR:&#160;eldriver_mc3p.h'],['../a08484.html#a47506520049251eaa8ebce4b07ac4198',1,'IS_TRAP_SECTOR:&#160;eldriver_mc3p.h']]]
 ];

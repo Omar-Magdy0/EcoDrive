@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['🛠️_20platform_20eldriver_20documentation_20stm32f4_0',['🛠️ Platform &amp; Eldriver Documentation [STM32F4]',['../index.html',1,'']]]
+  ['📦_20installation_0',['📦 Installation',['../a08443.html#autotoc_md-installation',1,'']]]
 ];

@@ -1,4 +1,4 @@
-#include "PmsmController.h"
+#include "PmsmControl.h"
 
 
 void PmsmControl::Idle_pwmLoop()

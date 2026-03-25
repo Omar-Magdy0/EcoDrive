@@ -1,16 +1,19 @@
 var searchData=
 [
-  ['oc1m_5factive_0',['OC1M_ACTIVE',['../eldriver__mc3p_8c.html#a48d197a86700a066beb2d0d87861d261',1,'eldriver_mc3p.c']]],
-  ['oc1m_5finactive_1',['OC1M_INACTIVE',['../eldriver__mc3p_8c.html#a6fb5469844cf90048c78053c7604d4cd',1,'eldriver_mc3p.c']]],
-  ['oc1m_5fmask_2',['OC1M_MASK',['../eldriver__mc3p_8c.html#a9587f9f6780cfae4cf615e1e9a64ba9c',1,'eldriver_mc3p.c']]],
-  ['oc1m_5fpwm_3',['OC1M_PWM',['../eldriver__mc3p_8c.html#ac94bc6c91c726dba646b5fd3dbbffce1',1,'eldriver_mc3p.c']]],
-  ['oc2m_5factive_4',['OC2M_ACTIVE',['../eldriver__mc3p_8c.html#a33fa21c558d1a4ce6b9f70ef1c3d8ada',1,'eldriver_mc3p.c']]],
-  ['oc2m_5finactive_5',['OC2M_INACTIVE',['../eldriver__mc3p_8c.html#aea74742f53d0bcd2b5fea0b0c09bdf62',1,'eldriver_mc3p.c']]],
-  ['oc2m_5fmask_6',['OC2M_MASK',['../eldriver__mc3p_8c.html#ae238291c3b3419e383260fba730132d5',1,'eldriver_mc3p.c']]],
-  ['oc2m_5fpwm_7',['OC2M_PWM',['../eldriver__mc3p_8c.html#ab47ffa8676d34596af5a3db012302f68',1,'eldriver_mc3p.c']]],
-  ['oc3m_5factive_8',['OC3M_ACTIVE',['../eldriver__mc3p_8c.html#afa26907743aa27754c317a85323a7544',1,'eldriver_mc3p.c']]],
-  ['oc3m_5finactive_9',['OC3M_INACTIVE',['../eldriver__mc3p_8c.html#adb73c5ea404a92268cd563ee677352e8',1,'eldriver_mc3p.c']]],
-  ['oc3m_5fmask_10',['OC3M_MASK',['../eldriver__mc3p_8c.html#a8d8cf671df047fa1f469a4ede1be729e',1,'eldriver_mc3p.c']]],
-  ['oc3m_5fpwm_11',['OC3M_PWM',['../eldriver__mc3p_8c.html#ab6176f63c0b37ef1dc46114c8f62ad00',1,'eldriver_mc3p.c']]],
-  ['overview_12',['🧠 Overview',['../md_README.html#autotoc_md17',1,'']]]
+  ['last_5fsample_0',['last_sample',['../a08354.html#ab18a79c86e195513fa36551101861b06',1,'ElcoreScopeStream']]],
+  ['last_5ft_1',['last_t',['../a08466.html#ab9ddcfc520a8e5e3755776b05d8596de',1,'last_t:&#160;eldriver_hall.c'],['../a08463.html#ab9ddcfc520a8e5e3755776b05d8596de',1,'last_t:&#160;eldriver_hall.c']]],
+  ['last_5ftime_5fns_2',['last_time_ns',['../a08414.html#a2a2cc3df63a830d474a57e1f04c1c0b1',1,'vtimer_t']]],
+  ['last_5fzc_5ftick_3',['last_zc_tick',['../a08322.html#a2a0cc1e9f68c64cf9f3800e31c28bd29',1,'BemfZc']]],
+  ['layer_20stack_3a_4',['Layer Stack:',['../index.html#layer-stack',1,'']]],
+  ['ld_5',['ld',['../a08430.html#a4920dd947254bd61af6e2655141eb31e',1,'MotorParams::Ld'],['../a08282.html#a7b16018e4e638c3b6086fbe2a77923ff',1,'PmsmControl::Ld']]],
+  ['len_6',['len',['../a08334.html#a07118d4d7db2be458834596bbb3736c0',1,'aebf_message_t']]],
+  ['level_20documentation_20doxygen_7',['📚 4. Code-Level Documentation (Doxygen)',['../index.html#autotoc_md-4-code-level-documentation-doxygen',1,'']]],
+  ['license_8',['📄 License',['../a08443.html#autotoc_md-license',1,'']]],
+  ['log_9',['Log',['../a08180.html#ad6c8ddf48e08e64fa5a6b1c8421aba17ace0be71e33226e4c1db2bcea5959f16b',1,'sys.cpp']]],
+  ['log_5fmax_5fsize_10',['LOG_MAX_SIZE',['../a08180.html#a44990353b8565c0d50766ce5ea00ebc8',1,'sys.cpp']]],
+  ['logmessages_11',['logMessages',['../a08180.html#acd1af3a52f114b01e052de9439a46a94',1,'sys.cpp']]],
+  ['lq_12',['lq',['../a08282.html#a668e9e65b2bb640a42b49f7b517d5db2',1,'PmsmControl::Lq'],['../a08430.html#a445cf5e47496377b3f0603f9e5d3c9be',1,'MotorParams::Lq']]],
+  ['lse_5fstartup_5ftimeout_13',['LSE_STARTUP_TIMEOUT',['../a08267.html#a85e6fc812dc26f7161a04be2568a5462',1,'stm32f4xx_hal_conf.h']]],
+  ['lse_5fvalue_14',['LSE_VALUE',['../a08267.html#a7bbb9d19e5189a6ccd0fb6fa6177d20d',1,'stm32f4xx_hal_conf.h']]],
+  ['lsi_5fvalue_15',['LSI_VALUE',['../a08267.html#a4872023e65449c0506aac3ea6bec99e9',1,'stm32f4xx_hal_conf.h']]]
 ];

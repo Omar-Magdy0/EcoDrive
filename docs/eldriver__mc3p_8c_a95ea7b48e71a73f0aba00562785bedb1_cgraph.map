@@ -1,7 +1,0 @@
-<map id="eldriver_mc3p_write_float" name="eldriver_mc3p_write_float">
-<area shape="rect" id="Node000001" title="Set all phases to floating state." alt="" coords="5,37,160,77"/>
-<area shape="rect" id="Node000002" href="$eldriver__mc3p_8c.html#ae42bf26be7b633984af6858692359570" title="Manually set PWM duty cycle for each phase in Q15." alt="" coords="208,5,363,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,43,194,37,195,42,161,48"/>
-<area shape="rect" id="Node000003" href="$eldriver__mc3p_8c.html#a624709df5a24e9de6cdf3912e590efa3" title="Set specific phase states (U, V, W)." alt="" coords="208,69,363,109"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,67,195,72,194,78,160,72"/>
-</map>

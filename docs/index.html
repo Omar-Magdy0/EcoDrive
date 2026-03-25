@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EcoDrive Platform: 🛠️ Platform &amp; Eldriver Documentation [STM32F4]</title>
+<title>EcoDrive: 🛠️ Platform &amp; Eldriver Documentation [STM32F4]</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,9 +25,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">EcoDrive Platform<span id="projectnumber">&#160;1.0.0</span>
+   <div id="projectname">EcoDrive<span id="projectnumber">&#160;1.0.0</span>
    </div>
-   <div id="projectbrief">STM32F4 High-Performance Motor Control Driver Suite</div>
+   <div id="projectbrief">EcoDrive High Performance PMSM drive</div>
   </td>
  </tr>
  </tbody>
@@ -94,14 +94,14 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_PLATFORM__DOCUMENTATION"></a> </p>
-<h1><a class="anchor" id="autotoc_md1"></a>
+<h1><a class="anchor" id="autotoc_md-introduction"></a>
 📌 Introduction</h1>
 <p>This document provides the technical specifications and software architecture for the <b>STM32F407</b> platform used in the <b>EcoDrive</b> system. It focuses on power optimization (Eco-mode) and peripheral driver interfacing.</p>
 <hr  />
-<h1><a class="anchor" id="autotoc_md3"></a>
+<h1><a class="anchor" id="️-1-system-architecture"></a>
 🏗️ 1. System Architecture</h1>
 <p>The firmware is structured in a layered approach to ensure modularity between the hardware and the eco-driving logic.</p>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="layer-stack"></a>
 Layer Stack:</h2>
 <ul>
 <li><b>Application Layer:</b> Eco-Drive Algorithm &amp; Power Management.</li>
@@ -112,9 +112,9 @@ Layer Stack:</h2>
 <blockquote class="doxtable">
 <p>&zwj;<b>Architecture Diagram:</b> ![System Architecture]("\\wsl.localhost\Ubuntu\home\carol_nasser\EcoDrive\docs\EcoDrive.drawio.png") </p>
 </blockquote>
-<h1><a class="anchor" id="autotoc_md5"></a>
+<h1><a class="anchor" id="blockquote"></a>
 &lt;/blockquote&gt;</h1>
-<h1><a class="anchor" id="autotoc_md6"></a>
+<h1><a class="anchor" id="autotoc_md-2-platform-specifications-stm32f4"></a>
 💻 2. Platform Specifications (STM32F4)</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -131,10 +131,10 @@ Layer Stack:</h2>
 <td class="markdownTableBodyLeft"><b>Toolchain</b>   </td><td class="markdownTableBodyLeft">GCC Arm Embedded / CMake   </td></tr>
 </table>
 <hr  />
-<h1><a class="anchor" id="autotoc_md8"></a>
+<h1><a class="anchor" id="autotoc_md-3-eldriver-peripheral-documentation"></a>
 🔌 3. Eldriver (Peripheral) Documentation</h1>
 <p>All drivers are implemented following the <b>Doxygen</b> commenting standard for automated API documentation.</p>
-<h2><a class="anchor" id="autotoc_md9"></a>
+<h2><a class="anchor" id="a-adc-driver-analog-to-digital"></a>
 A. ADC Driver (Analog-to-Digital)</h2>
 <ul>
 <li><b>Files:</b> <code>platform/drivers/adc_driver.h</code></li>
@@ -144,21 +144,21 @@ A. ADC Driver (Analog-to-Digital)</h2>
 </ul>
 </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md10"></a>
+<h2><a class="anchor" id="b-pwm-driver-pulse-width-modulation"></a>
 B. PWM Driver (Pulse Width Modulation)</h2>
 <ul>
 <li><b>Files:</b> <code>platform/drivers/pwm_driver.h</code></li>
 <li><b>Purpose:</b> Controls the inverter/motor power delivery.</li>
 <li><b>Key APIs:</b> - <code>PWM_SetDutyCycle()</code>: Dynamically adjusts power to optimize energy.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md11"></a>
+<h2><a class="anchor" id="c-gpio--communication"></a>
 C. GPIO &amp; Communication</h2>
 <ul>
 <li><b>GPIO:</b> Manages Eco-mode LED indicators and safety signals.</li>
 <li><b>CAN/UART:</b> Telemetry data transmission to the vehicle dashboard.</li>
 </ul>
 <hr  />
-<h1><a class="anchor" id="autotoc_md13"></a>
+<h1><a class="anchor" id="autotoc_md-4-code-level-documentation-doxygen"></a>
 📚 4. Code-Level Documentation (Doxygen)</h1>
 <p>To generate the full technical HTML report, navigate to the project root and run: ```bash doxygen Doxyfile </p>
 </div></div><!-- PageDoc -->

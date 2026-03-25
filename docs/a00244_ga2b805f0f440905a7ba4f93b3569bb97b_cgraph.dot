@@ -1,0 +1,11 @@
+digraph "cbor_value_skip_tag"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="cbor_value_skip_tag",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Advances the CBOR value it until it no longer points to a tag."];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="cbor_value_advance\l_fixed",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a00244.html#gac0701f791608589ddfff0bdb8acee7b4",tooltip="Advances the CBOR value it by one fixed-size position."];
+}

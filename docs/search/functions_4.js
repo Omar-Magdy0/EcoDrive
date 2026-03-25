@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['hal_5finittick_0',['HAL_InitTick',['../eldriver__mc3p__it_8c.html#a879cdb21ef051eb81ec51c18147397d5',1,'eldriver_mc3p_it.c']]],
-  ['hal_5fresumetick_1',['HAL_ResumeTick',['../eldriver__mc3p__it_8c.html#a24e0ee9dae1ec0f9d19200f5575ff790',1,'eldriver_mc3p_it.c']]],
-  ['hal_5fsuspendtick_2',['HAL_SuspendTick',['../eldriver__mc3p__it_8c.html#aaf651af2afe688a991c657f64f8fa5f9',1,'eldriver_mc3p_it.c']]],
-  ['hall1_5fgpioread_3',['hall1_gpioRead',['../eldriver__hall_8c.html#a1ea6e86ff52dd2efcec749cc06f872d2',1,'eldriver_hall.c']]]
+  ['directionsign_0',['DirectionSign',['../a08282.html#ac0c0a91164e74a41dd2ec6fbd5aa2db9',1,'PmsmControl']]],
+  ['dma2_5fstream0_5firqhandler_1',['DMA2_Stream0_IRQHandler',['../a08478.html#aaf6ce196dde98712e1223b99766e06c0',1,'eldriver_mc3p.c']]],
+  ['dummytask_5fdebug_2',['dummyTask_debug',['../a08180.html#af2759fb72a03bc0acea4da523d8312ca',1,'sys.cpp']]],
+  ['dummytask_5flog_3',['dummyTask_log',['../a08180.html#a58f5ff89466a641a12e566bafbbdd9c1',1,'sys.cpp']]],
+  ['dwt_5finit_4',['dwt_init',['../a08451.html#afcf2d5eb1aa6332c9a944c62b106792d',1,'dwt_init(void):&#160;eldriver_core.c'],['../a08454.html#afcf2d5eb1aa6332c9a944c62b106792d',1,'dwt_init(void):&#160;eldriver_core.c']]]
 ];

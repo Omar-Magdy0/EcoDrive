@@ -24,40 +24,42 @@
 */
 var NAVTREE =
 [
-  [ "EcoDrive Platform", "index.html", [
+  [ "EcoDrive", "index.html", [
     [ "🛠️ Platform & Eldriver Documentation [STM32F4]", "index.html", "index" ],
-    [ "README", "md_README.html", [
-      [ "⚡ EcoDrive", "md_README.html#autotoc_md15", [
-        [ "🧠 Overview", "md_README.html#autotoc_md17", null ],
-        [ "🚀 Features", "md_README.html#autotoc_md19", null ],
-        [ "📦 Installation", "md_README.html#autotoc_md21", null ],
-        [ "🧑‍💻 Used By", "md_README.html#autotoc_md23", null ],
-        [ "📄 License", "md_README.html#autotoc_md25", null ],
-        [ "💬 Support", "md_README.html#autotoc_md27", null ],
-        [ "- Become a sponsor", "md_README.html#autotoc_md28", null ],
-        [ "🤝 Sponsors", "md_README.html#autotoc_md29", null ],
-        [ "📬 Contact", "md_README.html#autotoc_md31", null ],
-        [ "🏷️ Acknowledgements", "md_README.html#autotoc_md33", null ]
+    [ "README", "a08443.html", [
+      [ "⚡ EcoDrive", "a08443.html#autotoc_md-ecodrive", [
+        [ "🧠 Overview", "a08443.html#autotoc_md-overview", null ],
+        [ "🚀 Features", "a08443.html#autotoc_md-features", null ],
+        [ "📦 Installation", "a08443.html#autotoc_md-installation", null ],
+        [ "🧑‍💻 Used By", "a08443.html#‍-used-by", null ],
+        [ "📄 License", "a08443.html#autotoc_md-license", null ],
+        [ "💬 Support", "a08443.html#autotoc_md-support", null ],
+        [ "- Become a sponsor", "a08443.html#autotoc_md--become-a-sponsor", null ],
+        [ "🤝 Sponsors", "a08443.html#autotoc_md-sponsors", null ],
+        [ "📬 Contact", "a08443.html#autotoc_md-contact", null ],
+        [ "🏷️ Acknowledgements", "a08443.html#️-acknowledgements", null ]
       ] ]
     ] ],
-    [ "Data Structures", "annotated.html", [
-      [ "Data Structures", "annotated.html", "annotated_dup" ],
-      [ "Data Structure Index", "classes.html", null ],
-      [ "Data Fields", "functions.html", [
-        [ "All", "functions.html", null ],
-        [ "Variables", "functions_vars.html", null ]
+    [ "Classes", "annotated.html", [
+      [ "Class List", "annotated.html", "annotated_dup" ],
+      [ "Class Index", "classes.html", null ],
+      [ "Class Members", "functions.html", [
+        [ "All", "functions.html", "functions_dup" ],
+        [ "Functions", "functions_func.html", null ],
+        [ "Variables", "functions_vars.html", null ],
+        [ "Enumerations", "functions_enum.html", null ]
       ] ]
     ] ],
     [ "Files", "files.html", [
       [ "File List", "files.html", "files_dup" ],
-      [ "Globals", "globals.html", [
+      [ "File Members", "globals.html", [
         [ "All", "globals.html", "globals_dup" ],
-        [ "Functions", "globals_func.html", null ],
+        [ "Functions", "globals_func.html", "globals_func" ],
         [ "Variables", "globals_vars.html", null ],
         [ "Typedefs", "globals_type.html", null ],
         [ "Enumerations", "globals_enum.html", null ],
         [ "Enumerator", "globals_eval.html", null ],
-        [ "Macros", "globals_defs.html", null ]
+        [ "Macros", "globals_defs.html", "globals_defs" ]
       ] ]
     ] ]
   ] ]
@@ -65,8 +67,12 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"annotated.html",
-"eldriver__mc3p__it_8c.html#a879cdb21ef051eb81ec51c18147397d5"
+"a08156.html",
+"a08264.html#aa895f35a492b5f8283dcf1d30d7fd403",
+"a08322.html#a2a8293401a7894ca065b4bf6f372ebb5",
+"a08448.html#a5b5dd1affba9db19936230397b4f08c7",
+"a08481.html#aac91f01fa0a28d655b1559810f29de35",
+"dir_b6533a6b739ae2c1e5a529f7270d9b56.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
