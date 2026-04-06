@@ -5,7 +5,7 @@ static inline void AlignHandler(PmsmControl *cp) {}
 static inline void RampHandler(PmsmControl *cp) {}
 static inline void ClosedHandler(PmsmControl *cp) {}
 
-void PmsmControl::OpenVF_pwmLoop()
+void PmsmControl::OpenFocIF_pwmLoop()
 {
     switch (stup.stage_current)
     {

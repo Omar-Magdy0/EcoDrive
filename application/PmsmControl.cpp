@@ -11,7 +11,7 @@ void hall1_ComCallback();
 
 PmsmControl motor_c1;
 
-void PmsmControl::init(const StupConfig &stup_cfg)
+void PmsmControl::init()
 {
     pwmTicks = 0;
     set_pwm_freq(PWM_FREQ_DEFAULT);
@@ -20,7 +20,6 @@ void PmsmControl::init(const StupConfig &stup_cfg)
     mc3p.config.duty_min = 0.05;
     mc3p.config.deadtime_nS = 1500;
 
-    stup.cfg = stup_cfg;
     stup.comm_ticks = 0;
     elec.sector = ELDRIVER_MC3P_SECTOR_FLOAT;
     stup.comm_timer.tick_period = tick_period_us;
@@ -66,8 +65,8 @@ void PmsmControl::pwmLoop()
     case ControlMode::OpenTrap:
         OpenTrap_pwmLoop();
         break;
-    case ControlMode::OpenVF:
-        OpenVF_pwmLoop();
+    case ControlMode::OpenFocIF:
+        OpenFocIF_pwmLoop();
         break;
     case ControlMode::Commission:
         SelfCommission_pwmLoop();
@@ -101,7 +100,7 @@ void PmsmControl::xmcLoop()
         break;
     case ControlMode::OpenTrap:
         break;
-    case ControlMode::OpenVF:
+    case ControlMode::OpenFocIF:
         break;
     case ControlMode::Commission:
         SelfCommission_xmcLoop();

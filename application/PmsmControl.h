@@ -47,21 +47,11 @@
 // CONFIG
 //==================================================
 
-/** Default PWM frequency used until reconfigured (Hz). */
-constexpr uint32_t PWM_FREQ_DEFAULT = 25000;
-/** Maximum relative error for BEMF zero-crossing estimation during STUP. */
-constexpr float STUP_BEMFZC_ERROR_MARGIN = 0.05f;
-/** Number of consecutive good BEMF estimates required before advancing STUP. */
-constexpr uint8_t STUP_BEMFZC_GOOD_EST_COUNT = 10;
-
-/** Size of STUP profile tables (time/voltage/frequency points). */
-constexpr size_t STUP_TABLE_SIZE = 4;
-
-/**
- * Hall-to-trapezoid sector lookup table.
- * Index is the raw 3-bit hall state (0..7).
- */
-static constexpr std::array<eldriver_mc3p_sector_t, 8> HALL_TO_TRAP_TABLE =
+constexpr uint32_t PWM_FREQ_DEFAULT = 25000; /** Default PWM frequency (Hz). */
+constexpr float STUP_BEMFZC_ERROR_MARGIN = 0.05f; /** Max relative BEMF ZC error. */
+constexpr uint8_t STUP_BEMFZC_GOOD_EST_COUNT = 10; /** Consecutive good ZC estimates. */
+constexpr size_t STUP_TABLE_SIZE = 4; /** STUP profile table size. */
+static constexpr std::array<eldriver_mc3p_sector_t, 8> HALL_TO_TRAP_TABLE = /** Hall->trap sector LUT (idx=hall 0..7). */
     {
         ELDRIVER_MC3P_SECTOR_FLOAT,
         ELDRIVER_MC3P_SECTOR_TRAP5,
@@ -87,23 +77,13 @@ static constexpr std::array<eldriver_mc3p_sector_t, 8> HALL_TO_TRAP_TABLE =
  */
 struct PmsmControl
 {
-    /**
-     * @brief High-level control mode.
-     *
-     * The active mode selects which control algorithm the fast loop executes.
-     */
     enum class ControlMode : uint8_t
     {
-        /** Outputs disabled, no commutation. */
-        Idle = 0,
-        /** Closed-loop trapezoidal commutation. */
-        ClosedTrap,
-        /** Open-loop trapezoidal commutation. */
-        OpenTrap,
-        /** Open-loop V/Hz (V/F) commutation. */
-        OpenVF,
-        /** Self-commissioning / parameter identification. */
-        Commission
+        Idle = 0,    /** Outputs disabled, no commutation. */
+        ClosedTrap, /** Closed-loop trapezoidal commutation. */
+        OpenTrap,   /** Open-loop trapezoidal commutation. */
+        OpenFocIF,  /** Open-loop V/Hz (V/F) commutation. */
+        Commission  /** Self-commissioning / parameter identification. */
     };
 
     /**
@@ -118,32 +98,18 @@ struct PmsmControl
         eldriver_mc3p_trap_data_t trap;
     } mc3p_sync_meas{};
 
-    /**
-     * @brief Startup (STUP) stage.
-     *
-     * Used by the open-loop startup sequence prior to closed-loop control.
-     */
     enum class StupStage : uint8_t
     {
-        /** STUP inactive or reset state. */
-        Reset = 0,
-        /** Rotor alignment stage. */
-        Align,
-        /** Open-loop ramp stage. */
-        Ramp,
-        /** Ready to transition to closed-loop. */
-        Closed
+        Reset = 0, /** STUP inactive or reset state. */
+        Align,     /** Rotor alignment stage. */
+        Ramp,      /** Open-loop ramp stage. */
+        Closed     /** Ready to transition to closed-loop. */
     };
 
-    /**
-     * @brief Mechanical rotation direction.
-     */
     enum class Direction : uint8_t
     {
-        /** Forward rotation. */
-        Forward = 0,
-        /** Reverse rotation. */
-        Backward
+        Forward = 0, /** Forward rotation. */
+        Backward     /** Reverse rotation. */
     };
 
     /**
@@ -159,39 +125,22 @@ struct PmsmControl
      */
     struct StupConfig
     {
-        /** Alignment dwell time in milliseconds. */
-        uint16_t align_duration_ms{};
-        /** Electrical sector used during alignment. */
-        eldriver_mc3p_sector_t align_sector{ELDRIVER_MC3P_SECTOR_FLOAT};
-        /** Bus voltage (V). */
-        float bus_V{};
-        /** Alignment voltage (V). */
-        float align_V{};
-        /** Time points for the ramp profile (ms). */
-        std::array<float, STUP_TABLE_SIZE> time_mS{};
-        /** Voltage points for the ramp profile (V). */
-        std::array<float, STUP_TABLE_SIZE> volt_V{};
-        /** Electrical frequency points for the ramp profile (Hz). */
-        std::array<float, STUP_TABLE_SIZE> freq_Hz{};
+        uint16_t align_duration_ms{}; /** Alignment dwell time (ms). */
+        eldriver_mc3p_sector_t align_sector{ELDRIVER_MC3P_SECTOR_FLOAT}; /** Alignment sector. */
+        float bus_V{}; /** Bus voltage (V). */
+        float align_V{}; /** Alignment voltage (V). */
+        float start_current_A{}; /** Open-loop accel current setpoint (A). */
+        std::array<float, STUP_TABLE_SIZE> time_mS{}; /** Ramp time points (ms). */
+        std::array<float, STUP_TABLE_SIZE> volt_V{}; /** Ramp voltage points (V). */
+        std::array<float, STUP_TABLE_SIZE> freq_Hz{}; /** Ramp frequency points (Hz). */
     };
 
-    /**
-     * @brief Convert direction enum to +1/-1 sign.
-     * @param dir Rotation direction.
-     * @return +1 for forward, -1 for backward.
-     */
     constexpr int8_t DirectionSign(Direction dir)
     {
         return (dir == Direction::Forward) ? 1 : -1;
     }
 
     // For trap sectors specifically (1-6)
-    /**
-     * Increment or decrement trapezoidal sector with wrap-around.
-     * @param sector Current trapezoidal sector (1..6).
-     * @param dir Rotation direction.
-     * @return Next sector after applying direction.
-     */
     static inline eldriver_mc3p_sector_t TrapIncrement(eldriver_mc3p_sector_t sector, Direction dir)
     {
         return static_cast<eldriver_mc3p_sector_t>(
@@ -216,7 +165,16 @@ struct PmsmControl
      */
     struct
     {
-        StupConfig cfg{}; /** Startup configuration (copy). */
+        StupConfig cfg{ /** Startup configuration (default). */
+            .align_duration_ms = 100,
+            .align_sector = ELDRIVER_MC3P_SECTOR_TRAP3,
+            .bus_V = 12,
+            .align_V = 1,
+            .start_current_A = 2,
+            .time_mS = {0, 1000, 1500, 2000},
+            .volt_V = {2, 2.25f, 2.5f, 2.75f},
+            .freq_Hz = {100, 125, 200, 250},
+        };
         elcore_swttimer_t stage_timer{}; /** Timer for current STUP stage. */
         elcore_swttimer_t comm_timer{}; /** Commutation timer during STUP. */
         uint32_t comm_ticks{}; /** Commutation interval in ticks. */
@@ -271,18 +229,12 @@ struct PmsmControl
     {
         enum class IDStage
         {
-            /** Initial / reset stage. */
-            RESET = 0,
-            /** D-axis alignment stage. */
-            DAXIS_ALIGN,
-            /** Stator resistance identification. */
-            RS_ID,
-            /** D-axis inductance identification. */
-            LD_ID,
-            /** Q-axis inductance identification. */
-            LQ_ID,
-            /** Final post-processing stage. */
-            ELEC_POSTPROCESS,
+            RESET = 0,       /** Initial / reset stage. */
+            DAXIS_ALIGN,     /** D-axis alignment stage. */
+            RS_ID,           /** Stator resistance identification. */
+            LD_ID,           /** D-axis inductance identification. */
+            LQ_ID,           /** Q-axis inductance identification. */
+            ELEC_POSTPROCESS /** Final post-processing stage. */
         };
         volatile IDStage IDstage;
         IDStage IDstage_last;
@@ -299,99 +251,35 @@ struct PmsmControl
 
     uint8_t pole_pairs{}; /** Motor pole pairs (electrical). */
 
-    /**
-     * @brief Initialize controller state and apply STUP configuration.
-     *
-     * @details
-     * This call prepares internal timers and copies the user-provided
-     * startup profile. It should be called before entering any active mode.
-     *
-     * @param stup_cfg Startup configuration to copy and use.
-     */
-    void init(const StupConfig &stup_cfg);
-    /**
-     * @brief Set PWM carrier frequency and update derived tick periods.
-     *
-     * @param pwm_hz PWM frequency in Hz.
-     */
-    void set_pwm_freq(uint32_t pwm_hz);
-    /** @brief Get PWM carrier frequency (Hz). */
-    uint32_t pwm_freq() const { return pwm_freq_hz; }
-    /** @brief Get PWM tick period (us). */
-    float pwm_tick_period_us() const { return tick_period_us; }
-    /** @brief Get PWM tick period (ms). */
-    float pwm_tick_period_ms() const { return tick_period_ms; }
-    /** @brief Convert microseconds to PWM ticks. */
-    float us_to_ticks(float us) const { return us / tick_period_us; }
-    /** @brief Convert milliseconds to PWM ticks. */
-    float ms_to_ticks(float ms) const { return us_to_ticks(ms * 1000.0f); }
-    /** @brief Convert PWM ticks to microseconds. */
-    float ticks_to_us(float ticks) const { return ticks * tick_period_us; }
-    /** @brief Convert PWM ticks to milliseconds. */
-    float ticks_to_ms(float ticks) const { return ticks * tick_period_ms; }
-    /**
-     * @brief Idle mode PWM loop (outputs disabled).
-     *
-     * Executed when `mode == ControlMode::Idle`.
-     */
-    void Idle_pwmLoop();
-
-    /**
-     * @brief Closed-loop trapezoidal commutation PWM loop.
-     *
-     * Uses sensor feedback and estimated speed to commutate.
-     */
-    void ClosedTrap_pwmLoop();
-    /**
-     * @brief Open-loop V/F PWM loop.
-     *
-     * Voltage is modulated as a function of electrical frequency.
-     */
-    void OpenVF_pwmLoop();
-    /**
-     * @brief Open-loop trapezoidal PWM loop.
-     *
-     * Commutation advances at a commanded rate without feedback.
-     */
-    void OpenTrap_pwmLoop();
-
-    /** @brief Initialize self-commissioning state. */
-    void SelfCommission_init();
-    /** @brief Self-commissioning PWM loop. */
-    void SelfCommission_pwmLoop();
-    /** @brief Self-commissioning slow loop. */
-    void SelfCommission_xmcLoop();
-
-    /**
-     * @brief Dispatches the fast (PWM) control loop based on mode.
-     *
-     * Intended to be called from the PWM ISR.
-     */
-    void pwmLoop();
-    /**
-     * @brief Dispatches the slow control loop based on mode.
-     *
-     * Intended to be called from a lower-rate scheduler.
-     */
-    void xmcLoop();
+    void init(); /** Init state and apply STUP config. */
+    void set_pwm_freq(uint32_t pwm_hz); /** Set PWM frequency and tick periods. */
+    uint32_t pwm_freq() const { return pwm_freq_hz; } /** Get PWM frequency (Hz). */
+    float pwm_tick_period_us() const { return tick_period_us; } /** Get PWM tick period (us). */
+    float pwm_tick_period_ms() const { return tick_period_ms; } /** Get PWM tick period (ms). */
+    float us_to_ticks(float us) const { return us / tick_period_us; } /** us -> ticks. */
+    float ms_to_ticks(float ms) const { return us_to_ticks(ms * 1000.0f); } /** ms -> ticks. */
+    float ticks_to_us(float ticks) const { return ticks * tick_period_us; } /** ticks -> us. */
+    float ticks_to_ms(float ticks) const { return ticks * tick_period_ms; } /** ticks -> ms. */
+    void Idle_pwmLoop(); /** Idle PWM loop (outputs disabled). */
+    void ClosedTrap_pwmLoop(); /** Closed-loop trapezoidal PWM loop. */
+    void OpenFocIF_pwmLoop(); /** Open-loop V/F PWM loop. */
+    void OpenTrap_pwmLoop(); /** Open-loop trapezoidal PWM loop. */
+    void SelfCommission_init(); /** Initialize self-commissioning. */
+    void SelfCommission_pwmLoop(); /** Self-commissioning PWM loop. */
+    void SelfCommission_xmcLoop(); /** Self-commissioning slow loop. */
+    void pwmLoop(); /** Dispatch fast PWM loop based on mode. */
+    void xmcLoop(); /** Dispatch slow loop based on mode. */
 };
 
-/** Global controller instance for motor channel 1. */
-extern PmsmControl motor_c1;
+extern PmsmControl motor_c1; /** Global controller instance for motor channel 1. */
 
 #include "core/elcore.h"
 
-/** Number of values per PWM sample (schema-defined). */
-constexpr uint8_t SAMPLE_LEN = 5;
-/** Samples per telemetry frame. */
-constexpr uint8_t SAMPLES_PER_FRAME = 24;
-/** Number of frames stored in the ring buffer. */
-constexpr uint8_t FRAME_BUFFER_COUNT = 8;
-/** Threshold for notifying when frames are available. */
-constexpr uint8_t FRAME_BUFFER_NOTIFY_THRESHOLD = 6;
-
-/** One PWM telemetry sample (schema-defined ordering). */
-using pwmSample_t = std::array<int16_t, SAMPLE_LEN>;
+constexpr uint8_t SAMPLE_LEN = 5; /** Values per PWM sample (schema). */
+constexpr uint8_t SAMPLES_PER_FRAME = 24; /** Samples per telemetry frame. */
+constexpr uint8_t FRAME_BUFFER_COUNT = 8; /** Frames stored in ring buffer. */
+constexpr uint8_t FRAME_BUFFER_NOTIFY_THRESHOLD = 6; /** Frame notify threshold. */
+using pwmSample_t = std::array<int16_t, SAMPLE_LEN>; /** One PWM telemetry sample. */
 
 /**
  * @brief Fixed-size telemetry frame.
@@ -416,37 +304,10 @@ struct pwmDataBuffer_t
     uint32_t sample_count{}; /** Total samples pushed since init. */
     uint32_t overflowCount{}; /** Samples dropped due to overflow. */
 
-    /** @brief Initialize the ring buffer. */
-    void init();
-    /**
-     * @brief Get a writable sample slot.
-     *
-     * @details
-     * The caller writes `SAMPLE_LEN` values into the returned slot,
-     * then calls `pushSample()` to commit it.
-     *
-     * @param len Output length of the sample (schema length).
-     * @return Pointer to the sample storage.
-     */
-    pwmSample_t *sample(uint8_t *len);
-    /**
-     * @brief Commit the current sample into the buffer.
-     *
-     * Advances the frame index and rolls to the next frame when full.
-     */
-    void pushSample();
-    /**
-     * @brief Read the next available frame.
-     *
-     * @details
-     * Returns the next full frame if available. The caller must process
-     * or copy the frame before the producer overwrites it.
-     *
-     * @param outFrame Output pointer to the frame.
-     * @return True if a frame is available.
-     */
-    bool readFrame(PwmDataFrame_t **outFrame);
+    void init(); /** Init ring buffer. */
+    pwmSample_t *sample(uint8_t *len); /** Get writable sample slot. */
+    void pushSample(); /** Commit current sample. */
+    bool readFrame(PwmDataFrame_t **outFrame); /** Read next available frame. */
 };
 
-/** Global telemetry buffer instance. */
-extern pwmDataBuffer_t pwmDataBuffer;
+extern pwmDataBuffer_t pwmDataBuffer; /** Global telemetry buffer instance. */
