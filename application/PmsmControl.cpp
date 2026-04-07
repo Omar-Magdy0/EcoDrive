@@ -2,8 +2,9 @@
  * @file PmsmControl.cpp
  * @brief Implementation of the Permanent Magnet Synchronous Motor (PMSM) controller.
  * @details Contains the primary control loops, hardware configuration, and telemetry data buffering logic.
+ * @details Detailed Doxygen documentation and code analysis by Bishoy Youssef.
  */
-
+ 
 #include "PmsmControl.h"
 #include "eldriver/eldriver_mc3p.h"
 #include "eldriver/eldriver_core.h"
