@@ -36,6 +36,7 @@ constexpr int CONTROL_PANEL_WIDTH = 200;
 constexpr float ELEC_PLOT_HEIGHT = 0.35f;
 constexpr float GENERAL_PANEL_WIDTH = 0.25f;
 
+
 static float channel_buffer[CHANNELS][BUFFER_SIZE];
 
 // ======================= UPDATE =======================
@@ -46,6 +47,8 @@ static void update_electric_scope() {
                 channel_buffer[ch][i] = view_buffer[i * CHANNELS + ch];
             }
         }
+    }
+}
 
 // ======================= DATA =======================
 ModelData getModelData() {
