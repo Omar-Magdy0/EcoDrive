@@ -1,6 +1,7 @@
 #include "eldriver_mc3p.h"
 #include "platform.h"
 #include "virtual_pmsm.h"
+#include "eldriver_sil.h"              // ADD THIS
 #include "eldriver_conf.h"
 
 #define SATURATE(v , min , max)(( v > max)?max: ((v < min)?0:v))
@@ -10,8 +11,10 @@
 extern float vtime;
 
 float eldriver_mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel){}
+
 void eldriver_mc3p_init(eldriver_mc3p_t *h)
 {
+    eldriver_sil_init();        // STEP 1: Initialize SIL layer
     register_timer(&timer_manager, eldriver_mc3p_sync_postScanCallback, (uint64_t)(1e9/h->config.pwm_Hz));
 }
 
@@ -21,25 +24,45 @@ uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_t *h){}
 uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float* scanData){}
 uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_t *h){}
 
+// ===== KEY CHANGE: Read from SIL instead of zeros =====
 void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void* data)
 {
+    // STEP 2: Step the SIL motor/inverter simulation
+    eldriver_sil_step();
+    
+    // STEP 3: Write simulation data to oscilloscope GUI
+    eldriver_sil_write_scope();
+    
     uint8_t is_svm = IS_SVM_SECTOR(h->sector_last);
     uint8_t is_trap = IS_TRAP_SECTOR(h->sector_last);
+    
     if(is_svm)
     {
-
-        ((eldriver_mc3p_svm_data_t *)(data))->cu_q31     = 0;
-        ((eldriver_mc3p_svm_data_t *)(data))->cv_q31     = 0;  
-        ((eldriver_mc3p_svm_data_t *)(data))->cw_q31     = 0;        
+        // Get simulated currents from SIL
+        float iu, iv, iw;
+        eldriver_sil_get_currents(&iu, &iv, &iw);
+        
+        // Convert float currents to Q31 format for the control algorithm
+        // Scaling: 1.0A = X counts (adjust ELDRIVER_MC3P_CS_SCALE to tune sensitivity)
+        ((eldriver_mc3p_svm_data_t *)(data))->cu_q31 = ELDRIVER_MC3P_FLOAT_TO_CS(iu);
+        ((eldriver_mc3p_svm_data_t *)(data))->cv_q31 = ELDRIVER_MC3P_FLOAT_TO_CS(iv);
+        ((eldriver_mc3p_svm_data_t *)(data))->cw_q31 = ELDRIVER_MC3P_FLOAT_TO_CS(iw);
     }
     else if (is_trap)
     {
-
-        ((eldriver_mc3p_trap_data_t *)(data))->vbemf_q31 = 0;
-        ((eldriver_mc3p_trap_data_t *)(data))->cbus_q31  = 0;
-    }
-    else{
-
+        // For trapezoidal commutation, we could return back-EMF, bus current, etc.
+        // For now, just return the phase currents
+        float iu, iv, iw;
+        eldriver_sil_get_currents(&iu, &iv, &iw);
+        
+        // Back-EMF would be: Ke * ωe where ωe = pp * ω_mech
+        // For now, just use a simple representation
+        float theta, omega;
+        eldriver_sil_get_rotor_state(&theta, &omega);
+        float bemf_est = 0.03f * 7.0f * omega;  // Ke=0.03, pp=7
+        
+        ((eldriver_mc3p_trap_data_t *)(data))->vbemf_q31 = ELDRIVER_MC3P_FLOAT_TO_VS(bemf_est);
+        ((eldriver_mc3p_trap_data_t *)(data))->cbus_q31  = ELDRIVER_MC3P_FLOAT_TO_CS((iu + iv + iw) / 3.0f);
     }
 }
 
@@ -52,6 +75,8 @@ void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_sta
     h->phase_state[1] = state_v;
     h->phase_state[2] = state_w;
 }
+
+// ===== KEY CHANGE: Send duty cycles to SIL =====
 void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, uint16_t duty_u_q15, uint16_t duty_v_q15, uint16_t duty_w_q15)
 {
     float duty[3] = {((float)duty_u_q15/INT16_MAX), ((float)duty_v_q15/INT16_MAX), ((float)duty_w_q15/INT16_MAX)};
@@ -65,6 +90,10 @@ void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, uint16_t duty_u_q15, uin
             duty[i] = 1;
         }
     }
+    
+    // STEP 4: Send duty cycles to SIL inverter model
+    eldriver_sil_set_inverter_duty(duty[0], duty[1], duty[2], 24.0f);  // 24V bus nominal
+    
     float dt = 1.0/h->config.pwm_Hz;
     vtime += dt;
 }
