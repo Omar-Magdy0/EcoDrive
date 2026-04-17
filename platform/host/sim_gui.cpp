@@ -46,8 +46,6 @@ static void update_electric_scope() {
                 channel_buffer[ch][i] = view_buffer[i * CHANNELS + ch];
             }
         }
-    }
-}
 
 // ======================= DATA =======================
 ModelData getModelData() {
