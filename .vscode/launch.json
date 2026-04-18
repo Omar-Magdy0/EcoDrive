@@ -5,13 +5,37 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "(gdb) Launch EcoDrive",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/bin/EcoDrive",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Launch EcoTool",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/EcoTool/EcoTool",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -41,7 +65,7 @@
             "type": "cortex-debug",
             "servertype": "bmp",
             "interface": "swd",
-            "device": "STM32FF401",
-        },
+            "device": "STM32FF401"
+        }
     ]
 }

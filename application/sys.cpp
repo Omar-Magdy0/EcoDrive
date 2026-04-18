@@ -229,16 +229,7 @@ void sys_init()
         NULL
     );
 
-    PmsmControl::StupConfig stup_cfg = {
-        .align_duration_ms  = 100,
-        .align_sector       = ELDRIVER_MC3P_SECTOR_TRAP3,
-        .bus_V              = 12,
-        .align_V            = 1,
-        .time_mS             = {0 , 1000 , 1500 , 2000},
-        .volt_V             = {2 , 2.25, 2.5, 2.75},
-        .freq_Hz            = {100, 125, 200, 250}
-    };
-    motor_c1.init(stup_cfg);
+    motor_c1.init();
     #ifndef PLATFORM_HOST
     vTaskStartScheduler();
     #else

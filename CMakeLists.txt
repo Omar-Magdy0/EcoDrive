@@ -137,6 +137,17 @@ if(PLATFORM_NAME STREQUAL "host")
         #tinycbor
     )
 
+    add_executable(EcoTool ${CMAKE_CURRENT_SOURCE_DIR}/EcoTool/EcoTool.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
+    target_sources(EcoTool PRIVATE ${PLATFORM_SOURCE})
+    target_link_libraries(EcoTool PRIVATE
+        ${PLATFORM_INTERFACE}
+        ${PLATFORM_LIB}
+        ${TOOLCHAIN_LINK_LIBRARIES}
+        #tinycbor
+    )
+    set_target_properties(EcoTool PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/EcoTool
+    )
 endif()
 
 

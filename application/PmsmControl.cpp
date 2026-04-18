@@ -32,11 +32,7 @@ void hall1_ComCallback();
  */
 PmsmControl motor_c1;
 
-/**
- * @brief Initializes the PMSM controller with a given startup configuration.
- * @param stup_cfg The startup configuration parameters.
- */
-void PmsmControl::init(const StupConfig &stup_cfg)
+void PmsmControl::init()
 {
     /// Reset the PWM tick counter to zero
     pwmTicks = 0;
@@ -51,9 +47,6 @@ void PmsmControl::init(const StupConfig &stup_cfg)
     /// Set the deadtime for the inverter switches to 1500 nanoseconds
     mc3p.config.deadtime_nS = 1500;
 
-    /// Load the provided startup configuration into the internal state
-    stup.cfg = stup_cfg;
-    /// Reset the commutation ticks counter
     stup.comm_ticks = 0;
     /// Initialize the electrical sector to floating state (all switches off)
     elec.sector = ELDRIVER_MC3P_SECTOR_FLOAT;
@@ -128,8 +121,8 @@ void PmsmControl::pwmLoop()
     case ControlMode::OpenTrap:
         OpenTrap_pwmLoop();
         break;
-    case ControlMode::OpenVF:
-        OpenVF_pwmLoop();
+    case ControlMode::OpenFocIF:
+        OpenFocIF_pwmLoop();
         break;
     case ControlMode::Commission:
         SelfCommission_pwmLoop();
@@ -177,7 +170,7 @@ void PmsmControl::xmcLoop()
         break;
     case ControlMode::OpenTrap:
         break;
-    case ControlMode::OpenVF:
+    case ControlMode::OpenFocIF:
         break;
     case ControlMode::Commission:
         /// Execute self-commissioning post-process calculations
