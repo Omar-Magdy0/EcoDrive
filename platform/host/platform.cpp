@@ -237,10 +237,17 @@ void gui_init(){
     #ifdef _WIN32
         // Windows standard font path
         font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-     #else
-        // Common Linux font paths (Ubuntu/Debian/Fedora)
-        font = io.Fonts->AddFontFromFileTTF("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", 18.0f);
-        if (!font) font = io.Fonts->AddFontFromFileTTF("/usr/share/fonts/TTF/DejaVuSans.ttf", 18.0f);
+    #else
+        auto try_load_font = [&](const char* path) -> ImFont* {
+            FILE* file = fopen(path, "rb");
+            if (!file) return nullptr;
+            fclose(file);
+            return io.Fonts->AddFontFromFileTTF(path, 18.0f);
+        };
+
+        font = try_load_font("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
+        if (!font) font = try_load_font("/usr/share/fonts/TTF/DejaVuSans.ttf");
+        if (!font) font = try_load_font("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf");
     #endif
 
     // Fallback if the specific system fonts above aren't found

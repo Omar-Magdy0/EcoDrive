@@ -36,6 +36,13 @@ class SimHelper{
     int elec_scope_size;
     ElcoreScopeStream<float> elec_scope;
 
+    struct MechanicalData {
+        float speed = 0.0f;
+        float torque = 0.0f;
+    } mechanical;
+
+    float dc_link_voltage = 0.0f;
+
     SimHelper(unsigned int elec_buf_depth):
     elec_buf(new float[VPMSM_ELEC_CHANNELS * elec_buf_depth]),
     elec_scope(elec_buf, VPMSM_ELEC_CHANNELS, 10, elec_buf_depth/10)
@@ -45,7 +52,16 @@ class SimHelper{
     }
     ~SimHelper()
     {
-        delete elec_buf;
+        delete[] elec_buf;
+    }
+
+    void start() {
+        elec_scope.triggered = false;
+        elec_scope.frozen = false;
+    }
+
+    void stop() {
+        elec_scope.frozen = true;
     }
 };
 #endif
