@@ -3,7 +3,6 @@
  * @brief Implementation of the Permanent Magnet Synchronous Motor (PMSM) controller.
  * @details Contains the primary control loops, hardware configuration, state machine routing,
  *          and telemetry data buffering logic required to drive a PMSM.
- * @details Detailed Doxygen documentation and code analysis by Bishoy Youssef.
  */
  
 #include "PmsmControl.h"
