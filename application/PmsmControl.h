@@ -79,31 +79,84 @@ struct PmsmControl
 {
     enum class ControlMode : uint8_t
     {
-        Idle = 0,    /** Outputs disabled, no commutation. */
-        ClosedTrap, /** Closed-loop trapezoidal commutation. */
-        OpenTrap,   /** Open-loop trapezoidal commutation. */
-        OpenFocIF,  /** Open-loop V/Hz (V/F) commutation. */
-        Commission  /** Self-commissioning / parameter identification. */
+        /** 
+         * @brief Safe resting state (Outputs Disabled).
+         * @details All inverter switches are turned off, leaving the motor phases floating 
+         *          (high-impedance). This is the default system state upon power-up and the 
+         *          fallback state during hardware faults (e.g., Over-Current or Over-Voltage).
+         */
+        Idle = 0,    
+        /** 
+         * @brief Closed-loop 6-step trapezoidal commutation.
+         * @details Dynamically determines the active commutation sector using real-time absolute 
+         *          rotor position feedback (from Hall sensors or BEMF zero-crossing observers). 
+         *          Provides optimal torque generation and is the primary running mode.
+         */
+        ClosedTrap, 
+        /** 
+         * @brief Open-loop 6-step trapezoidal commutation.
+         * @details Blindly applies a rotating 6-step voltage pattern without relying on actual 
+         *          rotor position feedback. Useful for diagnostic testing or initial forced rotation.
+         */
+        OpenTrap,   
+        /** 
+         * @brief Open-loop Voltage/Frequency (V/f) sinusoidal commutation.
+         * @details Synthesizes a rotating voltage vector (Space Vector Modulation) at a fixed V/f 
+         *          ratio. Often used for pumps/fans or as a preliminary step before closing the 
+         *          loop in Field Oriented Control (FOC).
+         */
+        OpenFocIF,  
+        /** 
+         * @brief Automated Self-Commissioning and Parameter Identification.
+         * @details Executes a sequence of static and high-frequency signal injections to physically 
+         *          measure motor characteristics (Rs, Ld, Lq) while the rotor is stationary. 
+         *          Crucial for auto-tuning the controller to unknown motors.
+         */
+        Commission  
     };
 
     /**
-     * @brief Synchronized measurement cache from MC3P driver.
-     *
-     * Stores either SVM or trapezoidal measurements depending on mode.
-     * The active interpretation is controlled by the current `ControlMode`.
+     * @brief Synchronized measurement cache from the MC3P hardware driver.
+     * @details Declared as a `union` to significantly save RAM. Because the motor can only operate 
+     *          in one physical commutation mode at a time (either Sinusoidal/SVM or Trapezoidal), 
+     *          the raw ADC readings are parsed and stored in the specific struct that matches the 
+     *          active `ControlMode`. This guarantees that high-frequency control loops always 
+     *          have instantaneous access to the freshest currents and voltages without memory overhead.
      */
     union
     {
-        eldriver_mc3p_svm_data_t svm;
-        eldriver_mc3p_trap_data_t trap;
+        eldriver_mc3p_svm_data_t svm;   /**< Active when Space Vector Modulation (SVM) is used (e.g., OpenFocIF, Commission). */
+        eldriver_mc3p_trap_data_t trap; /**< Active when 6-step block commutation is used (e.g., ClosedTrap, OpenTrap). */
     } mc3p_sync_meas{};
 
     enum class StupStage : uint8_t
     {
-        Reset = 0, /** STUP inactive or reset state. */
-        Align,     /** Rotor alignment stage. */
-        Ramp,      /** Open-loop ramp stage. */
-        Closed     /** Ready to transition to closed-loop. */
+        /** 
+         * @brief Initialization and preparation state.
+         * @details Clears all internal software timers, error tracking counters, and tracking 
+         *          variables. Acts as the entry gateway before attempting to energize the motor.
+         */
+        Reset = 0, 
+        /** 
+         * @brief Static rotor alignment phase (DC Injection).
+         * @details Used primarily in sensorless control. It injects a static DC voltage into a 
+         *          specific electrical sector, creating a stationary magnetic field that physically 
+         *          pulls the rotor into a known 0-degree starting position.
+         */
+        Align,     
+        /** 
+         * @brief Open-loop forced acceleration phase (V/f Ramp).
+         * @details Gradually accelerates the synthesized magnetic field using a predefined Voltage/Frequency 
+         *          profile. This physically drags the rotor up to a minimum velocity where Back-EMF 
+         *          signals become strong enough to be reliably measured by the ADC.
+         */
+        Ramp,      
+        /** 
+         * @brief Steady-state operational phase (Closed-Loop).
+         * @details Indicates that the startup sequence has successfully completed. The system is 
+         *          now fully relying on real-time feedback (Hall or BEMF) to commutate the motor.
+         */
+        Closed     
     };
 
     enum class Direction : uint8_t
@@ -113,26 +166,28 @@ struct PmsmControl
     };
 
     /**
-     * @brief Startup (STUP) configuration.
+     * @brief Startup (STUP) configuration profile.
      *
-     * Defines alignment parameters and the ramp profile used for
-     * open-loop startup.
+     * Defines the strict physical parameters for DC alignment and the precise 
+     * multi-point acceleration ramp used during open-loop sensorless startup.
      *
      * @details
-     * The ramp is defined as a piecewise profile over equally-indexed
-     * time, voltage, and frequency points. Each index represents a
-     * target operating point for the startup sequence.
+     * Since Back-EMF is absent at 0 RPM, the motor must be blindly accelerated. 
+     * This structure defines a piecewise linear interpolation profile. By matching 
+     * an elapsed `time_mS` to a target `volt_V` and `freq_Hz`, the controller can 
+     * synthesize a smooth acceleration curve that avoids stalling or drawing 
+     * excessive overcurrent.
      */
     struct StupConfig
     {
-        uint16_t align_duration_ms{}; /** Alignment dwell time (ms). */
-        eldriver_mc3p_sector_t align_sector{ELDRIVER_MC3P_SECTOR_FLOAT}; /** Alignment sector. */
-        float bus_V{}; /** Bus voltage (V). */
-        float align_V{}; /** Alignment voltage (V). */
-        float start_current_A{}; /** Open-loop accel current setpoint (A). */
-        std::array<float, STUP_TABLE_SIZE> time_mS{}; /** Ramp time points (ms). */
-        std::array<float, STUP_TABLE_SIZE> volt_V{}; /** Ramp voltage points (V). */
-        std::array<float, STUP_TABLE_SIZE> freq_Hz{}; /** Ramp frequency points (Hz). */
+        uint16_t align_duration_ms{}; /**< Total time to hold the DC alignment vector to allow mechanical ringing to dampen (ms). */
+        eldriver_mc3p_sector_t align_sector{ELDRIVER_MC3P_SECTOR_FLOAT}; /**< The specific stationary electrical sector used for alignment. */
+        float bus_V{}; /**< Nominal DC bus voltage used as a mathematical base to normalize duty cycles (V). */
+        float align_V{}; /**< The precise, low-level DC voltage applied during the alignment phase (V). */
+        float start_current_A{}; /**< Estimated open-loop acceleration current setpoint (A). */
+        std::array<float, STUP_TABLE_SIZE> time_mS{}; /**< Array of time milestones (in milliseconds) defining the X-axis of the ramp profile. */
+        std::array<float, STUP_TABLE_SIZE> volt_V{};  /**< Array of target voltage amplitudes mapped to each time milestone. */
+        std::array<float, STUP_TABLE_SIZE> freq_Hz{}; /**< Array of target electrical commutation frequencies mapped to each time milestone. */
     };
 
     constexpr int8_t DirectionSign(Direction dir)
@@ -186,17 +241,21 @@ struct PmsmControl
     } stup{};
 
     /**
-     * @brief Electrical (alpha/beta) state and commutation data.
+     * @brief High-frequency electrical state, coordinate transforms, and commutation metrics.
+     * @details This structure encapsulates all real-time electrical variables derived directly 
+     *          from the ADC measurements or generated by the control loops. It uses efficient 
+     *          Q15 fixed-point math for duty cycles and voltages to maximize execution speed 
+     *          on microcontrollers without native floating-point units.
      */
     struct
     {
-        float vbus{}; /** DC bus voltage (V). */
-        q15_t alpha_q15{}; /** Alpha-axis voltage/current (Q15). */
-        q15_t beta_q15{}; /** Beta-axis voltage/current (Q15). */
-        q15_t trap_duty_q15{}; /** Trapezoidal duty (Q15). */
-        eldriver_mc3p_sector_t sector{ELDRIVER_MC3P_SECTOR_FLOAT}; /** Electrical sector. */
-        float speed_hz{}; /** Electrical speed (Hz). */
-        float theta; /** Electrical angle (rad). */
+        float vbus{}; /**< Instantaneous measured DC link bus voltage (V). */
+        q15_t alpha_q15{}; /**< Stationary alpha-axis component of the Clarke transform (normalized Q15 format). */
+        q15_t beta_q15{};  /**< Stationary beta-axis component of the Clarke transform (normalized Q15 format). */
+        q15_t trap_duty_q15{}; /**< Commanded PWM duty cycle for block commutation (normalized Q15 format). */
+        eldriver_mc3p_sector_t sector{ELDRIVER_MC3P_SECTOR_FLOAT}; /**< The currently active 6-step commutation sector (1 to 6, or Float). */
+        float speed_hz{}; /**< Instantaneous electrical speed of the rotating stator field (Hz). */
+        float theta; /**< Real-time electrical angle of the rotor (in radians, from 0 to 2*PI). */
     } elec{};
 
     /**
@@ -210,20 +269,27 @@ struct PmsmControl
     } mech{};
 
     /**
-     * @brief Motor model parameters used for control and commissioning.
+     * @brief Comprehensive motor physics model parameters.
+     * @details This structure holds the fundamental electrical and mechanical constants of the 
+     *          connected PMSM. These values are typically populated by the `SelfCommission` routines 
+     *          and are absolutely vital for advanced closed-loop algorithms like Field Oriented Control (FOC), 
+     *          current decoupling, and state observers (like SMO or PLL).
      */
     struct
     {
-        float Rs; /** Stator resistance (Ohm). */
-        float Ld; /** D-axis inductance (H). */
-        float Lq; /** Q-axis inductance (H). */
-        float Ke; /** Back-EMF constant. */
-        float J; /** Rotor inertia. */
-        float B; /** Viscous friction coefficient. */
+        float Rs; /**< Stator phase resistance (Ohms). Dictates static copper losses and DC voltage drop. */
+        float Ld; /**< Direct-axis synchronous inductance (Henries). Affects flux-weakening capability. */
+        float Lq; /**< Quadrature-axis synchronous inductance (Henries). Primary contributor to reluctance torque. */
+        float Ke; /**< Back-EMF constant (V*s/rad). Dictates the voltage generated by the motor per unit of speed. */
+        float J;  /**< Mechanical rotor inertia (kg*m^2). Used to tune speed loop PID gains. */
+        float B;  /**< Viscous friction coefficient (N*m*s). Represents mechanical drag. */
     } model;
 
     /**
-     * @brief Self-commissioning / identification state.
+     * @brief Self-commissioning / hardware identification state machine context.
+     * @details Contains all staging variables, software timers, and mathematical accumulators 
+     *          required to run the automated motor identification sequence (measuring Rs, Ld, Lq). 
+     *          It specifically handles the complex High-Frequency Injection (HFI) heterodyning states.
      */
     struct
     {
@@ -293,7 +359,13 @@ struct PwmDataFrame_t
 };
 
 /**
- * @brief Ring buffer for PWM telemetry frames.
+ * @brief Lock-free ring buffer designed for high-speed PWM telemetry capture.
+ * @details In high-frequency motor control (e.g., 25 kHz), extracting debug data without blocking 
+ *          the fast PWM loop is extremely challenging. This struct implements a zero-copy, lock-free 
+ *          ring buffer. The fast ISR writes raw samples into a `currentFrame`. Once the frame fills 
+ *          up to `SAMPLES_PER_FRAME`, it is atomically committed to the underlying `elcore_rstream_t`, 
+ *          allowing a slower background RTOS task (like USB/UART) to transmit the data to a host GUI 
+ *          without ever interrupting the critical motor control execution.
  */
 struct pwmDataBuffer_t
 {

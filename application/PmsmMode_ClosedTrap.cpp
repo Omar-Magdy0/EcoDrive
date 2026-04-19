@@ -1,26 +1,47 @@
 #include "PmsmControl.h"
 
 /**
- * @brief Resets the startup state machine to its initial state.
- * @param cp Pointer to the PMSM control structure.
+ * @brief Resets the startup state machine and prepares hardware for the commutation sequence.
+ * @details This function acts as the entry point for motor startup. Depending on the active 
+ *          sensor configuration (Hall effect sensors vs. Sensorless Back-EMF), it delegates 
+ *          the initialization to the appropriate specific handler (e.g., Hall_ResetHandler or 
+ *          Bemfzc_ResetHandler). It ensures that all staging variables, timers, and error 
+ *          counters are cleared before energizing the motor phases.
+ * @param cp Pointer to the primary PMSM control structure containing the motor's state context.
  */
 static inline void ResetHandler(PmsmControl *cp);
 
 /**
- * @brief Handles the rotor alignment stage before starting commutation.
- * @param cp Pointer to the PMSM control structure.
+ * @brief Handles the rotor alignment stage to establish a known initial electrical angle.
+ * @details In sensorless (Back-EMF) control schemes, the absolute rotor position is unknown at 
+ *          standstill. This handler injects a fixed DC voltage vector into a specific electrical 
+ *          sector for a predetermined duration. This creates a stationary magnetic field that forces 
+ *          the permanent magnet rotor to align itself, guaranteeing a safe and predictable starting 
+ *          point for the subsequent open-loop ramp stage.
+ * @note This stage is typically bypassed when absolute position sensors (like Hall sensors) are available.
+ * @param cp Pointer to the primary PMSM control structure.
  */
 static inline void AlignHandler(PmsmControl *cp);
 
 /**
- * @brief Handles the open-loop voltage and frequency ramping stage.
- * @param cp Pointer to the PMSM control structure.
+ * @brief Manages the open-loop forced commutation ramping stage for sensorless startup.
+ * @details Since Back-EMF amplitude is proportional to speed, it cannot be reliably detected at 
+ *          very low speeds. This handler synthesizes a rotating magnetic field by applying a 
+ *          pre-configured Voltage/Frequency (V/f) profile. It linearly interpolates voltage and 
+ *          frequency targets over time, gradually accelerating the rotor open-loop until the 
+ *          generated Back-EMF is strong enough for reliable zero-crossing detection.
+ * @param cp Pointer to the primary PMSM control structure.
  */
 static inline void RampHandler(PmsmControl *cp);
 
 /**
- * @brief Handles the closed-loop state after successful startup estimation.
- * @param cp Pointer to the PMSM control structure.
+ * @brief Maintains steady-state closed-loop commutation.
+ * @details Once the motor has successfully started (either immediately via Hall sensors or after 
+ *          a successful open-loop ramp in sensorless mode), this handler takes over. It constantly 
+ *          evaluates real-time position feedback to dynamically update the active electrical sector 
+ *          and applies the appropriate PWM duty cycles to the inverter bridge, ensuring optimal 
+ *          torque generation and synchronous rotation.
+ * @param cp Pointer to the primary PMSM control structure.
  */
 static inline void ClosedHandler(PmsmControl *cp);
 
@@ -29,8 +50,15 @@ static inline void ClosedHandler(PmsmControl *cp);
 #endif
 
 /**
- * @brief Executes the PWM loop specifically for Closed-Loop Trapezoidal control.
- * @details Implements a state machine that transitions through Reset, Align, Ramp, and finally Closed-loop stages.
+ * @brief Executes the primary high-frequency PWM control loop for Closed-Loop Trapezoidal operation.
+ * @details This method acts as the central execution hub for the trapezoidal state machine. It is 
+ *          typically invoked by a hardware timer interrupt or an ADC synchronization callback at the 
+ *          PWM carrier frequency (e.g., 20 kHz to 25 kHz). By evaluating `stup.stage_current`, it 
+ *          routes the execution flow to the appropriate stage handler: Reset, Align, Ramp, or Closed.
+ *          It ensures that state transitions occur seamlessly without dropping PWM cycles.
+ * @warning This function is executed in a time-critical Interrupt Service Routine (ISR) context. 
+ *          Blocking operations, heavy math, or lengthy loops must be strictly avoided to prevent 
+ *          control loop instability.
  */
 void PmsmControl::ClosedTrap_pwmLoop()
 {
@@ -54,8 +82,13 @@ void PmsmControl::ClosedTrap_pwmLoop()
 }
 
 /**
- * @brief Callback function executed upon Back-EMF Zero Crossing detection.
- * @details Advances the electrical commutation sector and updates the driver's trapezoidal outputs.
+ * @brief Hardware/Software callback triggered upon successful Back-EMF Zero-Crossing (ZCD) detection.
+ * @details In sensorless trapezoidal control, a zero-crossing of the un-driven phase's Back-EMF 
+ *          indicates that the rotor's magnetic axis is perfectly aligned with the current commutation 
+ *          sector. To maximize torque, the actual commutation (phase switching) must be delayed by 
+ *          30 electrical degrees after this crossing. When this delayed callback fires, it calculates 
+ *          the next electrical sector based on the commanded mechanical direction (forward or reverse) 
+ *          and immediately updates the 3-phase inverter outputs.
  */
 void bemfzc_ComCallback()
 {
@@ -66,8 +99,13 @@ void bemfzc_ComCallback()
 }
 
 /**
- * @brief Callback function executed upon a Hall Sensor state change.
- * @details Reads the new Hall pattern, maps it to a trapezoidal sector, and commands the inverter.
+ * @brief Hardware interrupt callback triggered upon any state change of the physical Hall sensors.
+ * @details Hall effect sensors provide discrete, absolute rotor position feedback every 60 electrical 
+ *          degrees. When a state change triggers an interrupt, this callback executes immediately to 
+ *          minimize commutation latency. It reads the raw 3-bit binary pattern from the GPIO pins, 
+ *          uses a lookup table (`HALL_TO_TRAP_TABLE`) to determine the corresponding electrical sector, 
+ *          applies a directional offset for forward/reverse rotation, and updates the inverter's PWM 
+ *          duty cycles. This ensures highly responsive and robust torque control, especially at low speeds.
  */
 void hall1_ComCallback()
 {
@@ -88,7 +126,12 @@ void hall1_ComCallback()
 ///@{
 #ifdef BEMFZC_ENABLED
 /**
- * @brief Initializes the sensorless startup sequence.
+ * @brief Initializes the internal state machine variables for a sensorless (Back-EMF) startup sequence.
+ * @details This function is the first step in starting a motor without physical position sensors. 
+ *          It forces the internal state trackers to acknowledge the `Reset` stage, clears the consecutive 
+ *          good BEMF estimates counter (`good_est_count` = 0) to prevent premature closed-loop handover, 
+ *          and queues the `Align` stage as the immediate next operation.
+ * @param cp Pointer to the active PMSM control structure.
  */
 static inline void Bemfzc_ResetHandler(PmsmControl *cp)
 {
@@ -101,7 +144,15 @@ static inline void Bemfzc_ResetHandler(PmsmControl *cp)
 }
 
 /**
- * @brief Applies a fixed DC voltage vector to force the rotor to a known stationary alignment.
+ * @brief Executes the sensorless DC alignment protocol to lock the rotor into a known position.
+ * @details When the state machine first enters this handler, it calculates the necessary PWM duty 
+ *          cycle fraction by dividing the target alignment voltage (`align_V`) by the measured DC bus 
+ *          voltage (`bus_V`). This ratio is converted into a highly efficient Q15 fixed-point format 
+ *          (`arm_float_to_q15`) and applied to a predefined, static electrical sector (`align_sector`). 
+ *          A software timer is started, and the handler continuously monitors elapsed time until the 
+ *          configured `align_duration_ms` is reached, allowing any mechanical oscillations to dampen 
+ *          out before transitioning to the `Ramp` stage.
+ * @param cp Pointer to the active PMSM control structure.
  */
 static inline void Bemfzc_AlignHandler(PmsmControl *cp)
 {
@@ -129,7 +180,23 @@ static inline void Bemfzc_AlignHandler(PmsmControl *cp)
 }
 
 /**
- * @brief Accelerates the motor in open-loop by interpolating voltage and frequency against a time profile.
+ * @brief Orchestrates the complex open-loop V/f ramping profile to accelerate the rotor.
+ * @details At a standstill, Back-EMF is zero. To generate enough Back-EMF for sensorless observation, 
+ *          the motor must be forcefully spun up. This handler steps through a multi-point configuration 
+ *          table (`stup.cfg`), mapping time milestones (`time_mS`) to specific voltage (`volt_V`) and 
+ *          frequency (`freq_Hz`) targets. 
+ *          
+ *          Key operations per cycle:
+ *          - **Time Tracking**: Calculates elapsed stage time in milliseconds.
+ *          - **Voltage Interpolation**: Uses `elmath_linearInterp` to calculate a smooth voltage curve, 
+ *            converts it to a normalized Q15 duty cycle, and applies it to the active sector.
+ *          - **Frequency Commutation**: Simulates an electrical frequency by triggering forced phase 
+ *            commutations every `comm_ticks`.
+ *          - **Profile Advancement**: Moves to the next index in the ramp table as time passes.
+ *          - **BEMF Handover**: Once the mechanical ramp profile is exhausted, it compares the synthetically 
+ *            driven frequency against the real-time Back-EMF speed estimate. If they match within a margin, it 
+ *            enters `Closed` mode.
+ * @param cp Pointer to the active PMSM control structure.
  */
 static inline void Bemfzc_RampHandler(PmsmControl *cp)
 {
@@ -221,8 +288,14 @@ static inline void Bemfzc_RampHandler(PmsmControl *cp)
  */
 ///@{
 /**
- * @brief Immediately reads the Hall state and transitions directly to closed-loop.
- * @details Sensored motors do not require open-loop ramping; they can be closed-loop commutated immediately from standstill.
+ * @brief Initializes sensored startup by instantly resolving absolute rotor position and transitioning to closed-loop.
+ * @details Unlike sensorless techniques, a Hall-sensored motor does not require an alignment or open-loop 
+ *          ramp phase. This handler exploits this advantage by immediately reading the current Hall sensor 
+ *          pattern, deriving the correct starting electrical sector, and calculating the necessary PWM duty 
+ *          cycle based on the alignment voltage configuration. It pre-configures the phase delay for the 
+ *          optimal commutation point, registers the `hall1_ComCallback` for future interrupts, writes the 
+ *          initial pulse to the inverter, and instantly promotes the state machine to `Closed` mode.
+ * @param cp Pointer to the active PMSM control structure.
  */
 static inline void Hall_ResetHandler(PmsmControl *cp)
 {

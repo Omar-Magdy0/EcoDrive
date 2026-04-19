@@ -1,7 +1,9 @@
 /**
  * @file PmsmMode_SComm.cpp
  * @brief Implementation of the Self-Commissioning (Parameter Identification) control mode.
- * @details Executes automated tests (DC alignment, high-frequency injection) to identify motor parameters like Rs, Ld, and Lq.
+ * @details Executes automated electrical tests to identify motor parameters without spinning the rotor.
+ *          This includes DC alignment for rotor positioning, DC voltage injection for Stator Resistance (Rs) measurement,
+ *          and High-Frequency Injection (HFI) on the D and Q axes for Inductance (Ld and Lq) identification.
  */
 #include "PmsmControl.h"
 #include <arm_math.h>
@@ -18,7 +20,8 @@ constexpr uint16_t SCOMM_HFI_IIR_SETTLE = (4.6 / SCOMM_HFI_DEMOD_ALPHA);
 
 /**
  * @brief Initializes the Self-Commissioning state machine.
- * @details Resets the identification stages back to the initial condition.
+ * @details Resets the identification stages back to the initial condition (`RESET`),
+ *          ensuring that any previous commissioning data or states are cleared before starting a new test.
  */
 void PmsmControl::SelfCommission_init()
 {
@@ -28,7 +31,12 @@ void PmsmControl::SelfCommission_init()
 
 /**
  * @brief High-frequency PWM loop for Self-Commissioning parameter identification.
- * @details Sequences through D-Axis alignment, Stator Resistance (Rs) measurement, and Inductance (Ld/Lq) identification using High-Frequency Injection (HFI).
+ * @details Executed at the PWM switching frequency. It sequences through the following stages:
+ *          - **DAXIS_ALIGN**: Applies a fixed DC voltage to align the rotor to the D-axis (theta = 0).
+ *          - **RS_ID**: Measures the steady-state DC current to estimate Stator Resistance (Rs).
+ *          - **LD_ID**: Injects a high-frequency (HF) sinusoidal voltage on the D-axis and processes the current response.
+ *          - **LQ_ID**: Injects an HF sinusoidal voltage on the Q-axis and processes the current response.
+ *          - **ELEC_POSTPROCESS**: Safely disables outputs and signals the slow loop to calculate the final values.
  */
 void PmsmControl::SelfCommission_pwmLoop()
 {
@@ -237,7 +245,9 @@ void PmsmControl::SelfCommission_pwmLoop()
 
 /**
  * @brief Cross-domain low-frequency loop for post-processing identified parameters.
- * @details Performs heavy floating-point math (e.g., square roots and arctangents) to extract Rs, Ld, and Lq safely outside the fast PWM interrupt.
+ * @details Executed at a lower priority/frequency than the PWM loop. It performs heavy floating-point math 
+ *          (e.g., square roots and arctangents) to extract the final Rs, Ld, and Lq values safely outside 
+ *          the time-critical fast PWM interrupt. It uses the heterodyned and filtered data collected during the HFI stages.
  */
 void PmsmControl::SelfCommission_xmcLoop()
 {

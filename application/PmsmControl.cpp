@@ -1,7 +1,8 @@
 /**
  * @file PmsmControl.cpp
  * @brief Implementation of the Permanent Magnet Synchronous Motor (PMSM) controller.
- * @details Contains the primary control loops, hardware configuration, and telemetry data buffering logic.
+ * @details Contains the primary control loops, hardware configuration, state machine routing,
+ *          and telemetry data buffering logic required to drive a PMSM.
  * @details Detailed Doxygen documentation and code analysis by Bishoy Youssef.
  */
  
@@ -13,103 +14,116 @@
 
 /**
  * @def DEBUG_PIN
- * @brief GPIO pin definition used for debugging execution timing.
+ * @brief GPIO pin definition used for toggling signals to debug execution timing and measure interrupt latency.
  */
 #define DEBUG_PIN (16 * 1 + 2)
 
 /**
- * @brief External callback function for Back-EMF Zero Crossing commutation.
+ * @brief External callback function triggered upon detecting a Back-EMF Zero Crossing.
+ * @details Used in sensorless trapezoidal control to advance the commutation sector at the right electrical angle.
  */
 void bemfzc_ComCallback();
 
 /**
- * @brief External callback function for Hall Sensor 1 commutation.
+ * @brief External callback function triggered upon a change in the Hall Sensor state.
+ * @details Used in sensored trapezoidal control to instantly apply the next commutation sector based on rotor position.
  */
 void hall1_ComCallback();
 
 /**
- * @brief Global instance of the PMSM control structure for motor C1.
+ * @brief Global instance of the primary PMSM control structure for motor channel 1.
  */
 PmsmControl motor_c1;
 
+/**
+ * @brief Initializes the overall PMSM controller, state machine, and associated hardware drivers.
+ * @details Resets the global PWM tick counter, applies the default PWM frequency, configures the
+ *          inverter's maximum/minimum duty cycles and deadtime, and initializes the MC3P driver.
+ *          It also prepares the commutation and staging software timers and sets the initial mode.
+ */
 void PmsmControl::init()
 {
-    /// Reset the PWM tick counter to zero
+    /// Reset the PWM tick counter to zero to establish a fresh time reference
     pwmTicks = 0;
-    /// Set the initial PWM frequency to the default value
+    /// Set the initial PWM carrier frequency to the system's default value (typically 25kHz)
     set_pwm_freq(PWM_FREQ_DEFAULT);
-    /// Configure the 3-phase motor driver's PWM frequency
+    /// Apply the selected PWM frequency to the 3-phase motor driver configuration
     mc3p.config.pwm_Hz = pwm_freq_hz;
-    /// Set the maximum allowed duty cycle to 95%
+    /// Constrain the maximum allowed PWM duty cycle to 95% to leave a window for current sensing
     mc3p.config.duty_max = 0.95;
-    /// Set the minimum allowed duty cycle to 5%
+    /// Constrain the minimum allowed PWM duty cycle to 5% to ensure bootstrap capacitors stay charged
     mc3p.config.duty_min = 0.05;
-    /// Set the deadtime for the inverter switches to 1500 nanoseconds
+    /// Set the switching deadtime to 1500 nanoseconds to prevent shoot-through in the inverter bridge
     mc3p.config.deadtime_nS = 1500;
 
     stup.comm_ticks = 0;
-    /// Initialize the electrical sector to floating state (all switches off)
+    /// Initialize the electrical sector to a floating state to ensure all power switches are safely off initially
     elec.sector = ELDRIVER_MC3P_SECTOR_FLOAT;
-    /// Sync commutation timer period with the calculated microsecond tick period
+    /// Synchronize the commutation timer's software period with the calculated microsecond tick period
     stup.comm_timer.tick_period = tick_period_us;
-    /// Sync staging timer period with the calculated microsecond tick period
+    /// Synchronize the staging timer's software period with the calculated microsecond tick period
     stup.stage_timer.tick_period = tick_period_us;
-    /// Set the default control mode to Closed-Loop Trapezoidal
+    /// Set the default control mode to Closed-Loop Trapezoidal as the standard operational state
     mode = ControlMode::ClosedTrap;
-    /// Initialize the startup stage machine to the Reset stage
+    /// Initialize the startup state machine to the Reset stage, waiting for a start command
     stup.stage_current = StupStage::Reset;
-    /// Initialize the position sensor with the current PWM frequency
+    /// Initialize the rotor position sensor logic (Hall or Sensorless) with the active PWM frequency
     pos_sensor.init(pwm_freq_hz);
-    /// Enable hardware offset calibration for phase currents
+    /// Enable automated hardware offset calibration for the phase current sensors during driver startup
     mc3p.offset_calibration = true;
-    /// Initialize the underlying motor driver hardware
+    /// Initialize the underlying MC3P hardware motor driver
     eldriver_mc3p_init(&mc3p);
-    /// Flag the controller as successfully initialized
+    /// Flag the controller state as successfully initialized to allow main loop execution
     initialized = true;
 }
 
 /**
- * @brief Updates the PWM frequency and recalculates dependent timing periods.
- * @param pwm_hz The target PWM frequency in Hertz.
+ * @brief Updates the system PWM frequency and recalculates all dependent hardware and software timing periods.
+ * @param pwm_hz The target PWM carrier frequency in Hertz.
+ * @details This recalculates the tick period in both microseconds and milliseconds. It updates the underlying
+ *          MC3P hardware driver configuration and resynchronizes the software timers (commutation and stage timers)
+ *          to ensure timing accuracy is maintained across frequency changes.
  */
 void PmsmControl::set_pwm_freq(uint32_t pwm_hz)
 {
-    /// Prevent division by zero if frequency is invalid
+    /// Prevent division by zero crashes if an invalid frequency (0 Hz) is requested
     if (pwm_hz == 0)
         return;
-    /// Update the internal frequency variable
+    /// Update the internal active frequency tracking variable
     pwm_freq_hz = pwm_hz;
-    /// Calculate the time period of one tick in microseconds
+    /// Calculate the precise time period of one PWM tick in microseconds
     tick_period_us = 1'000'000.0f / static_cast<float>(pwm_freq_hz);
-    /// Calculate the time period of one tick in milliseconds
+    /// Calculate the precise time period of one PWM tick in milliseconds
     tick_period_ms = tick_period_us / 1000.0f;
-    /// Update the driver configuration with the new frequency
+    /// Update the underlying driver configuration payload with the newly requested frequency
     mc3p.config.pwm_Hz = pwm_freq_hz;
-    /// Update timing periods for the software timers
+    /// Resynchronize the timing periods for the startup phase commutation and stage software timers
     stup.comm_timer.tick_period = tick_period_us;
     stup.stage_timer.tick_period = tick_period_us;
-    /// Reinitialize the position sensor to adapt to the new timing
+    /// Reinitialize the position sensor logic to adapt filtering and delays to the new timing characteristics
     pos_sensor.init(pwm_freq_hz);
 }
 
-/// @brief
 /**
  * @brief Main high-frequency Pulse Width Modulation (PWM) control loop.
- * @details Executed periodically (usually bound to ADC synchronization). It evaluates the active control mode and drives the inverter.
+ * @details Executed periodically (usually bound to an ADC synchronization interrupt or a hardware timer).
+ *          It forms the core of the fast motor control loop. Depending on the active `ControlMode`, it delegates
+ *          execution to specific routines (e.g., Idle, OpenTrap, ClosedTrap, OpenFocIF, Commission).
+ *          It also captures high-frequency electrical telemetry (Bus voltage, BEMF, current, speed) and pushes it to a diagnostic data buffer.
  */
 void PmsmControl::pwmLoop()
 {
-    /// Abort execution if the controller has not been initialized
+    /// Abort execution safely if the controller initialization sequence has not been completed
     if (!initialized)
         return;
-    /// Start performance profiling for the loop execution time
+    /// Start performance profiling to measure the execution time of this time-critical fast loop
     uint32_t start = eldriver_core_prof_tick();
-    /// Read the latest synchronized measurements from the hardware driver
+    /// Retrieve the latest synchronized analog measurements (currents, voltages) from the hardware driver
     eldriver_mc3p_read_sync(&mc3p, &mc3p_sync_meas);
-    /// Update the local electrical bus voltage variable
+    /// Update the local state with the newly measured DC bus voltage for accurate duty cycle scaling
     elec.vbus = mc3p_sync_meas.svm.vbus_q31;
 
-    /// Route execution to the appropriate handler based on the active control mode
+    /// Route execution to the appropriate specific control handler based on the current active motor control mode
     switch (mode)
     {
     case ControlMode::Idle:
@@ -131,37 +145,39 @@ void PmsmControl::pwmLoop()
     default:
         break;
     }
-    /// Increment the global PWM loop tick counter
+    /// Increment the global PWM loop tick counter to track absolute time for software timers
     pwmTicks++;
     uint8_t len;
 
-    /// Request a new telemetry sample slot from the data buffer
+    /// Request a fresh, writable telemetry sample slot from the data ring buffer
     pwmSample_t *sample_ptr = pwmDataBuffer.sample(&len);
-    /// Populate the telemetry sample if the driver is in Trapezoidal mode and a valid pointer is returned
+    /// Populate the telemetry sample structure only if the driver is actively in Trapezoidal mode and buffer space is available
     if (mc3p.mode == ELDRIVER_MC3P_MODE_TRAP && sample_ptr)
     {
-        /// Store scaled bus voltage data
+        /// Store scaled bus voltage data, converted to a signed 16-bit integer for compact transmission
         (*sample_ptr)[0] = (int16_t)(((int64_t)(mc3p_sync_meas.trap.vbus_q31) * ELDRIVER_MC3P_VS_SCALE * 1000) >> 31);
-        /// Store scaled Back-EMF voltage data
+        /// Store scaled Back-EMF voltage data, converted to a signed 16-bit integer
         (*sample_ptr)[1] = (int16_t)(((int64_t)(mc3p_sync_meas.trap.vbemf_q31) * ELDRIVER_MC3P_VS_SCALE * 1000) >> 31);
-        /// Store scaled bus current data
+        /// Store scaled DC bus return current data, converted to a signed 16-bit integer
         (*sample_ptr)[2] = (int16_t)(((int64_t)(mc3p_sync_meas.trap.cbus_q31) * ELDRIVER_MC3P_CS_SCALE * 1000) >> 31);
-        /// Store the calculated electrical speed in Hertz
+        /// Store the instantaneous calculated electrical speed of the rotor in Hertz
         (*sample_ptr)[4] = (int16_t)elec.speed_hz;
     }
-    /// Commit the populated sample to the buffer
+    /// Commit the populated sample data to the active telemetry frame
     pwmDataBuffer.pushSample();
-    /// End performance profiling and record the elapsed ticks
+    /// End performance profiling and calculate the total ticks elapsed during this control cycle
     volatile uint32_t elapsed = eldriver_core_prof_tock(start);
 }
 
 /**
- * @brief Cross-domain/Low-frequency auxiliary control loop.
- * @details Used to execute slower tasks such as post-processing during self-commissioning.
+ * @brief Cross-domain or low-frequency auxiliary control loop.
+ * @details Designed to execute slower, non-time-critical tasks that should not block the fast PWM interrupt.
+ *          This includes complex mathematical post-processing during self-commissioning (e.g., floating-point
+ *          square roots and arctangents) or managing high-level mechanical speed control loops.
  */
 void PmsmControl::xmcLoop()
 {
-    /// Handle auxiliary routines based on the active control mode
+    /// Route execution to specific auxiliary routines based on the currently active motor control mode
     switch (mode)
     {
     case ControlMode::Idle:
@@ -173,7 +189,7 @@ void PmsmControl::xmcLoop()
     case ControlMode::OpenFocIF:
         break;
     case ControlMode::Commission:
-        /// Execute self-commissioning post-process calculations
+        /// Execute complex, low-priority self-commissioning post-process math calculations
         SelfCommission_xmcLoop();
         break;
 
@@ -184,128 +200,143 @@ void PmsmControl::xmcLoop()
 
 /**
  * @name CALLBACK DEFINITIONS
- * @brief System-level interrupt service routines and hardware callbacks.
+ * @brief System-level interrupt service routines and hardware synchronization callbacks.
  */
 ///@{
 
 /**
- * @brief Callback triggered after the synchronous ADC scan is complete.
+ * @brief Hardware callback triggered immediately after a synchronous ADC scan completes.
+ * @details This is the entry point for the fast motor control loop. Triggering it post-ADC scan ensures
+ *          that the control algorithm uses the freshest possible phase current and voltage measurements,
+ *          minimizing latency in the feedback loop.
  */
 void eldriver_mc3p_sync_postScanCallback()
 {
-    /// Execute the main PWM control loop for motor C1
+    /// Execute the primary high-frequency PWM control loop for motor channel 1
     motor_c1.pwmLoop();
 }
 
 /**
- * @brief Periodic timer callback for cross-domain motor control tasks.
+ * @brief Periodic software timer callback for slower, cross-domain motor control tasks.
+ * @details Typically executed at a much lower frequency compared to the PWM loop.
+ *          It dispatches to `xmcLoop()` to handle tasks like parameter estimation math or state transitions.
  */
 void eldriver_xmc3p_tickerCallback()
 {
-    /// Execute the auxiliary control loop for motor C1
+    /// Execute the auxiliary low-frequency control loop for motor channel 1
     motor_c1.xmcLoop();
 }
 ///@}
 
 //========================================================
 /**
- * @brief Initializes the telemetry PWM data ring buffer.
+ * @brief Initializes the telemetry PWM data ring buffer and reserves the first frame.
+ * @details Prepares the underlying reliable stream (rstream) to manage a fixed number of frames (`FRAME_BUFFER_COUNT`).
+ *          It resets global sample tracking counters and immediately attempts to reserve the first block of memory.
  */
 void pwmDataBuffer_t::init()
 {
-    /// Initialize the underlying reliable stream (rstream) buffer with the frame array structure
+    /// Initialize the underlying reliable stream (rstream) ring buffer with the predefined memory block of frames
     elcore_rstream_init(&buffer, (void *)frames.data(), sizeof(PwmDataFrame_t), FRAME_BUFFER_COUNT);
-    /// Reset the active sample index within the current frame
+    /// Reset the active sample index pointer to the start of the current frame
     frame_sample_idx = 0;
-    /// Reset the absolute global sample counter
+    /// Reset the absolute global telemetry sample tracking counter
     sample_count = 0;
-    /// Reset the buffer overflow event counter
+    /// Reset the counter that tracks how many telemetry data points were dropped due to buffer overflows
     overflowCount = 0;
     uint8_t *w2;
     uint16_t c1, c2;
-    /// Reserve the initial block of memory within the stream for writing the first data frame
+    /// Attempt to reserve the very first initial block of memory within the stream for writing the first data frame
     elcore_rstream_reserveWrite(&buffer, 1, (void **)&currentFrame, &c1, (void **)&w2, &c2);
-    /// Set the base sample counter for the first reserved frame
+    /// Stamp the base sample counter value for the first newly reserved frame to guarantee chronologically synced data
     currentFrame->sample_counter = 0;
-    /// @note The current frame value is initialized to reflect the base sample state.
+    /// @note The pointer `currentFrame` is now successfully initialized and ready for immediate writing by the fast loop.
 }
 
 /**
- * @brief Requests the next available sample pointer in the current data frame.
- * @param sample_len Output pointer indicating the data length of the returned sample.
- * @return Pointer to the telemetry sample buffer, or NULL if the frame is full.
+ * @brief Requests a writable pointer for the next available sample slot in the active telemetry frame.
+ * @param sample_len Output pointer that will be populated with the expected length (number of data points) per sample.
+ * @return Pointer to the `pwmSample_t` array slot within the active frame, or NULL if the frame has reached maximum capacity.
+ * @details Called by the fast control loop to obtain a memory location for storing real-time telemetry.
+ *          It performs a bounds check against `SAMPLES_PER_FRAME` to prevent buffer overflows within the frame.
  */
 pwmSample_t *pwmDataBuffer_t::sample(uint8_t *sample_len)
 {
-    /// Verify there is still capacity inside the current frame
+    /// Verify there is still allocated capacity remaining inside the currently active frame
     if (frame_sample_idx < SAMPLES_PER_FRAME)
     {
-        /// Set output length assigning the expected number of parameters (e.g., 5 data points per sample)
+        /// Set the output length variable, assigning the expected number of parameters (e.g., 5 raw data points per sample)
         *sample_len = SAMPLE_LEN;
-        /// Return the memory address of the targeted sample array slot within the active frame
+        /// Return the direct memory address of the targeted sample array slot within the active frame for fast data assignment
         return &currentFrame->samples[frame_sample_idx];
     }
-    /// Return NULL to indicate that there are no available sample slots left in the active frame
+    /// Return NULL to safely indicate to the caller that there are no available sample slots left in the active frame
     return NULL;
 }
 
 /**
- * @brief Commits the populated telemetry sample and manages frame rollover.
+ * @brief Commits the currently populated telemetry sample and handles frame rollover.
+ * @details Increments the active sample index. If the current frame becomes completely filled
+ *          (i.e., `frame_sample_idx` reaches `SAMPLES_PER_FRAME`), the frame is committed to the read stream
+ *          for consumer processing. It then immediately attempts to reserve a new frame.
  */
 void pwmDataBuffer_t::pushSample()
 {
-    /// Increment the local frame index if there is still room
+    /// Increment the local intra-frame tracking index if there is still room before saturation
     if (frame_sample_idx < SAMPLES_PER_FRAME)
     {
         frame_sample_idx++;
     }
-    /// Increment the absolute system sample counter
+    /// Always increment the absolute global system sample counter for synchronized time-stamping
     sample_count++;
-    /// Check if the current frame has reached its maximum sample capacity
+    /// Check if the current telemetry frame has now reached its predetermined maximum sample capacity
     if (frame_sample_idx >= SAMPLES_PER_FRAME)
     {
-        /// Commit the completely filled frame into the readable stream ring buffer for consumer processing
+        /// Commit the completed, thoroughly filled frame into the readable stream ring buffer for asynchronous consumer processing
         elcore_rstream_commitWrite(&buffer, 1);
         
-        /// Allocate pointers and length variables required for the next memory stream reservation
+        /// Allocate auxiliary pointers and length variables required by the stream interface for the next memory reservation
         uint8_t *w2;
         uint16_t c1, c2;
-        /// Attempt to reserve a new block of memory for the next incoming data frame
+        /// Attempt to aggressively reserve a brand new block of memory from the stream for the next incoming data frame
         if (elcore_rstream_reserveWrite(&buffer, 1, (void **)&currentFrame, &c1, (void **)&w2, &c2))
         {
-            /// Reservation successful; timestamp the new frame with the absolute sample count for synchronization
+            /// Memory reservation successful; timestamp the new frame with the current absolute sample count to maintain chronological synchronization
             currentFrame->sample_counter = sample_count;
-            /// Reset the local frame index to start populating from the beginning of the new frame
+            /// Reset the local intra-frame index to start cleanly populating from the beginning of the new memory block
             frame_sample_idx = 0;
         }
         else
         {
-            /// Reservation failed due to buffer overflow; increment the overflow counter (telemetry data is dropped)
+            /// Memory reservation failed due to the consumer being too slow (buffer overflow); increment the drop counter to reflect lost telemetry data
             overflowCount++;
         }
     }
 }
 
 /**
- * @brief Attempts to retrieve a complete telemetry frame from the read buffer.
- * @param frame Output double pointer to the fetched PWM data frame.
- * @return true if a frame was successfully read, false otherwise.
+ * @brief Attempts to retrieve a completely populated telemetry frame from the read buffer.
+ * @param frame Output double pointer that will point to the fetched `PwmDataFrame_t` if successful.
+ * @return `true` if a completed frame was successfully peeked and released for reading, `false` otherwise.
+ * @details Intended to be called by a lower-priority consumer task (like a communications thread).
+ *          It peeks at the buffer to get the data, and immediately releases the read sector so the high-frequency
+ *          producer can reuse the memory block in the ring buffer.
  */
 bool pwmDataBuffer_t::readFrame(PwmDataFrame_t **frame)
 {
     uint8_t *r2;
     uint16_t c1, c2;
-    /// Peek into the read stream buffer to check for an available frame without moving the read pointer yet
+    /// Non-destructively peek into the read stream buffer to check for an available full frame without immediately moving the read pointer
     if (elcore_rstream_peekRead(&buffer, (void **)frame, &c1, (void **)&r2, &c2))
     {
-        /// Successfully located an available frame; the caller will process its data payload
-        /// Immediately release the read buffer segment so the memory can be reclaimed by the writer
+        /// Successfully located an available, fully populated frame; the calling consumer will now process its data payload
+        /// Immediately release the read buffer segment from the stream so the memory block can be swiftly reclaimed by the high-frequency writer
         elcore_rstream_releaseRead(&buffer, 1);
         return true;
     }
     else
     {
-        /// No frames currently available to read
+        /// No fully populated frames are currently available to be read by the consumer
         return false;
     }
 }
