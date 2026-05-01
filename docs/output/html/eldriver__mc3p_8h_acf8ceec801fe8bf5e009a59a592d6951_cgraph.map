@@ -1,9 +1,0 @@
-<map id="eldriver_mc3p_write_svm" name="eldriver_mc3p_write_svm">
-<area shape="rect" id="Node000001" title="Set Alpha/Beta components for SVM control." alt="" coords="5,77,196,102"/>
-<area shape="rect" id="Node000002" href="$eldriver__mc3p_8c.html#ae42bf26be7b633984af6858692359570" title="Manually set PWM duty cycle for each phase in Q15." alt="" coords="254,5,409,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,74,245,46,246,52,148,79"/>
-<area shape="rect" id="Node000003" href="$eldriver__mc3p_8c.html#a624709df5a24e9de6cdf3912e590efa3" title="Set specific phase states (U, V, W)." alt="" coords="254,69,409,109"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,87,240,87,240,92,196,92"/>
-<area shape="rect" id="Node000004" href="$eldriver__mc3p_8c.html#a083ce9031f422dc9a92fa085226ceb0a" title=" " alt="" coords="244,134,419,159"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="153,99,267,128,266,133,152,105"/>
-</map>

@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['capacity_0',['capacity',['../a08342.html#ac6d893e6db5737e4598be699063ed149',1,'elcore_rstream_t']]],
+  ['cb_1',['cb',['../a08414.html#a462ae543d02d550e1fdfa6093e9a52a1',1,'vtimer_t']]],
+  ['cbus_5fq31_2',['cbus_q31',['../a08382.html#a84714c2aad665eccc290b66d8236b791',1,'eldriver_mc3p_trap_data_t']]],
+  ['cfg_3',['cfg',['../a08282.html#ad8b23a4ed24ec61925bc3d6ab71314dd',1,'PmsmControl']]],
+  ['channels_5fnum_4',['channels_num',['../a08354.html#a7642296443be5434acf0b1cc0b8e80fa',1,'ElcoreScopeStream']]],
+  ['comm_5fticks_5',['comm_ticks',['../a08282.html#a6ed96fa9d330c170f976a4aa52d58c1d',1,'PmsmControl']]],
+  ['comm_5ftimer_6',['comm_timer',['../a08282.html#ae35c8cfc3377fb7b06ed583535e86676',1,'PmsmControl']]],
+  ['commutation_5fcallback_7',['commutation_callback',['../a08466.html#affb11339fabaa98b30757adf1c1f0339',1,'commutation_callback:&#160;eldriver_hall.c'],['../a08463.html#affb11339fabaa98b30757adf1c1f0339',1,'commutation_callback:&#160;eldriver_hall.c']]],
+  ['commutation_5fphase_5fdelay_8',['COMMUTATION_PHASE_DELAY',['../a08177.html#a5b67d3bd73f84c2e574cfbdc19fb8230',1,'sensor.h']]],
+  ['config_9',['config',['../a08374.html#a84636602107df7f9312cd0b95c2a3be3',1,'eldriver_mc3p_t::config'],['../a08394.html#aa7cb530b09586e2c98de4c9dbae485d3',1,'eldriver_uart_handle_t::config']]],
+  ['consecutive_5ferrors_10',['consecutive_errors',['../a08358.html#a07daff87ae9126055eb342d8b9ebf018',1,'aebfStream_t']]],
+  ['consecutive_5fvalid_11',['consecutive_valid',['../a08358.html#ae982ed51716f43e69528f76bd5bcc00d',1,'aebfStream_t']]],
+  ['control_5fpanel_5fwidth_12',['CONTROL_PANEL_WIDTH',['../a08216.html#a1ddcd13c69c6efdee75df50dd4c56f02',1,'sim_gui.cpp']]],
+  ['core_13',['core',['../a08180.html#a7f090a4c44c6449f47d81865e2d45cd7',1,'core:&#160;sys.cpp'],['../a08192.html#a7f090a4c44c6449f47d81865e2d45cd7',1,'core:&#160;sys.cpp']]],
+  ['cu_5fq31_14',['cu_q31',['../a08378.html#a0b638ef24ec25e3789e53a33dfcd2989',1,'eldriver_mc3p_svm_data_t']]],
+  ['currentframe_15',['currentFrame',['../a08318.html#a2de4f6072f1b26e79d46bfcd2745929c',1,'pwmDataBuffer_t']]],
+  ['cv_5fq31_16',['cv_q31',['../a08378.html#a5ec331481574cd1ae7369a4b8b2773fb',1,'eldriver_mc3p_svm_data_t']]],
+  ['cw_5fq31_17',['cw_q31',['../a08378.html#a171dde0f27e81142392538d2644b6e3a',1,'eldriver_mc3p_svm_data_t']]]
+];

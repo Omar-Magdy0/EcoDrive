@@ -1,0 +1,11 @@
+digraph "cbor_value_validate_basic"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="cbor_value_validate\l_basic",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Performs a basic validation of the CBOR stream pointed by it and returns the error it found."];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="cbor_value_advance",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$a00244.html#gae2ede5aacd59f04437c24ef8ca2f449a",tooltip="Advances the CBOR value it by one element, skipping over containers."];
+}

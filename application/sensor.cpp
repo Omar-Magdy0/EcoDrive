@@ -1,7 +1,7 @@
 #include "sensor.h"
 #include "eldriver/eldriver_mc3p.h"
 #include "eldriver/eldriver_core.h"
-#include "PmsmController.h"
+#include "PmsmControl.h"
 
 void BemfZc::init(float threshold_low_V, float threshold_high_V, float phase_delay, uint16_t tick_freq)
 {
@@ -22,7 +22,7 @@ void BemfZc::update(int32_t bemf, uint32_t ticks, int8_t dir)
     if(rising || falling){
         if(rising){state = true;}else{state = false;}
         elec_angle_q31_ += dir * INT32_MAX/6;
-        elec_speed_ = ((XCPWM_TICKFREQ/(ticks - last_zc_tick))/6) * 2 * M_PI;
+        elec_speed_ = ((tick_freq/(ticks - last_zc_tick))/6) * 2 * M_PI;
         uint32_t delay_us = ((phase_delay_ + M_PI/6)/ elec_speed_)*1e6;
         last_zc_tick = ticks;
         eldriver_comDelay_setComDelay_uS(delay_us);

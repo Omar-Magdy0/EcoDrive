@@ -1,0 +1,26 @@
+var a07529 =
+[
+    [ "elcore_rstream_stats_t", "a07702.html", "a07702" ],
+    [ "elcore_rstream_t", "a07706.html", "a07706" ],
+    [ "elcore_smem_t", "a07710.html", "a07710" ],
+    [ "elcore_swttimer_t", "a07714.html", "a07714" ],
+    [ "ALIGN4", "a07529.html#a808d0810882dd1f0c4cf8392bc76dc34", null ],
+    [ "pTASK", "a07529.html#a1879ba176c6bbf26550ddee93680290b", null ],
+    [ "elcore_rstream_commitWrite", "a07529.html#a76b7b44be0879931421dff5a570383f8", null ],
+    [ "elcore_rstream_freeSpace", "a07529.html#a906440145d60e8ad638b1e72d19872da", null ],
+    [ "elcore_rstream_getStats", "a07529.html#adc63c902340ebfb551ef0e6400760597", null ],
+    [ "elcore_rstream_init", "a07529.html#a4b7d014ca7791ff37790f7b0ccff908c", null ],
+    [ "elcore_rstream_occupied", "a07529.html#ae21791cc7cdac3b5f6ed0758477b4cfa", null ],
+    [ "elcore_rstream_peekRead", "a07529.html#a214d7d470a13fcbb21eedf15b75000e6", null ],
+    [ "elcore_rstream_releaseRead", "a07529.html#a11bee640c226c63b10312ed42a03aa87", null ],
+    [ "elcore_rstream_reserveWrite", "a07529.html#af67459a8591c4862e85aa60228c40fe5", null ],
+    [ "elcore_rstream_reserveWriteOverride", "a07529.html#af103e0a5b212a628f378b463bf94bc3c", null ],
+    [ "elcore_rstream_resetStats", "a07529.html#a8fd07283699ebfcc8d0d25f0063a5ff9", null ],
+    [ "elcore_smem_alloc", "a07529.html#acb689e77bb7608bf86e404d062ee5cda", null ],
+    [ "elcore_smem_alloc_aligned", "a07529.html#aa88e423755d2fd043c9f4dad7cb37098", null ],
+    [ "elcore_smem_init", "a07529.html#ab7d196ec263863753cb3d52585565ee7", null ],
+    [ "elcore_swttimer_elapsed_ticks", "a07529.html#ae2773678a6060e12eac6a9fed6c6e74f", null ],
+    [ "elcore_swttimer_elapsed_time", "a07529.html#a1f03696d9a24f42a9c4935da7e16a20c", null ],
+    [ "elcore_swttimer_reset", "a07529.html#afab273a6d480495bebe96e7c4ab4e1ad", null ],
+    [ "elcore_swttimer_timout", "a07529.html#ab6de0c7e2503ce17c18fe79f799f1a6f", null ]
+];

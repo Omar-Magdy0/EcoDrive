@@ -18,6 +18,10 @@ void eldriver_mc3p_init(eldriver_mc3p_t *h)
     register_timer(&timer_manager, eldriver_mc3p_sync_postScanCallback, (uint64_t)(1e9/h->config.pwm_Hz));
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0b15a1b1d1f7e81b2891cf54e2bcbabf4f48f037
 void eldriver_mc3p_bg_startConv(eldriver_mc3p_t *h){}
 uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_t *h){}
 uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float* scanData){}
@@ -172,6 +176,7 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
         default: sector = 0; break;
     }
     
+    /* SVPWM zero-sequence injection */
     vmax = h->dutyu_q15;
     if (h->dutyv_q15 > vmax) vmax = h->dutyv_q15;
     if (h->dutyw_q15 > vmax) vmax = h->dutyw_q15;
@@ -189,4 +194,8 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
     h->sector_last = sector;
 }
 
+<<<<<<< HEAD
 void eldriver_mc3p_setGain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain){}
+=======
+void eldriver_mc3p_setGain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain){}
+>>>>>>> 0b15a1b1d1f7e81b2891cf54e2bcbabf4f48f037

@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 #define MC3P_SYNC_CHANNELS 7
-
+#include <stdbool.h>
 typedef enum {
     ELDRIVER_MC3P_SECTOR_FLOAT = 0,
     ELDRIVER_MC3P_SECTOR_TRAP1,
@@ -76,7 +76,7 @@ typedef struct{
     uint16_t dutyw_q15;
     int32_t sync_scale_q31[MC3P_SYNC_CHANNELS][2];
     uint8_t sync_rank_scale[4];
-
+    bool offset_calibration;
     int switch_state[3];
     int phase_state[3];
 }eldriver_mc3p_t;
@@ -102,12 +102,11 @@ typedef struct{
 
 
 //TODO  FINISH ADC IMPLEMENTATION FOR 1)TRAP & 2)SVM
-void mc3p_adc_init(eldriver_mc3p_t *h);
-void eldriver_mc3p_init(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2]);
-void eldriver_mc3p_setScales(eldriver_mc3p_t *h,const float scales[MC3P_SYNC_CHANNELS][2]);
+void eldriver_mc3p_init(eldriver_mc3p_t *h);
+void eldriver_mc3p_setGain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain);
 void eldriver_mc3p_bg_startConv(eldriver_mc3p_t *h);
 uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_t *h);
-float mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel);
+float eldriver_mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel);
 
 uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float *scanData);
 uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_t *h);
