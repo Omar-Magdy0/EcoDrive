@@ -41,6 +41,13 @@ void PmsmControl::init(const elmotor_pmsm_stup_config_t& stup_cfg)
     stup.stage_current = pmsm_stup_stage_t::Reset;
     pos_sensor.init(XCPWM_TICKFREQ);
     eldriver_mc3p_init(&mc3p, mc3p_sync_scales);
+
+    // Initialize speed PID controller
+    speed_loop.pid.Kp = SPEED_PID_KP;
+    speed_loop.pid.Ki = SPEED_PID_KI;
+    speed_loop.pid.Kd = SPEED_PID_KD;
+    arm_pid_init_f32(&speed_loop.pid, 1);  // 1 = reset state
+
     initialized = true;
 }
 
@@ -87,6 +94,21 @@ void PmsmControl::pwmLoop()
     volatile uint32_t elapsed = eldriver_core_prof_tock(start);
 }
 
+void PmsmControl::xmcLoop()
+{
+    switch (state)
+    {
+    case PmsmMode::ClosedTrap:
+    {
+        // Log speed error and PID output for tuning
+        // (Only update telemetry, don't update control parameters here)
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 //======================================================
 //  CALLBACK DEFINITIONS
 //======================================================
@@ -97,7 +119,7 @@ void eldriver_mc3p_sync_postScanCallback()
 
 void eldriver_xmc3p_tickerCallback()
 {
-
+    motor_c.xmcLoop();
 }
 
 //========================================================

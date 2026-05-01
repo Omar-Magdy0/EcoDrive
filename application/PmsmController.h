@@ -9,10 +9,13 @@
 #include <array>
 #include <cstdint>
 #include <cstddef>
+
 //===================================================
 // CONFIG
 //==================================================
-
+constexpr float SPEED_PID_KP = 0.001f;   // Proportional gain (tune this)
+constexpr float SPEED_PID_KI = 0.0001f;  // Integral gain
+constexpr float SPEED_PID_KD = 0.0f;     // Derivative gain
 constexpr uint32_t PWM_FREQ = 40000;
 constexpr float STUP_BEMFZC_ERROR_MARGIN = 0.05f;
 constexpr uint8_t STUP_BEMFZC_GOOD_EST_COUNT = 10;
@@ -66,7 +69,7 @@ constexpr int8_t DirectionSign(Direction dir)
 {
     return (dir == Direction::Forward) ? 1 : -1;
 }
-// For trap sectors specifically (1-6)
+
 inline eldriver_mc3p_sector_t TrapIncrement(eldriver_mc3p_sector_t sector, Direction dir)
 {
     return static_cast<eldriver_mc3p_sector_t>(
@@ -99,12 +102,12 @@ struct PmsmControl {
         elmotor_pmsm_stup_config_t cfg{};
         elcore_swttimer_t stage_timer{};
         elcore_swttimer_t comm_timer{};
-        uint32_t          comm_ticks{};
+        uint32_t           comm_ticks{};
         pmsm_stup_stage_t stage_last{pmsm_stup_stage_t::Reset};
         pmsm_stup_stage_t stage_current{pmsm_stup_stage_t::Reset};
-        uint8_t           ramp_idx{};
-        float             est_elec_speed{};
-        uint8_t           good_est_count{};
+        uint8_t            ramp_idx{};
+        float              est_elec_speed{};
+        uint8_t            good_est_count{};
     } stup{};
     
     struct {
@@ -118,9 +121,15 @@ struct PmsmControl {
     
     struct {
         volatile Direction dir{Direction::Forward};
-        volatile float         speed_rpm{};
-        volatile float         speed_sp_rpm{};
+        volatile float          speed_rpm{};
+        volatile float          speed_sp_rpm{};
     } mech{};
+
+    struct {
+        arm_pid_instance_f32 pid;  // Speed PID controller instance
+        float error;               // Speed error (setpoint - actual)
+        float output;              // PID output command (duty cycle adjustment)
+    } speed_loop{};
 
     uint8_t pole_pairs{};
 
@@ -132,24 +141,32 @@ struct PmsmControl {
     void pwmLoop();
     void set_speed(uint16_t speed_rpm);
     void freewheel();
+
+    // --- Added from Step 4 ---
+    void set_speed_setpoint_rpm(float rpm)
+    {
+        mech.speed_sp_rpm = rpm;
+    }
+
+    float get_measured_speed_rpm() const
+    {
+        return (elec.speed_hz * 60.0f / pole_pairs);
+    }
+    // ------------------------
 };
 
 extern PmsmControl motor_c;
 
-
-
-#include "core/elcore.h"
-
+// Data Buffer Structures
 constexpr uint8_t SAMPLE_LEN = 5;
 constexpr uint8_t SAMPLES_PER_FRAME = 24;
 constexpr uint8_t FRAME_BUFFER_COUNT = 8;
-constexpr uint8_t FRAME_BUFFER_NOTIFY_THRESHOLD = 6;
 
 using pwmSample_t = std::array<int16_t, SAMPLE_LEN>;
 
 struct PwmDataFrame_t {
     uint32_t sample_counter{};
-    std::array<pwmSample_t, SAMPLES_PER_FRAME> samples{}; // 5 values per sample as per schema
+    std::array<pwmSample_t, SAMPLES_PER_FRAME> samples{}; 
 };
 
 struct pwmDataBuffer_t {
@@ -165,6 +182,5 @@ struct pwmDataBuffer_t {
     void pushSample();
     bool readFrame(PwmDataFrame_t** outFrame);
 };
-
 
 extern pwmDataBuffer_t pwmDataBuffer;
