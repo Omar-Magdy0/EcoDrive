@@ -36,7 +36,7 @@ static InverterInput inv_input = {0};
 static InverterOutput inv_output = {0};
 
 // ==================== INITIALIZATION ====================
-void eldriver_sil_init(void)
+void eldriver_sil_init(float dt)
 {
     // Initialize global state
     memset(&g_sil_state, 0, sizeof(eldriver_sil_state_t));
@@ -49,15 +49,20 @@ void eldriver_sil_init(void)
     // Initialize inverter state
     memset(&inv_state, 0, sizeof(InverterState));
     
-    // Set simulation timestep (4 kHz motor control frequency)
-    g_sil_state.dt = 1.0f / ELDRIVER_XMC3P_TICKFREQ;  // 250 μs for 4 kHz
+    //Set Sil Stepping frequency
+    g_sil_state.dt = dt;
     g_sil_state.t = 0.0f;
     
     // Initialize inverter DC bus voltage
     g_sil_state.inv_vbus = 24.0f;  // 24V nominal
     
-    printf("[SIL] Initialized. dt=%.6f s, f=%d Hz\n", 
-           g_sil_state.dt, ELDRIVER_XMC3P_TICKFREQ);
+    printf("[SIL] Initialized. dt=%.6f s, f=%.2f Hz\n", 
+           g_sil_state.dt, 1.0/g_sil_state.dt);
+}
+
+void eldriver_sil_update_params(float dt)
+{
+    g_sil_state.dt = dt;
 }
 
 // ==================== CONTROL INPUTS ====================

@@ -40,7 +40,9 @@ typedef struct {
  * Initialize SIL motor/inverter simulation
  * Call this once during platform_init()
  */
-void eldriver_sil_init(void);
+void eldriver_sil_init(float dt);
+
+void eldriver_sil_update_params(float dt);
 
 // ==================== Control Input (from eldriver) ====================
 /**

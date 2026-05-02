@@ -14,7 +14,7 @@ float eldriver_mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel){}
 
 void eldriver_mc3p_init(eldriver_mc3p_t *h)
 {
-    eldriver_sil_init();        // STEP 1: Initialize SIL layer
+    eldriver_sil_init(1.0/h->config.pwm_Hz);        // STEP 1: Initialize SIL layer
     register_timer(&timer_manager, eldriver_mc3p_sync_postScanCallback, (uint64_t)(1e9/h->config.pwm_Hz));
 }
 
