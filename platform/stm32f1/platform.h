@@ -1,28 +1,9 @@
 #pragma once
 
-/* USER CODE BEGIN Header */
- /**
-   ******************************************************************************
-   * @file           : platform.h
-   * @brief          : Header for sys_init.c file.
-   *                   This file contains the common defines of the application.
-   ******************************************************************************
-   * @attention
-   *
-   * 
-   * 
-   */
-
-#include "stm32f1xx.h"
-#include "stm32f1xx_ll_rcc.h"
-#include "stm32f1xx_ll_bus.h"
-#include "stm32f1xx_ll_system.h"
-#include "stm32f1xx_ll_exti.h"
-#include "stm32f1xx_ll_cortex.h"
-#include "stm32f1xx_ll_utils.h"
-#include "stm32f1xx_ll_pwr.h"
-#include "stm32f1xx_ll_dma.h"
-#include "stm32f1xx_ll_gpio.h"
+/**
+ * @file    platform.h
+ * @brief   STM32F1 platform abstraction layer interface
+ */
 
 #ifdef __cplusplus
 extern "C" {
