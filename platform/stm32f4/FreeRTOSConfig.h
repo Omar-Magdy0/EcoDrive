@@ -169,3 +169,6 @@ standard names. */
 /* USER CODE END Defines */
 
 #endif /* FREERTOS_CONFIG_H */
+#define traceISR_ENTER()
+#define traceISR_EXIT()
+#define traceISR_EXIT_TO_SCHEDULER()

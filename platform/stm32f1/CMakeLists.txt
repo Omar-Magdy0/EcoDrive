@@ -7,6 +7,16 @@ set(DEVICE_DEFINITIONS
     STM32F103xB
 )
 
+set(FREERTOS_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/tasks.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/queue.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/list.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/timers.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/port.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
+)
+
 # Minimal include path (abstraction layer only)
 set(STM32_COMMON_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -14,12 +24,16 @@ set(STM32_COMMON_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/DSP/DSP/Include
     ${CMAKE_CURRENT_SOURCE_DIR}/DSP/Core/Include
     ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3
 )
 
 # Core platform files only
 set(Platform_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/platform.c
     ${CMAKE_CURRENT_SOURCE_DIR}/system_stm32f1xx.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/startup_stm32f103xb.s
+    ${CMAKE_CURRENT_SOURCE_DIR}/syscalls.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/sysmem.c
 )
 
 # Eldriver files
@@ -37,6 +51,7 @@ add_library(stm32f1_platform STATIC)
 target_sources(stm32f1_platform PRIVATE
     ${Platform_Src}
     ${Eldriver_Src}
+    ${FREERTOS_SRC}
 )
 
 target_include_directories(stm32f1_platform PUBLIC ${STM32_COMMON_INCLUDES})

@@ -96,6 +96,11 @@ file(GLOB_RECURSE CORE_SRC
 # Create executable
 add_executable(${PROJECT_NAME} ${APPLICATION_SRC} ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
 
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/platform/stm32f1/Middlewares/Third_Party/FreeRTOS/Source/include
+    ${CMAKE_SOURCE_DIR}/platform/stm32f1/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3
+)
+
 # Add eld sources directly to the executable to ensure strong IRQ handlers
 # override weak startup symbols (avoids linker archive symbol resolution issues)
 target_sources(${PROJECT_NAME} PRIVATE ${PLATFORM_SOURCE})

@@ -77,11 +77,10 @@ int _getpid(void)
   return 1;
 }
 
-int _exit (int status)
+void _exit (int status)
 {
   _kill(status, -1);
   while (1) {}		/* Make sure function does not return */
-  return 0;
 }
 
 int _open(char *path, int flags, ...)

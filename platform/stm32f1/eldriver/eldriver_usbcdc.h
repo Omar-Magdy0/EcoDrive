@@ -8,6 +8,8 @@
 #pragma once
 
 #include <stdint.h>
+#include "elcore.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,12 +43,13 @@ uint8_t eldriver_usbcdc_write(eldriver_uart_handle_t *handle, uint8_t* data, uin
 uint16_t eldriver_usbcdc_read(eldriver_uart_handle_t *handle, uint8_t* data, uint8_t len);
 
 /* Statistics structure */
+/*
 typedef struct {
     uint32_t bytes_received;
     uint32_t bytes_sent;
     uint32_t errors;
 } elcore_rstream_stats_t;
-
+*/
 /** @brief Returns USB CDC receive stream statistics. */
 elcore_rstream_stats_t eldriver_usbcdc_rx_stats(eldriver_uart_handle_t *handle);
 
