@@ -25,13 +25,11 @@ static int display_h = 1000;
 static inline void DrawScopeTest() {
     static int ratio_cnt = 0;
     static const int CHANNELS = 3;
-    static const int DIVS = 10;
-    static const int SAMPLES_PER_DIV = 50;
-    static const int TOTAL_SAMPLES = DIVS * SAMPLES_PER_DIV;
+    static const int SAMPLE_DEPTH = 500;
 
-    static float storage[TOTAL_SAMPLES * CHANNELS];
-    static ElcoreScopeStream<float> scope(storage, CHANNELS, DIVS, SAMPLES_PER_DIV);
-    static float display_buffer[TOTAL_SAMPLES * CHANNELS];
+    static float storage[SAMPLE_DEPTH * CHANNELS];
+    static ElcoreScopeStream<float> scope(storage, CHANNELS, SAMPLE_DEPTH);
+    static float display_buffer[SAMPLE_DEPTH * CHANNELS];
     static float time_accum = 0.0f;
 
     // Simulation logic (unchanged)
@@ -50,7 +48,7 @@ static inline void DrawScopeTest() {
     {
         ratio_cnt = 0;
     if (scope.frozen) {
-        scope.read_aligned(display_buffer);
+        scope.read(display_buffer, sizeof(display_buffer));
     }
 
     }
@@ -63,7 +61,7 @@ static inline void DrawScopeTest() {
     // --- ImPlot Visualization ---
     if (ImPlot::BeginPlot("Three Phase Scope", ImVec2(-1, 400))) {
     ImPlot::SetupAxes("Sample Index", "Voltage");
-    ImPlot::SetupAxisLimits(ImAxis_X1, 0, TOTAL_SAMPLES);
+    ImPlot::SetupAxisLimits(ImAxis_X1, 0, SAMPLE_DEPTH);
     ImPlot::SetupAxisLimits(ImAxis_Y1, -1.5f, 1.5f);
 
     // --- Phase A (Blue) ---
@@ -74,7 +72,7 @@ static inline void DrawScopeTest() {
     ImPlot::PlotLineG("Phase A", [](int idx, void* data) {
         float val = ((float*)data)[idx * 3 + 0];
         return ImPlotPoint((double)idx, (double)val);
-    }, display_buffer, TOTAL_SAMPLES, specA);
+    }, display_buffer, SAMPLE_DEPTH, specA);
 
     // --- Phase B (Red) ---
     ImPlotSpec specB;
@@ -84,7 +82,7 @@ static inline void DrawScopeTest() {
     ImPlot::PlotLineG("Phase B", [](int idx, void* data) {
         float val = ((float*)data)[idx * 3 + 1];
         return ImPlotPoint((double)idx, (double)val);
-    }, display_buffer, TOTAL_SAMPLES, specB);
+    }, display_buffer, SAMPLE_DEPTH, specB);
 
     // --- Phase C (Yellow) ---
     ImPlotSpec specC;
@@ -94,7 +92,7 @@ static inline void DrawScopeTest() {
     ImPlot::PlotLineG("Phase C", [](int idx, void* data) {
         float val = ((float*)data)[idx * 3 + 2];
         return ImPlotPoint((double)idx, (double)val);
-    }, display_buffer, TOTAL_SAMPLES, specC);
+    }, display_buffer, SAMPLE_DEPTH, specC);
 
     // --- Trigger Markers ---
     double trig_lvl = (double)scope.trigger_level;
@@ -271,7 +269,7 @@ void run_cli_test() {
     float storage[DEPTH * CHANNELS] = {0};
     float display_out[DEPTH * CHANNELS] = {0};
 
-    ElcoreScopeStream<float> scope(storage, CHANNELS, 1, DEPTH);
+    ElcoreScopeStream<float> scope(storage, CHANNELS, DEPTH);
     
     // Test Configuration
     scope.trigger_level = 5.0f;
@@ -279,7 +277,7 @@ void run_cli_test() {
     std::cout << "=== ElcoreScope CLI Debugger ===" << std::endl;
     std::cout << "Usage:" << std::endl;
     std::cout << "  {val1, val2, val3} -> Input a sample" << std::endl;
-    std::cout << "  n                  -> Trigger a GUI 'read_aligned'" << std::endl;
+    std::cout << "  n                  -> Trigger a GUI 'read'" << std::endl;
     std::cout << "  q                  -> Quit" << std::endl;
     std::cout << "Target: Trigger > " << scope.trigger_level << " on Channel 0" << std::endl;
 
@@ -289,7 +287,7 @@ void run_cli_test() {
 
         if (line == "n") {
             if (scope.frozen) {
-                scope.read_aligned(display_out);
+                scope.read(display_out, sizeof(display_out));
                 print_buffer(display_out, DEPTH, CHANNELS);
                 std::cout << "Buffer reset. Status: WAITING" << std::endl;
             } else {

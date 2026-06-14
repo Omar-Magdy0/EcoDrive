@@ -20,7 +20,7 @@ extern "C"{
 void eldriver_hall1_init();
 
 /** @brief Sets the commutation delay in microseconds. */
-void eldriver_hall1_setComDelay_uS(uint32_t COM_delay_uS);
+void eldriver_hall1_setComDelay_uS(uint32_t delay_uS);
 
 /** @brief Sets the callback function for commutation events. */
 void eldriver_hall1_setComCallback(void (*callback)(void));

@@ -10,6 +10,11 @@ set(FREERTOS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/Source)
 set(CMSIS_DSP_DIR ${CMAKE_SOURCE_DIR}/platform/host/CMSIS-DSP)
 set(CMSISCORE ${CMAKE_SOURCE_DIR}/platform/stm32f4/Drivers/CMSIS)
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/platform/host/imgui)
+set(IMGUIFD_DIR ${CMAKE_SOURCE_DIR}/platform/host/ImGuiFileDialog)
+set(EIGEN_DIR ${CMAKE_SOURCE_DIR}/platform/host/Eigen)
+
+
+
 
 set(HOST_COMMON_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -19,6 +24,8 @@ set(HOST_COMMON_INCLUDES
     ${IMGUI_DIR}
     ${IMGUI_DIR}/implot
     ${IMGUI_DIR}/backends
+    ${IMGUIFD_DIR}
+    ${EIGEN_DIR}
 )
 
 set(FreeRTOS_Src
@@ -45,11 +52,12 @@ set(IMGUI_SRC
     ${IMGUI_DIR}/implot/implot_demo.cpp
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
     ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+
+    ${IMGUIFD_DIR}/ImGuiFileDialog.cpp
 )
 
 set(Platform_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/platform.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sim_gui.cpp
 )
 
 file(GLOB_RECURSE Driver_Core_Src
@@ -64,6 +72,7 @@ find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED)
 # This looks for the glfw3 library you installed via apt
 find_package(glfw3 REQUIRED)
+find_package(HDF5 REQUIRED COMPONENTS C CXX)
 
 add_library(host_platform STATIC)
 target_sources(host_platform PRIVATE
@@ -77,7 +86,8 @@ target_compile_definitions(host_platform PUBLIC
     projCOVERAGE_TEST=0
     projENABLE_TRACING=0
 )
-target_link_libraries(host_platform PUBLIC Threads::Threads CMSISDSP OpenGL::GL glfw)
+
+target_link_libraries(host_platform PUBLIC ${HDF5_LIBRARIES} ${HDF5_CXX_LIBRARIES} Threads::Threads CMSISDSP OpenGL::GL glfw)
 
 add_library(host_platform_interface INTERFACE)
 target_link_libraries(host_platform_interface INTERFACE
@@ -88,6 +98,7 @@ target_link_libraries(host_platform_interface INTERFACE
 
 target_include_directories(host_platform_interface INTERFACE
     ${HOST_COMMON_INCLUDES}
+    ${HDF5_INCLUDE_DIRS}
     ${CMSIS_DSP_DIR}/Include
     ${CMSISCORE}/Include
 )

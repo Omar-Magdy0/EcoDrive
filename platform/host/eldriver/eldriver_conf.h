@@ -21,8 +21,7 @@
 //########################################################################
 // FIXED HARDWARE MAPPING FOR STM32F4xx Series MCU's #########END#######
 //########################################################################
-
-
+#include <stdint.h>
 
 #define NONE 0
 //================================================
@@ -61,5 +60,23 @@
 
 #define ELDRIVER_MC3P_CS_SCALE 50
 #define ELDRIVER_MC3P_VS_SCALE 60
+
+
+//================================================
+// SIL SIMULATION CONFIGURATION
+//================================================
+#define SIL_DEFAULT_VCC 36.0f
+// Number of SIL steps to run for each PWM update 
+//(for better resolution in the scope plots, better simulation quality and for marginally low time constants)
+#define SIL_TO_PWM_FREQ 1
+#define SIL_HALL_OFFSET 0
+static const uint8_t SIL_HALL_TABLE_PI_3[6] = {
+    ((1 << 2) | (1 << 1) | (0 << 0)), // 110
+    ((0 << 2) | (1 << 1) | (0 << 0)), // 010
+    ((0 << 2) | (1 << 1) | (1 << 0)), // 011
+    ((0 << 2) | (0 << 1) | (1 << 0)), // 001
+    ((1 << 2) | (0 << 1) | (1 << 0)), // 101
+    ((1 << 2) | (0 << 1) | (0 << 0))  // 100
+};
 
 #endif//eldriver_conf.h

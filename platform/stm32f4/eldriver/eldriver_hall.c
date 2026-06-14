@@ -84,12 +84,17 @@ void eldriver_hall1_init()
     hall1_value = hall1_gpioRead();
 }
 
-uint32_t last_t = 0;
-void eldriver_hall1_setComDelay_uS(uint32_t COM_delay_uS)
+void eldriver_hall1_setComDelay_uS(uint32_t delay_uS)
 {
-    uint32_t now = TIM2->CNT;
-    volatile uint32_t elapsed = now - last_t;
-    last_t = now;
+    uint32_t compare_value = US_TO_CLK(delay_us);
+    
+    // Handle 16-bit timer overflow
+    if (compare_value > 0xFFFF) {
+        compare_value -= 0x10000;  // Wrap around
+    }
+    
+    // Set the compare register
+    LL_TIM_OC_SetCompareCH2(TIM2, compare_value);
 }
 
 // Set your commutation callback function
@@ -99,7 +104,7 @@ void eldriver_hall1_setComCallback(void (*callback)(void))
 }
 
 float eldriver_hall1_elec_speed(){
-    return (((M_PI/6)*1000000)/hall1_period_uS);
+    return (((M_PI/3)*1000000)/hall1_period_uS);
 }
 
 uint8_t eldriver_hall1_read(){

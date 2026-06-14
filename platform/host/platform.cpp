@@ -89,7 +89,7 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer,
 #include <pthread.h>
 #include <time.h>
 #include <unistd.h>
-#include "sim_gui.h"
+#include "silgui.h"
 
 volatile uint64_t virtual_tick = 0;
 float vtime = 0;
@@ -119,41 +119,38 @@ bool register_timer(vtimer_manager_t* mgr, timer_callback_t cb, uint64_t timeste
     return true;
 }
 
-void* tick_thread(void* arg)
-{
-    const uint64_t sleep_ns = 1000000ULL;   // 1 ms coarse sleep
-    uint64_t sim_time_ns = now_ns();        // simulation time anchored to wall clock
-    uint64_t last_wall_ns = sim_time_ns;
+struct SIM{
+    uint64_t time_ns;
+};
+inline SIM sim;
 
+void tick(uint64_t elapsed_ns)
+{
     // determine smallest timestep needed by any timer
     uint64_t dt_ns = timer_manager.min_timestep_ns; // example 10 us, can be min of all timers
-
-    while (1)
+    uint64_t steps = elapsed_ns / dt_ns;
+    for (uint64_t i = 0; i < steps; i++)
     {
-        dt_ns = timer_manager.min_timestep_ns;
-        uint64_t current_wall_ns = now_ns();
-        uint64_t elapsed_ns = current_wall_ns - last_wall_ns;
-        last_wall_ns = current_wall_ns;
-
-        uint64_t steps = elapsed_ns / dt_ns;
-        for (uint64_t i = 0; i < steps; i++)
+        sim.time_ns += dt_ns;
+        // unified check of all timers
+        for (int t_idx = 0; t_idx < timer_manager.timer_index; t_idx++)
         {
-            sim_time_ns += dt_ns;
-
-            // unified check of all timers
-            for (int t_idx = 0; t_idx < timer_manager.timer_index; t_idx++)
+            vtimer_t* t = &timer_manager.timers[t_idx];
+            if (!t->cb) continue;
+            if (sim.time_ns - t->last_time_ns >= t->periodic_time_ns)
             {
-                vtimer_t* t = &timer_manager.timers[t_idx];
-                if (!t->cb) continue;
-
-                if (sim_time_ns - t->last_time_ns >= t->periodic_time_ns)
-                {
-                    t->last_time_ns += t->periodic_time_ns; // advance by one period
-                    t->cb();
-                }
+                t->last_time_ns += t->periodic_time_ns; // advance by one period
+                t->cb();
             }
         }
+    }
+}
 
+void* tick_thread(void* arg) {
+    while (1)
+    {
+        const uint64_t sleep_ns = 1000000ULL;   // 1 ms coarse sleep
+        tick(sleep_ns);
         // coarse sleep to avoid spinning CPU
         struct timespec req = {0, sleep_ns};
         nanosleep(&req, NULL);
@@ -165,8 +162,6 @@ void* freertos_thread(void* arg)
     vTaskStartScheduler();
     return NULL;
 }
-
-
 
 
 static inline int display_w = 1000;
@@ -216,7 +211,7 @@ void gui_init(){
         glfwTerminate();
     }
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    glfwSwapInterval(3);
 
     // Setup context
     IMGUI_CHECKVERSION();
@@ -274,6 +269,9 @@ void gui_init(){
     // --- Anti-aliasing (Crucial for ImPlot) ---
     style.AntiAliasedLines = true;
     style.AntiAliasedFill  = true;
+    
+    //Initialization silgui
+    silgui_init();
 }
 
 void gui_deinit()
@@ -296,7 +294,7 @@ void gui_loop() {
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glfwPollEvents();
         
-        virtual_pmsm_gui();
+        silgui_render();
 
         ImGui::Render();
         glViewport(0, 0, display_w, display_h);

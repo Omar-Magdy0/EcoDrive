@@ -2,7 +2,7 @@
 
 
 int main(){
-    sys_init();
+    Sys::init();
     while (true) {
 
     }

@@ -212,9 +212,8 @@ private:
             return;
         }
 
-        aebf_encode_frame(payload, (uint8_t)device_id, (uint16_t)service_id, (uint8_t)payload_len);
-        ser.write(payload, AEBF_FRAMED_SIZE(payload_len));
-        const uint16_t frame_len = AEBF_FRAMED_SIZE(payload_len);
+        ser.write(payload, 5);
+        const uint16_t frame_len = 5;
     }
 
     void cmd_fsave(const std::vector<std::string> &args)
