@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 
 # Select target platform
-set(PLATFORM_NAME "host" CACHE STRING "Target platform (host, stm32f4)")
+set(PLATFORM_NAME "host" CACHE STRING "Target platform (host, stm32f4, stm32f1)")
 ####platform specific settings
 # SET TOOLCHAIN BEFORE PROJECT - ADD THIS LINE
 if(NOT PLATFORM_NAME STREQUAL "host")
@@ -52,11 +52,13 @@ include_directories(
 
 # Link with platform EARLY to get include paths
 if(PLATFORM_NAME STREQUAL "host")
-   
     add_subdirectory(platform/host)
-else()
-   
+elseif(PLATFORM_NAME STREQUAL "stm32f4")
     add_subdirectory(platform/stm32f4)
+elseif(PLATFORM_NAME STREQUAL "stm32f1")
+    add_subdirectory(platform/stm32f1)
+else()
+    message(FATAL_ERROR "Unsupported PLATFORM_NAME: ${PLATFORM_NAME}")
 endif()
 #add_library(tinycbor STATIC IMPORTED)
 #set_target_properties(tinycbor PROPERTIES
@@ -93,6 +95,11 @@ file(GLOB_RECURSE CORE_SRC
 
 # Create executable
 add_executable(${PROJECT_NAME} ${APPLICATION_SRC} ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/platform/stm32f1/Middlewares/Third_Party/FreeRTOS/Source/include
+    ${CMAKE_SOURCE_DIR}/platform/stm32f1/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3
+)
 
 # Add eld sources directly to the executable to ensure strong IRQ handlers
 # override weak startup symbols (avoids linker archive symbol resolution issues)
@@ -135,18 +142,6 @@ if(PLATFORM_NAME STREQUAL "host")
         ${PLATFORM_LIB}
         ${TOOLCHAIN_LINK_LIBRARIES}
         #tinycbor
-    )
-
-    add_executable(EcoTool ${CMAKE_CURRENT_SOURCE_DIR}/EcoTool/EcoTool.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
-    target_sources(EcoTool PRIVATE ${PLATFORM_SOURCE})
-    target_link_libraries(EcoTool PRIVATE
-        ${PLATFORM_INTERFACE}
-        ${PLATFORM_LIB}
-        ${TOOLCHAIN_LINK_LIBRARIES}
-        #tinycbor
-    )
-    set_target_properties(EcoTool PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/EcoTool
     )
 endif()
 

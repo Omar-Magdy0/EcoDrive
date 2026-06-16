@@ -7,6 +7,7 @@
 #include "semphr.h"
 #include "aebfStream.h"
 #include <array>
+#include "eldriver_uart.h"
 
 constexpr uint8_t AEBF_PWM_SERVICEID = 0xC1;
 //==================== FREERTOS Variables ===============================
