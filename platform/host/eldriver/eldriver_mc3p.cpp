@@ -24,52 +24,34 @@ void postScanMethod()
     }
 }
 
-
-inline double trapezoidal_wave(double theta)
-{
-    static const double angles[] = {0, M_PI/6, 5*M_PI/6, M_PI, 7*M_PI/6, 11*M_PI/6, 12*M_PI/6};
-    static const double values[] = {0, 1     , 1       , 0   , -1      , -1       , 0        };
-    theta = fmod(theta, 2*M_PI);
-    if (theta < 0) theta += 2*M_PI;
-    int cval_idx, nval_idx = 0;
-    int arr_size = sizeof(angles)/sizeof(double);
-    for(int i = 0; i < arr_size; i++) {
-        if(theta >= angles[i]) {
-            cval_idx = i;
-        }
-    }
-    nval_idx = (cval_idx+1)%arr_size;
-    double m = (values[nval_idx] - values[cval_idx]) / (angles[nval_idx] - angles[cval_idx]);
-    return values[cval_idx] + m * (theta - angles[cval_idx]);
-}
-inline void dPsim_dTheta(double theta_e, double dPsi_dTheta[3])
+static void dPsim_dTheta_Sine(double theta_e, double dPsi_dTheta[3])
 {
     double amplitude = sil.param.motor_fluxLinkage; // Back EMF amplitude
-    #ifdef SINE_BEMF
     dPsi_dTheta[0] = - amplitude * sin(theta_e);
     dPsi_dTheta[1] = - amplitude * sin(theta_e - 2*M_PI/3);
     dPsi_dTheta[2] = - amplitude * sin(theta_e + 2*M_PI/3);
-    #else
-    // Trapezoidal waveform function (120° flat top, 60° rising/falling edges)
-    dPsi_dTheta[0] = - amplitude * trapezoidal_wave(theta_e);
-    dPsi_dTheta[1] = - amplitude * trapezoidal_wave(theta_e - 2*M_PI/3);
-    dPsi_dTheta[2] = - amplitude * trapezoidal_wave(theta_e + 2*M_PI/3);
-    #endif
 };
+static void dPsim_dTheta_Trapezoidal(double theta_e, double dPsi_dTheta[3])
+{
+    double amplitude = sil.param.motor_fluxLinkage; // Back EMF amplitude
+    dPsi_dTheta[0] = - amplitude * Sil::trapezoidal_wave(theta_e);
+    dPsi_dTheta[1] = - amplitude * Sil::trapezoidal_wave(theta_e - 2*M_PI/3);
+    dPsi_dTheta[2] = - amplitude * Sil::trapezoidal_wave(theta_e + 2*M_PI/3);
+}
 
 void eldriver_mc3p_init(eldriver_mc3p_t *h)
 {
     sil_input.dt = 1.0f / h->config.pwm_Hz / SIL_TO_PWM_FREQ;
     sil_input.load_torque = 0.00;
     sil_input.vcc = SIL_DEFAULT_VCC;
-    sil.param.dPsim_dTheta = dPsim_dTheta;
+    sil.param.dPsim_dTheta = dPsim_dTheta_Trapezoidal;
     sil.param.inv_Ron = 0.008;
     sil.param.inv_Roff = 1e6;
     sil.param.motor_pp = 6;
     sil.param.motor_Rs = 0.25;
     sil.param.motor_Ls = 0.0008;
-    sil.param.motor_Lm = 0;
-    sil.param.motor_Ms = 0;
+    sil.param.motor_Lm = 0.0002;
+    sil.param.motor_Ms = sil.param.motor_Ls/3;
     sil.param.motor_rotorOffset = 0;
     sil.param.motor_fluxLinkage = 0.036;
     sil.param.motor_B = 1e-2;
@@ -220,19 +202,19 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
         eldriver_mc3p_write_phase_state(h, ELDRIVER_MC3P_PHASE_COMP, ELDRIVER_MC3P_PHASE_COMP, ELDRIVER_MC3P_PHASE_COMP);
         h->mode        = ELDRIVER_MC3P_MODE_SVM;
     }
-
+    int32_t dutyu_q15, dutyv_q15, dutyw_q15;
     /* αβ → phase (normalized Q15) */
-    h->dutyu_q15 = alpha_q15;
+    dutyu_q15 = alpha_q15;
 
-    h->dutyv_q15 = (-(int32_t)Q15_HALF * alpha_q15
+    dutyv_q15 = (-(int32_t)Q15_HALF * alpha_q15
          + (int32_t)Q15_SQRT3_BY_2 * beta_q15) >> 15;
 
-    h->dutyw_q15 = (-(int32_t)Q15_HALF * alpha_q15
+    dutyw_q15 = (-(int32_t)Q15_HALF * alpha_q15
          - (int32_t)Q15_SQRT3_BY_2 * beta_q15) >> 15;
 
-    uint8_t b0 = (h->dutyu_q15 >= 0);
-    uint8_t b1 = (h->dutyv_q15 >= 0);
-    uint8_t b2 = (h->dutyw_q15 >= 0);
+    uint8_t b0 = (dutyu_q15 >= 0);
+    uint8_t b1 = (dutyv_q15 >= 0);
+    uint8_t b2 = (dutyw_q15 >= 0);
 
     // 3-bit code
     uint8_t code = (b2 << 2) | (b1 << 1) | b0;
@@ -250,18 +232,18 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
     
     /* SVPWM zero-sequence injection */
     vmax = h->dutyu_q15;
-    if (h->dutyv_q15 > vmax) vmax = h->dutyv_q15;
-    if (h->dutyw_q15 > vmax) vmax = h->dutyw_q15;
+    if (dutyv_q15 > vmax) vmax = dutyv_q15;
+    if (dutyw_q15 > vmax) vmax = dutyw_q15;
 
     vmin = h->dutyu_q15;
-    if (h->dutyv_q15 < vmin) vmin = h->dutyv_q15;
-    if (h->dutyw_q15 < vmin) vmin = h->dutyw_q15;
+    if (dutyv_q15 < vmin) vmin = dutyv_q15;
+    if (dutyw_q15 < vmin) vmin = dutyw_q15;
 
     voff = (vmax + vmin) >> 1;
 
-    h->dutyu_q15 = (h->dutyu_q15 - voff) + Q15_HALF;
-    h->dutyv_q15 = (h->dutyv_q15 - voff) + Q15_HALF;
-    h->dutyw_q15 = (h->dutyw_q15 - voff) + Q15_HALF;
+    h->dutyu_q15 = (dutyu_q15 - voff) + Q15_HALF;
+    h->dutyv_q15 = (dutyv_q15 - voff) + Q15_HALF;
+    h->dutyw_q15 = (dutyw_q15 - voff) + Q15_HALF;
     eldriver_mc3p_write_phase_duty(h, h->dutyu_q15, h->dutyv_q15, h->dutyw_q15);
     h->sector_last = sector;
 }

@@ -34,6 +34,8 @@ uint8_t eldriver_hall1_read();
 /** @brief Returns the estimated electrical angle in Q31 format. */
 int32_t eldriver_hall1_elec_angle_q31();
 
+void eldriver_hall1_reset();
+
 /** @brief Initializes the commutation delay timer. */
 void eldriver_comDelay_init();
 

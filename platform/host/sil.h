@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <array>
 
 
 
@@ -28,7 +29,9 @@ struct Sil
         double time;
         double ip[3]; /** Phase currents ia, ib, ic */
         double vp[3]; /** Motor terminal voltages va, vb, vc */
+        double vp_filt[3];
         double vn;
+        double vn_filt;
         double vinv[3]; /** inverter equivelant average voltage source */
         double rinv[3]; /** inverter equivelant average impedance */
         double Lself[3]; /** Laa, Lbb, Lcc*/
@@ -40,8 +43,10 @@ struct Sil
         double theta; /** Rotor mechanical angle radians */
         double omega; /** Rotor mechanical angular speed radians per second */
         double alignment_torque; /** Motor alignment torque */
+        double drive_n1[3];
         double reluctance_torque; /** Motor reluctance torque */
         double torque; /** Motor total developed torque */
+        unsigned int steps_after_discontinuity = 0;
     } state;
 
     struct Param{
@@ -59,7 +64,10 @@ struct Sil
         double inv_alpha = 0; /** inverter impedance transition constant in terms of samples*/
         double load_J;
         double load_B;
+        double filt_cuttoff = 400;
         void (*dPsim_dTheta)(double theta_e, double dPsi_dTheta[3]);
+        unsigned int discontinuity_substep = 20;
+        unsigned int discontinuity_forward = 10; 
     } param;
 
     struct Input {
@@ -69,6 +77,24 @@ struct Sil
         double vcc; /** inverter supply voltage */
         double load_torque;
     };
+
+    static inline double trapezoidal_wave(double theta)
+    {
+        static const double angles[] = {0, M_PI/6, 5*M_PI/6, M_PI, 7*M_PI/6, 11*M_PI/6, 12*M_PI/6};
+        static const double values[] = {0, 1     , 1       , 0   , -1      , -1       , 0        };
+        theta = fmod(theta, 2*M_PI);
+        if (theta < 0) theta += 2*M_PI;
+        int cval_idx, nval_idx = 0;
+        int arr_size = sizeof(angles)/sizeof(double);
+        for(int i = 0; i < arr_size; i++) {
+            if(theta >= angles[i]) {
+                cval_idx = i;
+            }
+        }
+        nval_idx = (cval_idx+1)%arr_size;
+        double m = (values[nval_idx] - values[cval_idx]) / (angles[nval_idx] - angles[cval_idx]);
+        return values[cval_idx] + m * (theta - angles[cval_idx]);
+    }
 
     class {
         FILE* file;
@@ -113,13 +139,7 @@ struct Sil
     void step(const Input& in)
     {
         state.time += in.dt;
-        //Inverter equivelance 
-        for(int i = 0; i < 3; i++) {
-            state.vinv[i] = ( in.vcc * in.duty[i] ) * in.drive[i];
-            double rt = in.drive[i] ? param.inv_Ron : param.inv_Roff; 
-            state.rinv[i] = state.rinv[i]*param.inv_alpha + rt*(1 - param.inv_alpha);
-        }
-
+        //Inverter equivelance
         //Motor equivelant circuit update
         constexpr double m_2pi3 = 2 * M_PI / 3;
         constexpr double m_pi6 = M_PI / 6;
@@ -150,42 +170,37 @@ struct Sil
 
         #ifndef EIGEN_SOLVER
         //Circuit solver
-        double Rself[3], Rmut[3];
-        for(int i = 0; i < 3; i++) {
-            Rself[i] = state.rinv[i] + param.motor_Rs + state.dLself_dTheta[i] * omega_e;
-            Rmut[i] = state.dLmut_dTheta[i] * omega_e;
+        
+        
+        int substep = 1;
+        for(int i = 0; i < 3; i++)
+        {
+            if(in.drive[i] != state.drive_n1[i])
+            {
+                //discontinuity detection
+                state.steps_after_discontinuity = param.discontinuity_forward;
+                break;
+            }
+        }
+        if(state.steps_after_discontinuity > 0)
+        {
+            //substep for n base steps after discontinuity
+            substep = param.discontinuity_substep;
+            state.steps_after_discontinuity--;
         }
 
-        //Backward euler equivelant solving
-        // Set of equations 
-        // 
-        double L_dt[2][2];
-        L_dt[0][0] = (state.Lself[0] + state.Lself[2] - 2*state.Lmut[2]) / in.dt;
-        L_dt[0][1] = (state.Lmut[0] - state.Lmut[1] - state.Lmut[2] + state.Lself[2]) / in.dt;
-        L_dt[1][0] = (state.Lmut[0] - state.Lmut[1] - state.Lmut[2] + state.Lself[2]) / in.dt;
-        L_dt[1][1] = (state.Lself[1] + state.Lself[2] - 2*state.Lmut[1]) / in.dt;
+        double dt = in.dt / substep;
 
-        double E[2];
-        E[0] = (state.vinv[0] - state.dPsim_dt[0]) - (state.vinv[2] - state.dPsim_dt[2]) + L_dt[0][0] * state.ip[0] + L_dt[0][1] * state.ip[1];
-        E[1] = (state.vinv[1] - state.dPsim_dt[1]) - (state.vinv[2] - state.dPsim_dt[2]) + L_dt[1][0] * state.ip[0] + L_dt[1][1] * state.ip[1];
-        
-        double R[2][2];
-        R[0][0] = Rself[0] + Rself[2] - 2*Rmut[2] + L_dt[0][0];
-        R[0][1] = Rmut[0] - Rmut[1] - Rmut[2] + Rself[2] + L_dt[0][1];
-        R[1][0] = Rmut[0] - Rmut[1] - Rmut[2] + Rself[2] + L_dt[1][0];
-        R[1][1] = Rself[1] - 2*Rmut[1] + Rself[2] + L_dt[1][1];
-        double iprev[3] = {state.ip[0], state.ip[1], state.ip[2]};
-        //Solve 2x2 system through inverting R
-        double det = R[0][0]*R[1][1] - R[1][0]*R[0][1];
-        //lets solve for ip[0] and ip[1]
-        state.ip[0] = ( E[0]*R[1][1] - E[1]*R[0][1] ) / det;
-        state.ip[1] = ( E[1]*R[0][0] - E[0]*R[1][0] ) / det;
-        state.ip[2] = - state.ip[0] - state.ip[1];
-        //Now 3 phase abc currents ready....  get Phase voltages on motor terminals
-        for(int i = 0; i < 3; i++) state.vp[i] = state.vinv[i] - state.ip[i] * state.rinv[i];
-        state.vn = ( (state.vinv[2] - state.dPsim_dt[2]) + (state.Lmut[2]/in.dt) * iprev[0] + (state.Lmut[1]/in.dt) * iprev[1] + (state.Lself[2]/in.dt) * iprev[2]); 
-        state.vn -= ((Rmut[2]+state.Lmut[2]/in.dt) * state.ip[0] + (Rmut[1]+state.Lmut[1]/in.dt) * state.ip[1] + (Rself[2]+state.Lself[2]/in.dt) * state.ip[2]);
-
+        for(int i = 0; i < substep; i++)
+        {
+            inverter_step(in, dt);
+            electrical_solve(in, dt, theta_e, omega_e);
+        }
+        double filt_alpha = 2*M_PI*param.filt_cuttoff*in.dt;
+        for(int i = 0; i < 3; i++)state.vp_filt[i] = state.vp_filt[i] + filt_alpha * (state.vp[i] - state.vp_filt[i]) ;
+        state.vn_filt = state.vn_filt + filt_alpha * (state.vn - state.vn_filt);
+        //Keep the drive variable (main source of discontinuity for discontinuity detection)
+        for(int i = 0; i< 3; i++)state.drive_n1[i] = in.drive[i];
         // Electromechanical conversion
         state.alignment_torque = param.motor_pp * ( state.ip[0]*state.dPsim_dTheta[0] + state.ip[1]*state.dPsim_dTheta[1] + state.ip[2]*state.dPsim_dTheta[2]); 
         state.reluctance_torque =  state.ip[0] * (state.dLself_dTheta[0]*state.ip[0] + state.dLmut_dTheta[0] *state.ip[1] + state.dLmut_dTheta[2] *state.ip[2]);
@@ -254,6 +269,73 @@ struct Sil
 
         state.omega = (T + J_dt*state.omega)/(J_dt + Bt);
         state.theta = state.omega*in.dt + state.theta;
+    }
+
+    void electrical_solve(const Sil::Input &in, double dt, double theta_e, double omega_e)
+    {
+        double Rself[3], Rmut[3];
+        for(int i = 0; i < 3; i++) {
+            Rself[i] = state.rinv[i] + param.motor_Rs + state.dLself_dTheta[i] * omega_e;
+            Rmut[i] = state.dLmut_dTheta[i] * omega_e;
+        }
+        // Backward euler equivelant solving
+        //  Set of equations
+        //
+        double L_dt[2][2];
+        L_dt[0][0] = (state.Lself[0] + state.Lself[2] - 2 * state.Lmut[2]) / dt;
+        L_dt[0][1] = (state.Lmut[0] - state.Lmut[1] - state.Lmut[2] + state.Lself[2]) / dt;
+        L_dt[1][0] = (state.Lmut[0] - state.Lmut[1] - state.Lmut[2] + state.Lself[2]) / dt;
+        L_dt[1][1] = (state.Lself[1] + state.Lself[2] - 2 * state.Lmut[1]) / dt;
+
+        double E[2];
+        E[0] = (state.vinv[0] - state.dPsim_dt[0]) - (state.vinv[2] - state.dPsim_dt[2]) + L_dt[0][0] * state.ip[0] + L_dt[0][1] * state.ip[1];
+        E[1] = (state.vinv[1] - state.dPsim_dt[1]) - (state.vinv[2] - state.dPsim_dt[2]) + L_dt[1][0] * state.ip[0] + L_dt[1][1] * state.ip[1];
+
+        double R[2][2];
+        R[0][0] = Rself[0] + Rself[2] - 2 * Rmut[2] + L_dt[0][0];
+        R[0][1] = Rmut[0] - Rmut[1] - Rmut[2] + Rself[2] + L_dt[0][1];
+        R[1][0] = Rmut[0] - Rmut[1] - Rmut[2] + Rself[2] + L_dt[1][0];
+        R[1][1] = Rself[1] - 2 * Rmut[1] + Rself[2] + L_dt[1][1];
+        double iprev[3] = {state.ip[0], state.ip[1], state.ip[2]};
+        // Solve 2x2 system through inverting R
+        double det = R[0][0] * R[1][1] - R[1][0] * R[0][1];
+        // lets solve for ip[0] and ip[1]
+        state.ip[0] = (E[0] * R[1][1] - E[1] * R[0][1]) / det;
+        state.ip[1] = (E[1] * R[0][0] - E[0] * R[1][0]) / det;
+        state.ip[2] = -state.ip[0] - state.ip[1];
+        // Now 3 phase abc currents ready....  get Phase voltages on motor terminals
+        for (int i = 0; i < 3; i++)
+            state.vp[i] = state.vinv[i] - state.ip[i] * state.rinv[i];
+        state.vn = ((state.vinv[2] - state.dPsim_dt[2]) + (state.Lmut[2] / dt) * iprev[0] + (state.Lmut[1] / dt) * iprev[1] + (state.Lself[2] / dt) * iprev[2]);
+        state.vn -= ((Rmut[2] + state.Lmut[2] / dt) * state.ip[0] + (Rmut[1] + state.Lmut[1] / dt) * state.ip[1] + (Rself[2] + state.Lself[2] / dt) * state.ip[2]);
+    }
+
+    void inverter_step(const Sil::Input &in, double dt)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if(in.drive[i])
+            {
+                state.vinv[i] = (in.vcc * in.duty[i]) * in.drive[i];
+                state.rinv[i] = param.inv_Ron;
+            }
+            else
+            {
+                if(state.ip[i] > 0.05)
+                {
+                    state.vinv[i] = -0.7;
+                    state.rinv[i] = param.inv_Ron;
+                }else if(state.ip[i] < -0.05)
+                {
+                    state.vinv[i] = in.vcc+0.7;
+                    state.rinv[i] = param.inv_Ron;
+                }else
+                {
+                    state.vinv[i] = in.vcc * 0.5;
+                    state.rinv[i] = param.inv_Roff;
+                }
+            }
+        }
     }
 
     void abc_to_dq(float a, float b, float c, float *d, float *q) 

@@ -125,18 +125,18 @@ extern "C"
     /** @brief Data structure for SVM-specific measurements. */
     typedef struct
     {
-        uint32_t vbus_q31;
-        uint32_t cu_q31;
-        uint32_t cv_q31;
-        uint32_t cw_q31;
+        int32_t vbus_q31;
+        int32_t cu_q31;
+        int32_t cv_q31;
+        int32_t cw_q31;
     } eldriver_mc3p_svm_data_t;
 
     /** @brief Data structure for Trapezoidal-specific measurements. */
     typedef struct
     {
-        uint32_t vbus_q31;
-        uint32_t vbemf_q31;
-        uint32_t cbus_q31;
+        int32_t vbus_q31;
+        int32_t vbemf_q31;
+        int32_t cbus_q31;
     } eldriver_mc3p_trap_data_t;
 
 /* Conversion Macros */

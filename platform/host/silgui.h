@@ -40,6 +40,7 @@ enum class VoltagePlotType
     Line_To_Ground,
     Line_To_Line,
     Line_To_Neutral,
+    Line_To_Neutral_Filtered,
     PhaseEmf,
     Alpha_beta,
     DQ
@@ -55,6 +56,7 @@ inline const char *voltage_plot_names[] = {
     "Line to Ground",
     "Line to Line",
     "Line to Neutral",
+    "Line to Neutral Filtered",
     "Phase EMF",
     "Alpha_beta",
     "DQ"};
@@ -385,7 +387,6 @@ inline void silgui_updateData()
 {
     float scope_data[CHANNELS];
     static float prev_scope_data[3] = {0, 0, 0};
-    double alpha = 1;
     scope_data[0] = sil.state.ip[0];
     scope_data[1] = sil.state.ip[1];
     scope_data[2] = sil.state.ip[2];
@@ -413,15 +414,11 @@ inline void silgui_updateData()
         scope_data[3] = sil.state.dPsim_dt[0];
         scope_data[4] = sil.state.dPsim_dt[1];
         scope_data[5] = sil.state.dPsim_dt[2];
-    }
-    if (voltage_plot_type != VoltagePlotType::PhaseEmf)
+    }else if (voltage_plot_type == VoltagePlotType::Line_To_Neutral_Filtered)
     {
-        scope_data[3] = alpha * scope_data[3] + (1 - alpha) * prev_scope_data[0];
-        scope_data[4] = alpha * scope_data[4] + (1 - alpha) * prev_scope_data[1];
-        scope_data[5] = alpha * scope_data[5] + (1 - alpha) * prev_scope_data[2];
-        prev_scope_data[0] = scope_data[3];
-        prev_scope_data[1] = scope_data[4];
-        prev_scope_data[2] = scope_data[5];
+        scope_data[3] = sil.state.vp_filt[0] - sil.state.vn_filt;
+        scope_data[4] = sil.state.vp_filt[1] - sil.state.vn_filt;
+        scope_data[5] = sil.state.vp_filt[2] - sil.state.vn_filt;
     }
     scope_data[6] = sil.state.torque;
     scope.write(scope_data);

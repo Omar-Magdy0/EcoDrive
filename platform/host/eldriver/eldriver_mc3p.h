@@ -82,21 +82,21 @@ typedef struct{
 
 typedef struct
 {   
-    uint32_t vbus_q31;
-    uint32_t cu_q31;
-    uint32_t cv_q31;
-    uint32_t cw_q31;
+    int32_t vbus_q31;
+    int32_t cu_q31;
+    int32_t cv_q31;
+    int32_t cw_q31;
 } eldriver_mc3p_svm_data_t;
 
 typedef struct{
-    uint32_t vbus_q31;
-    uint32_t vbemf_q31;
-    uint32_t cbus_q31;
+    int32_t vbus_q31;
+    int32_t vbemf_q31;
+    int32_t cbus_q31;
 } eldriver_mc3p_trap_data_t;
 
-#define ELDRIVER_MC3P_VS_TO_FLOAT(vs)((float)(((int64_t)(vs)* ELDRIVER_MC3P_VS_SCALE)  >> 31 ))
-#define ELDRIVER_MC3P_CS_TO_FLOAT(cs)((float)(((int64_t)(cs)* ELDRIVER_MC3P_CS_SCALE)  >> 31 ))
-#define ELDRIVER_MC3P_FLOAT_TO_VS(f)((int32_t)(((float)(f)/ELDRIVER_MC3P_VS_SCALE) * INT32_MAX ))
+#define ELDRIVER_MC3P_VS_TO_FLOAT(vs)(((float)vs*ELDRIVER_MC3P_VS_SCALE) / INT32_MAX )
+#define ELDRIVER_MC3P_CS_TO_FLOAT(cs)(((float)cs*ELDRIVER_MC3P_CS_SCALE) / INT32_MAX )
+#define ELDRIVER_MC3P_FLOAT_TO_VS(f)((int32_t)(((float)(f)/ELDRIVER_MC3P_VS_SCALE) * INT32_MAX ))   
 #define ELDRIVER_MC3P_FLOAT_TO_CS(f)((int32_t)(((float)(f)/ELDRIVER_MC3P_CS_SCALE) * INT32_MAX ))
 
 

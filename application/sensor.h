@@ -88,63 +88,43 @@ class HallSensor
 public:
     void init(uint16_t tick_freq)
     {
-#ifdef ELDRIVER_HALL1_ENABLED
         (void)tick_freq;
         eldriver_hall1_init();
-#else
-        (void)tick_freq;
-#endif
     }
 
     void update(int32_t bemf_q31, uint32_t ticks, int8_t dir)
     {
-#ifdef ELDRIVER_HALL1_ENABLED
         (void)bemf_q31;
         (void)ticks;
         (void)dir;
-#else
-        (void)bemf_q31;
-        (void)ticks;
-        (void)dir;
-#endif
     }
 
     float elec_speed() const
     {
-#ifdef ELDRIVER_HALL1_ENABLED
         return eldriver_hall1_elec_speed();
-#else
-        return 0.0f;
-#endif
     }
 
     int32_t elec_angle_q31() const
     {
-#ifdef ELDRIVER_HALL1_ENABLED
-        return eldriver_hall1_elec_angle_q31();
-#else
-        return 0;
-#endif
+
     }
 
     void set_com_delay_us(uint32_t delay_uS)
     {
-#ifdef ELDRIVER_HALL1_ENABLED
+
         eldriver_hall1_setComDelay_uS(delay_uS);
-#else
-        (void)delay_uS;
-#endif
     }
 
     void set_com_callback(void (*callback)(void))
     {
-#ifdef ELDRIVER_HALL1_ENABLED
         eldriver_hall1_setComCallback(callback);
-#else
-        (void)callback;
-#endif
     }
-};
+
+    void reset()
+    {
+   
+    }
+}; 
 
 template <typename Impl>
 class PosSensorT
@@ -152,6 +132,7 @@ class PosSensorT
 public:
     void init(uint16_t tick_freq) { impl_.init(tick_freq); }
     void update(int32_t bemf_q31, uint32_t ticks, int8_t dir) { impl_.update(bemf_q31, ticks, dir); }
+    void reset() { impl_.reset(); }
     float elec_speed() const { return impl_.elec_speed(); }
     int32_t elec_angle_q31() const { return impl_.elec_angle_q31(); }
     void set_com_delay_us(uint32_t delay_uS) { impl_.set_com_delay_us(delay_uS); }

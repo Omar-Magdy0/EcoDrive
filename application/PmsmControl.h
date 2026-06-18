@@ -30,7 +30,7 @@ struct PmsmControl
         Fault,
         Foc, /** Open-loop V/Hz (V/F) commutation. */
         Trap,
-        Commission /** Self-commissioning / parameter identification. */
+        SComm /** Self-commissioning / parameter identification. */
     };
 
     enum class ECType : uint8_t
@@ -62,7 +62,7 @@ struct PmsmControl
     volatile uint32_t pwmTicks{};                                                       /** PWM period in ticks (timer ticks). */
     uint32_t pwm_freq_hz{PWM_FREQ_DEFAULT};                                    /** PWM carrier frequency (Hz). */
     uint32_t tick_period_ns{ (uint32_t)(1'000'000'000.0f / static_cast<float>(PWM_FREQ_DEFAULT)) }; /** PWM tick period (us). */
-    uint32_t tick_period_us{tick_period_ns / 1000.0f};                         /** PWM tick period (us). */
+    uint32_t tick_period_us{tick_period_ns / 1000};                         /** PWM tick period (us). */
     uint32_t pwm_freq() const { return pwm_freq_hz; }                          /** Get PWM frequency (Hz). */
     float pwm_tick_period_us() const { return tick_period_us; }                /** Get PWM tick period (us). */
     float pwm_tick_period_ms() const { return tick_period_ns/1000'000.0f; }                /** Get PWM tick period (ms). */
@@ -70,6 +70,9 @@ struct PmsmControl
     float ms_to_ticks(float ms) const { return us_to_ticks(ms * 1000.0f); }    /** ms -> ticks. */
     float ticks_to_us(float ticks) const { return ticks * tick_period_us; }    /** ticks -> us. */
     float ticks_to_ms(float ticks) const { return ticks * pwm_tick_period_ms(); }    /** ticks -> ms. */
+    float voltage_q31_to_float(q31_t voltage_q31) const { return ELDRIVER_MC3P_VS_TO_FLOAT(voltage_q31); }
+    float current_q31_to_float(q31_t current_q31) const { return ELDRIVER_MC3P_CS_TO_FLOAT(current_q31); }
+    float angle_q31_to_float(q31_t eAngle_q31) const { return (float)eAngle_q31 * (2 * M_PI / INT32_MAX);}
 
     // Owned hardware elements
     eldriver_mc3p_t mc3p{}; /** Underlying MC3P driver instance. */
@@ -83,11 +86,12 @@ struct PmsmControl
     // Control variables
     struct
     {
-        uint32_t vbus_mV = 12'000;                                               /** DC bus voltage (V). */
-        uint32_t ibus_mA{};
-        volatile Direction dir{Direction::Forward};                 /** Commanded rotation direction. */
-        uint32_t eAngv_mRPS{};                                        /** Electrical speed (Hz). */
-        uint32_t eTheta_cmR{};                                               /** Electrical angle (rad). */
+        volatile q31_t Vbus_q31 = ELDRIVER_MC3P_FLOAT_TO_VS(15);                                               /** DC bus voltage (V). */
+        volatile q31_t Ibus_q31;
+        volatile Direction dir{Direction::Forward};               /** Commanded rotation direction. */
+        volatile float eAngv_RPS{};                                        /** Electrical speed (rad per second). */
+        volatile q31_t eTheta_q31;                                      /** Electrical angle (rad) (-Pi to Pi https://arm-software.github.io/CMSIS-DSP/v1.14.0/group__SinCos.html#gae9e4ddebff9d4eb5d0a093e28e0bc504). */
+        volatile q31_t eAngv_RPT_q31{};                                       /** Electrical speed (rad per pwm tick). */
     } state;
 
     struct
@@ -104,99 +108,17 @@ struct PmsmControl
     struct
     {
         MCType mctype{MCType::None}; /** Current control mode. */
+        ECType ectype{ECType::Voltage}; /** Current error type. */
     } control;
 
 #include "PmsmControl_Trap.h"
+#include "PmsmControl_SComm.h"
+#include "PmsmControl_Foc.h"
 
-    void init()
-    {
-        pwmTicks = 0;
-        control.mctype = MCType::None;
-
-        pwm_freq_hz = PWM_FREQ_DEFAULT;
-        tick_period_ns = 1'000'000'000.0f / static_cast<float>(pwm_freq_hz);
-        tick_period_us = tick_period_ns / 1000.0f;
-        /* instance bindings */
-
-        /* mode initialization*/
-        Trap_init();
-
-        /* hardware initialization */
-        pos_sensor.init(pwm_freq_hz);
-        mc3p.offset_calibration = true;
-        mc3p.config.pwm_Hz = pwm_freq_hz;
-        mc3p.config.duty_max = 0.95;
-        mc3p.config.duty_min = 0.05;
-        mc3p.config.deadtime_nS = 1500;
-        eldriver_mc3p_init(&mc3p);
-        eldriver_mc3p_write_float(&mc3p);
-    };
-
-    void setControlMode(MCType mctype)
-    {
-        if (control.mctype != mctype)
-        {
-            // Exit current mode
-            switch (control.mctype)
-            {
-            case MCType::Trap:
-                Trap_onExit();
-                break;
-            case MCType::Foc:
-                break;
-            case MCType::Commission:
-                break;
-            default:
-                break;
-            }
-            // Enter new mode
-            switch (mctype)
-            {
-            case MCType::Trap:
-                Trap_onEnter(control.mctype);
-                break;
-            case MCType::Foc:
-                break;
-            case MCType::Commission:
-                break;
-            default:
-                break;
-            }
-            control.mctype = mctype;
-        }
-    }
-
-    void pwmLoop()
-    {
-        if (control.mctype == MCType::None)
-            return;
-        uint32_t start = eldriver_core_prof_tick();
-        eldriver_mc3p_read_sync(&mc3p, &mc3p_sync_meas);
-        switch (control.mctype)
-        {
-        case MCType::Trap:
-            Trap_pwmLoop();
-            break;
-        default:
-            break;
-        }
-        pwmTicks++;
-        volatile uint32_t elapsed = eldriver_core_prof_tock(start);
-    }
-
-    void xmcLoop()
-    {
-        if (control.mctype == MCType::None)
-            return;
-        switch (control.mctype)
-        {
-        case MCType::Trap:
-            Trap_xmcLoop();
-            break;
-        default:
-            break;
-        }
-    }
+    void init();
+    void setControlMode(MCType mctype);
+    void pwmLoop();
+    void xmcLoop();
 };
 
 

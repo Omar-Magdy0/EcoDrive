@@ -105,3 +105,7 @@ void sil_hall_update()
     }
 }
 
+void eldriver_hall1_reset()
+{
+
+}
