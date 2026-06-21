@@ -140,7 +140,7 @@ void PmsmControl::SComm_xmcLoop()
             }
             break;
         case SComm::IDSubStage::LPFSettle_Wait:
-            if (pwmTicks - scomm.eSettle_start_tick > (scomm.eSettle_min_ticks > 1))
+            if (pwmTicks - scomm.eSettle_start_tick > (scomm.eSettle_min_ticks))
             {
                 scomm.idsub = SComm::IDSubStage::Active_Sampling;
             }
@@ -148,8 +148,8 @@ void PmsmControl::SComm_xmcLoop()
         case SComm::IDSubStage::Active_Sampling:
             if (scomm.samples_counter == 0)
             {
-                scomm.Idd = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate0 >> (scomm.oversample_bits) - 1));
-                scomm.Idq = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate1 >> (scomm.oversample_bits) - 1));
+                scomm.Idd = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate0 >> scomm.oversample_bits));
+                scomm.Idq = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate1 >> scomm.oversample_bits));
                 scomm.idsub = SComm::IDSubStage::ESettle_Start;
                 scomm.idstage = SComm::IDStage::LQ_ID;
             }
@@ -185,7 +185,7 @@ void PmsmControl::SComm_xmcLoop()
             }
             break;
         case SComm::IDSubStage::LPFSettle_Wait:
-            if (pwmTicks - scomm.eSettle_start_tick > (scomm.eSettle_min_ticks > 1))
+            if (pwmTicks - scomm.eSettle_start_tick > (scomm.eSettle_min_ticks))
             {
                 scomm.idsub = SComm::IDSubStage::Active_Sampling;
             }
@@ -193,8 +193,8 @@ void PmsmControl::SComm_xmcLoop()
         case SComm::IDSubStage::Active_Sampling:
             if (scomm.samples_counter == 0)
             {
-                scomm.Iqd = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate0 >> (scomm.oversample_bits - 1) ));
-                scomm.Iqq = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate1 >> (scomm.oversample_bits - 1) ));
+                scomm.Iqd = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate0 >> scomm.oversample_bits ));
+                scomm.Iqq = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate1 >> scomm.oversample_bits ));
             }
             break;
         default:
