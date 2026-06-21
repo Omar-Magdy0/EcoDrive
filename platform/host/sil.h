@@ -321,11 +321,11 @@ struct Sil
             }
             else
             {
-                if(state.ip[i] > 0.05)
+                if(state.ip[i] > 0.2)
                 {
                     state.vinv[i] = -0.7;
                     state.rinv[i] = param.inv_Ron;
-                }else if(state.ip[i] < -0.05)
+                }else if(state.ip[i] < -0.2)
                 {
                     state.vinv[i] = in.vcc+0.7;
                     state.rinv[i] = param.inv_Ron;

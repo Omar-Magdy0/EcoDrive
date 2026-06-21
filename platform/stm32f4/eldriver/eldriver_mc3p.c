@@ -413,7 +413,7 @@ void eldriver_mc3p_init(eldriver_mc3p_t *h)
     mc3p_irq_bind(h);
     mc3p_interrupt_init();
     if(h->offset_calibration)mc3p_offset_calibration(h);
-    eldriver_mc3p_write_float();
+    eldriver_mc3p_write_float(h);
 }
 
 //======================================================
@@ -528,16 +528,15 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
         eldriver_mc3p_write_phase_state(h, ELDRIVER_MC3P_PHASE_COMP, ELDRIVER_MC3P_PHASE_COMP, ELDRIVER_MC3P_PHASE_COMP);
         h->mode        = ELDRIVER_MC3P_MODE_SVM;
     }
-
+    int32_t dutyu_q15, dutyv_q15, dutyw_q15;
     /* αβ → phase (normalized Q15) */
-    h->dutyu_q15 = alpha_q15;
+    dutyu_q15 = alpha_q15;
 
-    h->dutyv_q15 = (-(int32_t)Q15_HALF * alpha_q15
+    dutyv_q15 = (-(int32_t)Q15_HALF * alpha_q15
          + (int32_t)Q15_SQRT3_BY_2 * beta_q15) >> 15;
 
-    h->dutyw_q15 = (-(int32_t)Q15_HALF * alpha_q15
+    dutyw_q15 = (-(int32_t)Q15_HALF * alpha_q15
          - (int32_t)Q15_SQRT3_BY_2 * beta_q15) >> 15;
-
     /* SVPWM zero-sequence injection */
     uint8_t b0 = (h->dutyu_q15 >= 0);
     uint8_t b1 = (h->dutyv_q15 >= 0);
@@ -556,21 +555,20 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
         case 0b101: sector = ELDRIVER_MC3P_SECTOR_SVM6; break;
         default: sector = ELDRIVER_MC3P_SECTOR_FLOAT; break; // should not happen
     }
-     /* SVPWM zero-sequence injection */
-    vmax = h->dutyu_q15;
-    if (h->dutyv_q15 > vmax) vmax = h->dutyv_q15;
-    if (h->dutyw_q15 > vmax) vmax = h->dutyw_q15;
+    /* SVPWM zero-sequence injection */
+    vmax = dutyu_q15;
+    if (dutyv_q15 > vmax) vmax = dutyv_q15;
+    if (dutyw_q15 > vmax) vmax = dutyw_q15;
 
-    vmin = h->dutyu_q15;
-    if (h->dutyv_q15 < vmin) vmin = h->dutyv_q15;
-    if (h->dutyw_q15 < vmin) vmin = h->dutyw_q15;
+    vmin = dutyu_q15;
+    if (dutyv_q15 < vmin) vmin = dutyv_q15;
+    if (dutyw_q15 < vmin) vmin = dutyw_q15;
 
     voff = (vmax + vmin) >> 1;
 
-    h->dutyu_q15 = (h->dutyu_q15 - voff) + Q15_HALF;
-    h->dutyv_q15 = (h->dutyv_q15 - voff) + Q15_HALF;
-    h->dutyw_q15 = (h->dutyw_q15 - voff) + Q15_HALF;
-    mc3p_adc_svm_update(h, sector);
+    h->dutyu_q15 = (dutyu_q15 - voff) + Q15_HALF;
+    h->dutyv_q15 = (dutyv_q15 - voff) + Q15_HALF;
+    h->dutyw_q15 = (dutyw_q15 - voff) + Q15_HALF;
     eldriver_mc3p_write_phase_duty(h, h->dutyu_q15, h->dutyv_q15, h->dutyw_q15);
     h->sector_last = sector;
 }

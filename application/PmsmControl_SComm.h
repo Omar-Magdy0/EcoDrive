@@ -1,29 +1,47 @@
 
 
-struct
+struct SComm
 {
     enum class IDStage
     {
-        RESET = 0,       /** Initial / reset stage. */
-        DAXIS_ALIGN,     /** D-axis alignment stage. */
         RS_ID,           /** Stator resistance identification. */
         LD_ID,           /** D-axis inductance identification. */
-        LQ_ID,           /** Q-axis inductance identification. */
-        ELEC_POSTPROCESS /** Final post-processing stage. */
+        LQ_ID            /** Q-axis inductance identification. */
     };
+    enum class IDSubStage
+    {
+        ESettle_Start,
+        ESettle_Wait,
+        LPFSettle_Start,
+        LPFSettle_Wait,
+        Active_Sampling
+    };
+    static constexpr uint8_t oversample_bits = 14;
+    static constexpr uint16_t oversample = 1 << oversample_bits; //using a power of two, for shift based division and averaging (nearly free)
+    uint16_t eSettle_min_ticks = 1000;
+    volatile uint16_t eSettle_start_tick = 0;
+    float hfi_Angv_RPS = (1000)*(2*M_PI);
 
-    volatile IDStage IDstage;
-    IDStage IDstage_last;
-    elcore_swttimer_t timer{};    /** Stage timing for self-commissioning. */
-    uint32_t remaining_id_samples; /** Remaining samples for current step. */
-    float id_sin_prod_2;          /** D-axis correlation accumulator. */
-    float id_cos_prod_2;          /** D-axis correlation accumulator. */
-    float iq_sin_prod_2;          /** Q-axis correlation accumulator. */
-    float iq_cos_prod_2;          /** Q-axis correlation accumulator. */
-    float rs_dc;                  /** Estimated DC resistance. */
-    uint16_t iir_filtered_cnt;    /** IIR filter counter for smoothing. */
-    float hfi_angle;              /** High-frequency injection angle estimate. */
-} SComm;
+    volatile IDStage idstage;
+    volatile IDSubStage idsub;
+    volatile uint16_t samples_counter; /** Remaining samples for current step. */
+    
+    int64_t accumulate0;
+    int64_t accumulate1;
+    q31_t hfi_alpha = 0.5*INT32_MAX;
+    q31_t hfid_q31;
+    q31_t hfiq_q31;
+    q31_t hfi_Angv_RPT_q31 = 0;
+    q31_t hfi_angle_q31;              /** High-frequency injection angle */
+    q31_t dc_vinj_q31 = ELDRIVER_MC3P_FLOAT_TO_VS(5);
+    q31_t hfi_vinj_q31 = ELDRIVER_MC3P_FLOAT_TO_VS(15);
+
+    float R;
+    float Idd;
+    float Idq;
+    float Iqd;
+    float Iqq;
+} scomm;
 
 void SComm_init();    /** Initialize self-commissioning. */
 void SComm_onEnter(MCType prev_mct);    /** Initialize self-commissioning. */

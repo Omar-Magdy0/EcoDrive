@@ -86,7 +86,7 @@ void eldriver_hall1_init()
 
 void eldriver_hall1_setComDelay_uS(uint32_t delay_uS)
 {
-    uint32_t compare_value = US_TO_CLK(delay_us);
+    uint32_t compare_value = US_TO_CLK(delay_uS);
     
     // Handle 16-bit timer overflow
     if (compare_value > 0xFFFF) {

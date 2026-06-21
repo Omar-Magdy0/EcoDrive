@@ -3,28 +3,21 @@
 void PmsmControl::init()
 {
     pwmTicks = 0;
-    control.mctype = MCType::None;
-
-    pwm_freq_hz = PWM_FREQ_DEFAULT;
-    tick_period_ns = 1'000'000'000.0f / static_cast<float>(pwm_freq_hz);
-    tick_period_us = tick_period_ns / 1000.0f;
     /* instance bindings */
     
     /* mode initialization*/
     voltage_q31_to_float(state.Vbus_q31);
     current_q31_to_float(state.Ibus_q31);
     angle_q31_to_float(state.eTheta_q31);
+
+    tick_period_ns = 1'000'000'000.0f / static_cast<float>(pwm_freq_hz);
+    tick_period_us = tick_period_ns / 1000.0f;
+    mc3p.config.pwm_Hz = pwm_freq_hz;
     Trap_init();
     SComm_init();
     Foc_init();
-
     /* hardware initialization */
     pos_sensor.init(pwm_freq_hz);
-    mc3p.offset_calibration = true;
-    mc3p.config.pwm_Hz = pwm_freq_hz;
-    mc3p.config.duty_max = 0.95;
-    mc3p.config.duty_min = 0.05;
-    mc3p.config.deadtime_nS = 1500;
     eldriver_mc3p_init(&mc3p);
     eldriver_mc3p_write_float(&mc3p);
 };
@@ -47,6 +40,7 @@ void PmsmControl::xmcLoop()
         break;
     }
 }
+
 void PmsmControl::pwmLoop()
 {
     if (control.mctype == MCType::None)
@@ -71,8 +65,10 @@ void PmsmControl::pwmLoop()
     volatile uint32_t elapsed = eldriver_core_prof_tock(start);
 }
 
-void PmsmControl::setControlMode(MCType mctype)
+void PmsmControl::setControlMode(MCType mctype, ECType ectype)
 {
+    //Todo: Sanity check, and probably don't allow all or any electrical or motor control changes while motor is running
+    control.ectype = ectype;
     if (control.mctype != mctype)
     {
         // Exit current mode
@@ -108,7 +104,6 @@ void PmsmControl::setControlMode(MCType mctype)
         control.mctype = mctype;
     }
 }
-
 //======================================================
 //  GLOBAL INSTANCE
 //======================================================

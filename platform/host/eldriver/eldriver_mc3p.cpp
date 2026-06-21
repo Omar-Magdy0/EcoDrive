@@ -44,7 +44,7 @@ void eldriver_mc3p_init(eldriver_mc3p_t *h)
     sil_input.dt = 1.0f / h->config.pwm_Hz / SIL_TO_PWM_FREQ;
     sil_input.load_torque = 0.00;
     sil_input.vcc = SIL_DEFAULT_VCC;
-    sil.param.dPsim_dTheta = dPsim_dTheta_Trapezoidal;
+    sil.param.dPsim_dTheta = dPsim_dTheta_Sine;
     sil.param.inv_Ron = 0.008;
     sil.param.inv_Roff = 1e6;
     sil.param.motor_pp = 6;
@@ -53,12 +53,13 @@ void eldriver_mc3p_init(eldriver_mc3p_t *h)
     sil.param.motor_Lm = 0.0002;
     sil.param.motor_Ms = sil.param.motor_Ls/3;
     sil.param.motor_rotorOffset = 0;
-    sil.param.motor_fluxLinkage = 0.036;
+    sil.param.motor_fluxLinkage = 0.025;
     sil.param.motor_B = 1e-2;
     sil.param.motor_J = 8e-5;
     dummy_load.K = 1.2e-5;
     dummy_load.J = 1e-3;
     dummy_load.B = 5e-2;
+    dummy_load.Tc = 0;
     sil.param.load_J = dummy_load.J;
     register_timer(&timer_manager, postScanMethod, (uint64_t)(1e9/h->config.pwm_Hz));
     register_timer(&timer_manager, eldriver_xmc3p_tickerCallback, (uint64_t)(1e9/ELDRIVER_XMC3P_TICKFREQ));
@@ -231,11 +232,11 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
     }
     
     /* SVPWM zero-sequence injection */
-    vmax = h->dutyu_q15;
+    vmax = dutyu_q15;
     if (dutyv_q15 > vmax) vmax = dutyv_q15;
     if (dutyw_q15 > vmax) vmax = dutyw_q15;
 
-    vmin = h->dutyu_q15;
+    vmin = dutyu_q15;
     if (dutyv_q15 < vmin) vmin = dutyv_q15;
     if (dutyw_q15 < vmin) vmin = dutyw_q15;
 

@@ -56,12 +56,25 @@ struct PmsmControl
         Overtemperature
     };
 
+    enum SyncErrBits
+    {
+        SYNCBITS_SUCCESS = 0,
+        SYNCBITS_BAD_PWM_FREQ = 1 << 1
+    };
+
+    enum DirtyPits
+    {
+        DIRTYBITS_PWM    = 1 << 0,
+        DIRTYBITS_ADC    = 1 << 1,  // 0x02
+        DIRTYBITS_CTRL   = 1 << 2,  // 0x04
+        DIRTYBITS_SP     = 1 << 3,  // 0x08
+    };
 
     #define RPM_TO_RPS(rpm)(rpm * (2*M_PI/60.0))
 
     volatile uint32_t pwmTicks{};                                                       /** PWM period in ticks (timer ticks). */
-    uint32_t pwm_freq_hz{PWM_FREQ_DEFAULT};                                    /** PWM carrier frequency (Hz). */
-    uint32_t tick_period_ns{ (uint32_t)(1'000'000'000.0f / static_cast<float>(PWM_FREQ_DEFAULT)) }; /** PWM tick period (us). */
+    uint32_t pwm_freq_hz{10000};                                    /** PWM carrier frequency (Hz). */
+    uint32_t tick_period_ns{ (uint32_t)(1'000'000'000.0f / static_cast<float>(10000)) }; /** PWM tick period (us). */
     uint32_t tick_period_us{tick_period_ns / 1000};                         /** PWM tick period (us). */
     uint32_t pwm_freq() const { return pwm_freq_hz; }                          /** Get PWM frequency (Hz). */
     float pwm_tick_period_us() const { return tick_period_us; }                /** Get PWM tick period (us). */
@@ -72,7 +85,7 @@ struct PmsmControl
     float ticks_to_ms(float ticks) const { return ticks * pwm_tick_period_ms(); }    /** ticks -> ms. */
     float voltage_q31_to_float(q31_t voltage_q31) const { return ELDRIVER_MC3P_VS_TO_FLOAT(voltage_q31); }
     float current_q31_to_float(q31_t current_q31) const { return ELDRIVER_MC3P_CS_TO_FLOAT(current_q31); }
-    float angle_q31_to_float(q31_t eAngle_q31) const { return (float)eAngle_q31 * (2 * M_PI / INT32_MAX);}
+    float angle_q31_to_float(q31_t eAngle_q31) const { return (float)eAngle_q31 * (M_PI / INT32_MAX);}
 
     // Owned hardware elements
     eldriver_mc3p_t mc3p{}; /** Underlying MC3P driver instance. */
@@ -102,24 +115,27 @@ struct PmsmControl
         float Ke;           /** Back-EMF constant. */
         float J;            /** Rotor inertia. */
         float B;            /** Viscous friction coefficient. */
-        uint8_t pole_pairs = DEFAULT_POLE_PAIRS; /** Motor pole pairs (electrical). */
+        uint8_t pole_pairs = 1; /** Motor pole pairs (electrical). */
     } model;
 
+    protected:
     struct
     {
         MCType mctype{MCType::None}; /** Current control mode. */
         ECType ectype{ECType::Voltage}; /** Current error type. */
     } control;
 
+    public:
+
 #include "PmsmControl_Trap.h"
-#include "PmsmControl_SComm.h"
 #include "PmsmControl_Foc.h"
+#include "PmsmControl_SComm.h"
 
     void init();
-    void setControlMode(MCType mctype);
+    void setControlMode(MCType mctype, ECType ectype);
     void pwmLoop();
     void xmcLoop();
+    uint32_t isync();
 };
-
 
 extern PmsmControl motor_c1;

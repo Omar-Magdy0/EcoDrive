@@ -6,7 +6,7 @@ set(DEVICE_DEFINITIONS
     USE_HAL_DRIVER
     STM32F401xC
     USE_FULL_LL_DRIVER
-    USE_FULL_ASSERT
+    #USE_FULL_ASSERT
 )
 
 # Path configurations
