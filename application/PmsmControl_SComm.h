@@ -18,29 +18,26 @@ struct SComm
     };
     static constexpr uint8_t oversample_bits = 14;
     static constexpr uint16_t oversample = 1 << oversample_bits; //using a power of two, for shift based division and averaging (nearly free)
-    uint16_t eSettle_min_ticks = 1000;
-    volatile uint16_t eSettle_start_tick = 0;
-    float hfi_Angv_RPS = (1000)*(2*M_PI);
+    static constexpr uint8_t hfi_N = 25;
 
+    uint16_t eSettle_min_ticks = 5000;
+    volatile uint16_t eSettle_start_tick = 0;
     volatile IDStage idstage;
     volatile IDSubStage idsub;
     volatile uint16_t samples_counter; /** Remaining samples for current step. */
     
     int64_t accumulate0;
     int64_t accumulate1;
-    q31_t hfi_alpha = 0.5*INT32_MAX;
     q31_t hfid_q31;
     q31_t hfiq_q31;
-    q31_t hfi_Angv_RPT_q31 = 0;
+    q31_t hfi_Angv_RPT_q31 = ((float)2.0/hfi_N)*INT32_MAX;
     q31_t hfi_angle_q31;              /** High-frequency injection angle */
     q31_t dc_vinj_q31 = ELDRIVER_MC3P_FLOAT_TO_VS(5);
-    q31_t hfi_vinj_q31 = ELDRIVER_MC3P_FLOAT_TO_VS(15);
+    q31_t hfi_vinj_q31 = ELDRIVER_MC3P_FLOAT_TO_VS(20);
 
     float R;
-    float Idd;
-    float Idq;
-    float Iqd;
-    float Iqq;
+    float Ld;
+    float Lq;
 } scomm;
 
 void SComm_init();    /** Initialize self-commissioning. */

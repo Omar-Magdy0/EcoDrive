@@ -93,8 +93,8 @@ void PmsmControl::Foc_pwmLoop()
     if(mod_idx_q3p12 > foc.state.mod_idx_max_q3p12)
     {
         //scale both Vd and Vq down 
-        foc.state.vd_q31 =  (foc.state.vd_q31 >> 12) * (((int32_t)foc.state.mod_idx_max_q3p12 * (int16_t)((1<<12) - 1))/mod_idx_q3p12);
-        foc.state.vq_q31 =  (foc.state.vq_q31 >> 12) * (((int32_t)foc.state.mod_idx_max_q3p12 * (int16_t)((1<<12) - 1))/mod_idx_q3p12);
+        foc.state.vd_q31 =  (foc.state.vd_q31 >> 12) * (((int32_t)foc.state.mod_idx_max_q3p12<<12)/mod_idx_q3p12);
+        foc.state.vq_q31 =  (foc.state.vq_q31 >> 12) * (((int32_t)foc.state.mod_idx_max_q3p12<<12)/mod_idx_q3p12);
         foc.state.Id_pid.state[2] = foc.state.vd_q31;
         foc.state.Iq_pid.state[2] = foc.state.vq_q31;
     }

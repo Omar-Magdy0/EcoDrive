@@ -27,17 +27,19 @@ void PmsmControl::SComm_pwmLoop()
         }
         break;
     case SComm::IDStage::LD_ID:
-        if (scomm.samples_counter)
+        if (1)
         {
             q31_t sin, cos;
             arm_sin_cos_q31(scomm.hfi_angle_q31, &sin, &cos);
             foc.state.ECd_sp_q31 = ((int64_t)scomm.hfi_vinj_q31 * sin) >> 31;
             foc.state.ECq_sp_q31 = 0;
             // Heterodyne the read current.....
-            q31_t hfid = ((int64_t)foc.state.Id_q31 * sin) >> 31; // Since they are multiplied by half already
-            q31_t hfiq = ((int64_t)foc.state.Id_q31 * cos) >> 31; // Since they are multiplied by half already
-            scomm.hfid_q31 = ((scomm.hfi_alpha) * (int64_t)hfid + (INT32_MAX - scomm.hfi_alpha) * (int64_t)scomm.hfid_q31) >> 31;
-            scomm.hfiq_q31 = ((scomm.hfi_alpha) * (int64_t)hfiq + (INT32_MAX - scomm.hfi_alpha) * (int64_t)scomm.hfiq_q31) >> 31;
+            q31_t hfid = ((int64_t)foc.state.Id_q31 * sin) >> 31;
+            q31_t hfiq = ((int64_t)foc.state.Id_q31 * cos) >> 31;
+            if(scomm.idsub == SComm::IDSubStage::LPFSettle_Wait || scomm.idsub == SComm::IDSubStage::Active_Sampling)
+            {
+
+            }
             if (scomm.idsub == SComm::IDSubStage::Active_Sampling)
             {
                 scomm.accumulate0 += scomm.hfid_q31;
@@ -46,6 +48,7 @@ void PmsmControl::SComm_pwmLoop()
             }
             scomm.hfi_angle_q31 += scomm.hfi_Angv_RPT_q31;
         }
+        break;
     case SComm::IDStage::LQ_ID:
         if (scomm.samples_counter)
         {
@@ -54,10 +57,12 @@ void PmsmControl::SComm_pwmLoop()
             foc.state.ECd_sp_q31 = 0;
             foc.state.ECq_sp_q31 = ((int64_t)scomm.hfi_vinj_q31 * sin) >> 31;
             // Heterodyne the read current.....
-            q31_t hfid = ((int64_t)foc.state.Iq_q31 * sin) >> 30; // Since they are multiplied by half already
-            q31_t hfiq = ((int64_t)foc.state.Iq_q31 * cos) >> 30; // Since they are multiplied by half already
-            scomm.hfid_q31 = ((scomm.hfi_alpha) * (int64_t)hfid + (INT32_MAX - scomm.hfi_alpha) * (int64_t)scomm.hfid_q31) >> 31;
-            scomm.hfiq_q31 = ((scomm.hfi_alpha) * (int64_t)hfiq + (INT32_MAX - scomm.hfi_alpha) * (int64_t)scomm.hfiq_q31) >> 31;
+            q31_t hfid = ((int64_t)foc.state.Iq_q31 * sin) >> 31;
+            q31_t hfiq = ((int64_t)foc.state.Iq_q31 * cos) >> 31;
+            if( scomm.idsub == SComm::IDSubStage::LPFSettle_Wait || scomm.idsub == SComm::IDSubStage::Active_Sampling)
+            {
+
+            }
             if (scomm.idsub == SComm::IDSubStage::Active_Sampling)
             {
                 scomm.accumulate0 += scomm.hfid_q31;
@@ -119,20 +124,15 @@ void PmsmControl::SComm_xmcLoop()
         switch (scomm.idsub)
         {
         case SComm::IDSubStage::ESettle_Start:
-            scomm.hfi_Angv_RPT_q31 = q31_t((scomm.hfi_Angv_RPS / pwm_freq_hz) * (INT32_MAX / M_PI));
             scomm.eSettle_start_tick = pwmTicks;
             scomm.idsub = SComm::IDSubStage::ESettle_Wait;
             scomm.accumulate0 = 0;
             scomm.accumulate1 = 0;
+            scomm.hfiq_q31 = 0;
+            scomm.hfiq_q31 = 0;
             scomm.samples_counter = scomm.oversample;
             break;
         case SComm::IDSubStage::ESettle_Wait:
-            if (pwmTicks - scomm.eSettle_start_tick > scomm.eSettle_min_ticks)
-            {
-                scomm.idsub = SComm::IDSubStage::LPFSettle_Start;
-            }
-            break;
-        case SComm::IDSubStage::LPFSettle_Start:
             if (pwmTicks - scomm.eSettle_start_tick > scomm.eSettle_min_ticks)
             {
                 scomm.eSettle_start_tick = pwmTicks;
@@ -148,10 +148,15 @@ void PmsmControl::SComm_xmcLoop()
         case SComm::IDSubStage::Active_Sampling:
             if (scomm.samples_counter == 0)
             {
-                scomm.Idd = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate0 >> scomm.oversample_bits));
-                scomm.Idq = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate1 >> scomm.oversample_bits));
-                scomm.idsub = SComm::IDSubStage::ESettle_Start;
-                scomm.idstage = SComm::IDStage::LQ_ID;
+                q31_t Idd = (scomm.accumulate0 >> (scomm.oversample_bits) );// Since accumulator accumulates I/2 we compensate in shift 
+                q31_t Idq = (scomm.accumulate1 >> (scomm.oversample_bits) );// Since accumulator accumulates I/2 we compensate in shift
+                q31_t Imag2 = (((int64_t)Idd*Idd) + ((int64_t)Idq*Idq))>>31; 
+                q31_t Imag;
+                arm_sqrt_q31(Imag2, &Imag);
+                float Xd = ELDRIVER_MC3P_VS_TO_FLOAT(scomm.hfi_vinj_q31)/(2*ELDRIVER_MC3P_CS_TO_FLOAT(Imag)) - scomm.R;
+                scomm.Ld = (Xd)/(angle_q31_to_float(scomm.hfi_Angv_RPT_q31)*pwm_freq_hz);
+                //scomm.idsub = SComm::IDSubStage::ESettle_Start;
+                //scomm.idstage = SComm::IDStage::LQ_ID;
             }
             break;
         default:
@@ -164,7 +169,6 @@ void PmsmControl::SComm_xmcLoop()
         switch (scomm.idsub)
         {
         case SComm::IDSubStage::ESettle_Start:
-            scomm.hfi_Angv_RPT_q31 = q31_t((scomm.hfi_Angv_RPS / pwm_freq_hz) * (INT32_MAX / M_PI));
             scomm.eSettle_start_tick = pwmTicks;
             scomm.idsub = SComm::IDSubStage::ESettle_Wait;
             scomm.accumulate0 = 0;
@@ -172,12 +176,6 @@ void PmsmControl::SComm_xmcLoop()
             scomm.samples_counter = scomm.oversample;
             break;
         case SComm::IDSubStage::ESettle_Wait:
-            if (pwmTicks - scomm.eSettle_start_tick > scomm.eSettle_min_ticks)
-            {
-                scomm.idsub = SComm::IDSubStage::LPFSettle_Start;
-            }
-            break;
-        case SComm::IDSubStage::LPFSettle_Start:
             if (pwmTicks - scomm.eSettle_start_tick > scomm.eSettle_min_ticks)
             {
                 scomm.eSettle_start_tick = pwmTicks;
@@ -193,8 +191,8 @@ void PmsmControl::SComm_xmcLoop()
         case SComm::IDSubStage::Active_Sampling:
             if (scomm.samples_counter == 0)
             {
-                scomm.Iqd = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate0 >> scomm.oversample_bits ));
-                scomm.Iqq = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate1 >> scomm.oversample_bits ));
+                int32_t Iqd = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate0 >> scomm.oversample_bits ));
+                int32_t Iqq = ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate1 >> scomm.oversample_bits ));
             }
             break;
         default:
