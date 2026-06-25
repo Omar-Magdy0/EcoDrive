@@ -112,14 +112,16 @@ extern "C"
         uint32_t timer_max_q15;
         uint16_t duty_max_q15;
         uint16_t duty_min_q15;
-        uint16_t dutyu_q15;
-        uint16_t dutyv_q15;
-        uint16_t dutyw_q15;
+        int16_t dutyu_q15;
+        int16_t dutyv_q15;
+        int16_t dutyw_q15;
         int32_t sync_scale_q31[MC3P_SYNC_CHANNELS][2];
         uint8_t sync_rank_scale[4];
         bool offset_calibration;
         volatile uint8_t offset_calibration_remaining_samples;
         volatile uint16_t offset_calibration_sum[4];
+        uint16_t dtc_comp_q15;
+        uint8_t dtc_state;
     } eldriver_mc3p_t;
 
     /** @brief Data structure for SVM-specific measurements. */
@@ -243,7 +245,7 @@ extern "C"
      * @param duty_v_q15 Phase-V duty in Q15.
      * @param duty_w_q15 Phase-W duty in Q15.
      */
-    void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, uint16_t duty_u_q15, uint16_t duty_v_q15, uint16_t duty_w_q15);
+    void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, int16_t duty_u_q15, int16_t duty_v_q15, int16_t duty_w_q15);
 
     /**
      * @brief Set all phases to float (high-Z) with zero duty.
@@ -263,7 +265,7 @@ extern "C"
      * @param duty_q15 Duty in Q15.
      */
     void eldriver_mc3p_write_trap(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector, uint16_t duty_q15);
-
+    
     /**
      * @brief Apply SVM duty from alpha/beta inputs (Q15).
      *
@@ -282,7 +284,6 @@ extern "C"
 
     /** @brief Weak callback after synchronized ADC scan completion. */
     __attribute__((weak)) void eldriver_mc3p_sync_postScanCallback(void);
-
 #ifdef __cplusplus
 }
 #endif

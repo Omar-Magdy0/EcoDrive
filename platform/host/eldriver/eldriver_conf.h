@@ -44,6 +44,13 @@
 // MCADCPWM3P CONFIGURATION    
 //================================================
 #define ELDRIVER_MC3P_ENABLED        
+#define ELDRIVER_MC3P_CS_SCALE 50
+#define ELDRIVER_MC3P_VS_SCALE 60
+#define CONF_MC3P_FLOAT_TO_VS(f) ((int32_t)(((float)(f) / ELDRIVER_MC3P_VS_SCALE) * INT32_MAX))
+#define CONF_MC3P_FLOAT_TO_CS(f) ((int32_t)(((float)(f) / ELDRIVER_MC3P_CS_SCALE) * INT32_MAX))
+
+#define ELDRIVER_MC3P_DTC_ACTIVE
+#define ELDRIVER_MC3P_DTC_CTHRESH CONF_MC3P_FLOAT_TO_CS(0.05)
 #define ELDRIVER_MC3P_CS_NONE               0
 #define ELDRIVER_MC3P_CS_TRIPLE_SHUNT       1
 #define ELDRIVER_MC3P_CS_DOUBLE_SHUNT       2
@@ -58,8 +65,7 @@
 #define ELDRIVER_MC3P_HIN_ACTIVE            1
 #define ELDRIVER_MC3P_LIN_ACTIVE            0
 
-#define ELDRIVER_MC3P_CS_SCALE 50
-#define ELDRIVER_MC3P_VS_SCALE 60
+
 
 
 //================================================

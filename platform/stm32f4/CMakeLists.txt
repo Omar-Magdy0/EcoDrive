@@ -17,7 +17,6 @@ set(CMSIS_CORE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Include)
 set(CMSIS_DSP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS-DSP)
 set(USBD_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library)
 set(USB_CLASS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library)
-set(FREERTOS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source)
 
 # Common include directories for all STM32 targets
 set(STM32_COMMON_INCLUDES
@@ -32,8 +31,6 @@ set(STM32_COMMON_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/
     ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/
     ${CMAKE_CURRENT_SOURCE_DIR}/driver_impl
-    ${FREERTOS_DIR}/include
-    ${FREERTOS_DIR}/portable/GCC/ARM_CM4F
 )
 
 # ===== HAL DRIVERS (for complex protocols) =====
@@ -71,20 +68,6 @@ set(STM32_Drivers_Src
     ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_ll_usart.c
 )
 
-
-set(FreeRTOS_Src
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/croutine.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/list.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/queue.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/tasks.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/timers.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
-)
-
 set(USB_Device_Library_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/usb_device.c
     ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/usbd_desc.c
@@ -119,7 +102,6 @@ file(GLOB_RECURSE Driver_Core_Src
 
 add_library(stm32f4_platform STATIC)
 target_sources(stm32f4_platform PRIVATE
-    ${FreeRTOS_Src}
     ${STM32_Drivers_Src}
     ${USB_Device_Library_Src}
 )

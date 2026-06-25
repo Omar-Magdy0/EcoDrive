@@ -63,6 +63,13 @@
 // MCADCPWM3P CONFIGURATION    
 //================================================
 #define ELDRIVER_MC3P_ENABLED        
+#define ELDRIVER_MC3P_CS_SCALE 50
+#define ELDRIVER_MC3P_VS_SCALE 60
+#define CONF_MC3P_FLOAT_TO_VS(f) ((int32_t)(((float)(f) / ELDRIVER_MC3P_VS_SCALE) * INT32_MAX))
+#define CONF_MC3P_FLOAT_TO_CS(f) ((int32_t)(((float)(f) / ELDRIVER_MC3P_CS_SCALE) * INT32_MAX))
+
+#define ELDRIVER_MC3P_DTC_ACTIVE
+#define ELDRIVER_MC3P_DTC_CTHRESH CONF_MC3P_FLOAT_TO_CS(0.05)
 #define ELDRIVER_MC3P_CS_NONE               0
 #define ELDRIVER_MC3P_CS_TRIPLE_SHUNT       1
 #define ELDRIVER_MC3P_CS_DOUBLE_SHUNT       2
@@ -89,11 +96,6 @@
 #define ELDRIVER_MC3P_WH_PORT        GPIOA
 #define ELDRIVER_MC3P_WL_PIN         LL_GPIO_PIN_15
 #define ELDRIVER_MC3P_WL_PORT        GPIOB
-
-
-#define ELDRIVER_MC3P_CS_SCALE 50
-#define ELDRIVER_MC3P_VS_SCALE 60
-
 
 #define ELDRIVER_MC3P_VSBUS_PIN               LL_GPIO_PIN_0
 #define ELDRIVER_MC3P_VSBUS_PORT              GPIOA
@@ -178,7 +180,7 @@
     #define ELDRIVER_MC3P_BG2_RANK
 #endif
 
-#define ELDRIVER_MC3P_OFFSET_CALIBRATION_SAMPLES 20
+#define ELDRIVER_MC3P_OFFSET_CALIBRATION_SAMPLES 50
 
 /** @name Hall Sensor Configuration */
 //================================================

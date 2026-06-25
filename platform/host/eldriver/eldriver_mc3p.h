@@ -71,13 +71,15 @@ typedef struct{
     uint32_t timer_max_q15;
     uint16_t duty_max_q15;
     uint16_t duty_min_q15;
-    uint16_t dutyu_q15;
-    uint16_t dutyv_q15;
-    uint16_t dutyw_q15;
+    int16_t dutyu_q15;
+    int16_t dutyv_q15;
+    int16_t dutyw_q15;
     int32_t sync_scale_q31[MC3P_SYNC_CHANNELS][2];
     uint8_t sync_rank_scale[4];
     bool offset_calibration;
     int phase_state[3];
+    uint16_t dtc_comp_q15;
+    uint8_t dtc_state;
 }eldriver_mc3p_t;
 
 typedef struct
@@ -112,7 +114,7 @@ uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_t *h);
 void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void* scanData);
 
 void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_state_t state_u, eldriver_mc3p_phase_state_t state_v, eldriver_mc3p_phase_state_t state_w);
-void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, uint16_t duty_u_q15, uint16_t duty_v_q15, uint16_t duty_w_q15);
+void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, int16_t duty_u_q15, int16_t duty_v_q15, int16_t duty_w_q15);
 
 void eldriver_mc3p_write_float(eldriver_mc3p_t *h);
 void eldriver_mc3p_write_trap(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector, uint16_t duty_q15);

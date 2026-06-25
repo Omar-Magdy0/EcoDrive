@@ -405,7 +405,10 @@ void eldriver_mc3p_init(eldriver_mc3p_t *h)
     mc3p_tim1_init(h);
     h->duty_max_q15 = (uint16_t)((h->config.duty_max) * 0x7FFF);
     h->duty_min_q15 = (uint16_t)((h->config.duty_min) * 0x7FFF);
-
+    //compute deadtme compensation
+    #ifdef ELDRIVER_MC3P_DTC_ACTIVE
+    h->dtc_comp_q15 = (uint16_t)(((float)h->config.deadtime_nS*h->config.pwm_Hz/1e9)*INT16_MAX + 0.5);
+    #endif
     mc3p_adc_init(h);
     mc3p_dma_init();
     h->sector_last = ELDRIVER_MC3P_SECTOR_FLOAT;
@@ -463,7 +466,7 @@ void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_sta
     TIM1->EGR |= TIM_EGR_COMG;
 }
 
-void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, uint16_t dutyu_q15, uint16_t dutyv_q15, uint16_t dutyw_q15)
+void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, int16_t dutyu_q15, int16_t dutyv_q15, int16_t dutyw_q15)
 {
     uint32_t compare_u = ((uint32_t)SATURATE(dutyu_q15, h->duty_min_q15, h->duty_max_q15) * h->timer_max_q15) >> 15;
     uint32_t compare_v = ((uint32_t)SATURATE(dutyv_q15, h->duty_min_q15, h->duty_max_q15) * h->timer_max_q15) >> 15;
@@ -517,7 +520,16 @@ void eldriver_mc3p_write_trap(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector,
         mc3p_adc_trap_update(h, sector);
         h->sector_last = sector;
     }
-    eldriver_mc3p_write_phase_duty(h, duty_q15, duty_q15, duty_q15);
+    #ifdef ELDRIVER_MC3P_DTC_ACTIVE
+    h->dutyu_q15 = __SSAT((int32_t)duty_q15 + ((h->dtc_state & (1<<3))? h->dtc_comp_q15 : -h->dtc_comp_q15), 16);
+    h->dutyv_q15 = h->dutyu_q15;
+    h->dutyw_q15 = h->dutyu_q15;
+    #else
+    h->dutyu_q15 = duty_q15;
+    h->dutyv_q15 = h->dutyu_q15;
+    h->dutyw_q15 = h->dutyu_q15;
+    #endif
+    eldriver_mc3p_write_phase_duty(h, h->dutyu_q15, h->dutyv_q15, h->dutyw_q15);
 }
 
 void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta_q15) 
@@ -538,9 +550,9 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
     dutyw_q15 = (-(int32_t)Q15_HALF * alpha_q15
          - (int32_t)Q15_SQRT3_BY_2 * beta_q15) >> 15;
     /* SVPWM zero-sequence injection */
-    uint8_t b0 = (h->dutyu_q15 >= 0);
-    uint8_t b1 = (h->dutyv_q15 >= 0);
-    uint8_t b2 = (h->dutyw_q15 >= 0);
+    uint8_t b0 = (dutyu_q15 >= 0);
+    uint8_t b1 = (dutyv_q15 >= 0);
+    uint8_t b2 = (dutyw_q15 >= 0);
 
     // 3-bit code
     uint8_t code = (b2 << 2) | (b1 << 1) | b0;
@@ -566,9 +578,18 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
 
     voff = (vmax + vmin) >> 1;
 
-    h->dutyu_q15 = (dutyu_q15 - voff) + Q15_HALF;
-    h->dutyv_q15 = (dutyv_q15 - voff) + Q15_HALF;
-    h->dutyw_q15 = (dutyw_q15 - voff) + Q15_HALF;
+    dutyu_q15 = (dutyu_q15 - voff) + Q15_HALF;
+    dutyv_q15 = (dutyv_q15 - voff) + Q15_HALF;
+    dutyw_q15 = (dutyw_q15 - voff) + Q15_HALF;
+    #ifdef ELDRIVER_MC3P_DTC_ACTIVE
+    h->dutyu_q15 = __SSAT(dutyu_q15 + ((h->dtc_state & (1<<0))? h->dtc_comp_q15 : -h->dtc_comp_q15), 16);
+    h->dutyv_q15 = __SSAT(dutyv_q15 + ((h->dtc_state & (1<<1))? h->dtc_comp_q15 : -h->dtc_comp_q15), 16);
+    h->dutyw_q15 = __SSAT(dutyw_q15 + ((h->dtc_state & (1<<2))? h->dtc_comp_q15 : -h->dtc_comp_q15), 16);
+    #else
+    h->dutyu_q15 = dutyu_q15;
+    h->dutyv_q15 = dutyv_q15;
+    h->dutyw_q15 = dutyw_q15;
+    #endif
     eldriver_mc3p_write_phase_duty(h, h->dutyu_q15, h->dutyv_q15, h->dutyw_q15);
     h->sector_last = sector;
 }
@@ -604,7 +625,6 @@ void mc3p_adc_svm_update(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector)
     
 }
 
-
 typedef struct {
     uint32_t rank2_channel;
     uint32_t rank3_channel;
@@ -629,25 +649,48 @@ void mc3p_adc_trap_update(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector)
 }
 
 #include <string.h>
-void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void* data)
+void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void *data)
 {
+#define DTC_UPDATE_POLARITY(current, bit)         \
+    do                                            \
+    {                                             \
+        if ((current) > (int32_t)ELDRIVER_MC3P_DTC_CTHRESH)       \
+        {                                         \
+            h->dtc_state |= (bit);             \
+        }                                         \
+        else if ((current) < -(int32_t)ELDRIVER_MC3P_DTC_CTHRESH) \
+        {                                         \
+            h->dtc_state &= ~(bit);            \
+        }                                         \
+    } while (0)
+
     uint8_t is_svm = IS_SVM_SECTOR(h->sector_last);
     uint8_t is_trap = IS_TRAP_SECTOR(h->sector_last);
-    if(is_svm)
+    if (is_svm)
     {
-        ((eldriver_mc3p_trap_data_t *)(data))->vbus_q31  = (h->sync_scale_q31[h->sync_rank_scale[0]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1)) + h->sync_scale_q31[h->sync_rank_scale[0]][1]);
-        ((eldriver_mc3p_svm_data_t *)(data))->cu_q31     = (h->sync_scale_q31[h->sync_rank_scale[1]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1)) + h->sync_scale_q31[h->sync_rank_scale[1]][1]);
-        ((eldriver_mc3p_svm_data_t *)(data))->cv_q31     = (h->sync_scale_q31[h->sync_rank_scale[2]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_2)) + h->sync_scale_q31[h->sync_rank_scale[2]][1]);  
-        ((eldriver_mc3p_svm_data_t *)(data))->cw_q31     = (h->sync_scale_q31[h->sync_rank_scale[3]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_3)) + h->sync_scale_q31[h->sync_rank_scale[3]][1]);        
+        ((eldriver_mc3p_trap_data_t *)(data))->vbus_q31 = (h->sync_scale_q31[h->sync_rank_scale[0]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1)) + h->sync_scale_q31[h->sync_rank_scale[0]][1]);
+        ((eldriver_mc3p_svm_data_t *)(data))->cu_q31 = (h->sync_scale_q31[h->sync_rank_scale[1]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1)) + h->sync_scale_q31[h->sync_rank_scale[1]][1]);
+        ((eldriver_mc3p_svm_data_t *)(data))->cv_q31 = (h->sync_scale_q31[h->sync_rank_scale[2]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_2)) + h->sync_scale_q31[h->sync_rank_scale[2]][1]);
+        ((eldriver_mc3p_svm_data_t *)(data))->cw_q31 = (h->sync_scale_q31[h->sync_rank_scale[3]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_3)) + h->sync_scale_q31[h->sync_rank_scale[3]][1]);
+        // Dead-time compensation
+        #ifdef ELDRIVER_MC3P_DTC_ACTIVE
+        DTC_UPDATE_POLARITY(((eldriver_mc3p_svm_data_t *)(data))->cu_q31, (1 << 0));
+        DTC_UPDATE_POLARITY(((eldriver_mc3p_svm_data_t *)(data))->cv_q31, (1 << 1));
+        DTC_UPDATE_POLARITY(((eldriver_mc3p_svm_data_t *)(data))->cw_q31, (1 << 2));
+        #endif
     }
     else if (is_trap)
     {
-        ((eldriver_mc3p_trap_data_t *)(data))->vbus_q31  = (h->sync_scale_q31[h->sync_rank_scale[0]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1)) + h->sync_scale_q31[h->sync_rank_scale[0]][1]);
+        ((eldriver_mc3p_trap_data_t *)(data))->vbus_q31 = (h->sync_scale_q31[h->sync_rank_scale[0]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1)) + h->sync_scale_q31[h->sync_rank_scale[0]][1]);
         ((eldriver_mc3p_trap_data_t *)(data))->vbemf_q31 = (h->sync_scale_q31[h->sync_rank_scale[1]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_2)) + h->sync_scale_q31[h->sync_rank_scale[1]][1]);
-        ((eldriver_mc3p_trap_data_t *)(data))->cbus_q31  = (h->sync_scale_q31[h->sync_rank_scale[2]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_3)) + h->sync_scale_q31[h->sync_rank_scale[2]][1]);
+        ((eldriver_mc3p_trap_data_t *)(data))->cbus_q31 = (h->sync_scale_q31[h->sync_rank_scale[2]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_3)) + h->sync_scale_q31[h->sync_rank_scale[2]][1]);
+        #ifdef ELDRIVER_MC3P_DTC_ACTIVE
+        DTC_UPDATE_POLARITY(((eldriver_mc3p_trap_data_t *)(data))->cbus_q31 , (1 << 3));
+        #endif
     }
-    else{
-        ((eldriver_mc3p_trap_data_t *)(data))->vbus_q31  = (h->sync_scale_q31[h->sync_rank_scale[0]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1)) + h->sync_scale_q31[h->sync_rank_scale[0]][1]);
+    else
+    {
+        ((eldriver_mc3p_trap_data_t *)(data))->vbus_q31 = (h->sync_scale_q31[h->sync_rank_scale[0]][0] * (LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1)) + h->sync_scale_q31[h->sync_rank_scale[0]][1]);
     }
 }
 

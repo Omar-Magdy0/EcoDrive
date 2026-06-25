@@ -62,6 +62,8 @@ struct Sil
         double inv_Ron; /** inverter on resistance */
         double inv_Roff;
         double inv_alpha = 0; /** inverter impedance transition constant in terms of samples*/
+        double inv_deatime_ns = 1000;
+        double inv_pwm_freq;
         double load_J;
         double load_B;
         double filt_cuttoff = 400;
@@ -316,7 +318,8 @@ struct Sil
         {
             if(in.drive[i])
             {
-                state.vinv[i] = (in.vcc * in.duty[i]) * in.drive[i];
+                double dtv = (in.vcc * ((double)param.inv_deatime_ns*param.inv_pwm_freq)/1e9) * ((state.ip[i] > 0.05)?-1:(state.ip[i] < -0.05)?1:0); 
+                state.vinv[i] = (in.vcc * in.duty[i]) * in.drive[i] + dtv;
                 state.rinv[i] = param.inv_Ron;
             }
             else

@@ -5,8 +5,6 @@ cmake_minimum_required(VERSION 3.20)
 set(DEVICE_DEFINITIONS
     USE_FULL_ASSERT
 )
-
-set(FREERTOS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/Source)
 set(CMSIS_DSP_DIR ${CMAKE_SOURCE_DIR}/platform/host/CMSIS-DSP)
 set(CMSISCORE ${CMAKE_SOURCE_DIR}/platform/stm32f4/Drivers/CMSIS)
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/platform/host/imgui)
@@ -18,27 +16,11 @@ set(EIGEN_DIR ${CMAKE_SOURCE_DIR}/platform/host/Eigen)
 
 set(HOST_COMMON_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${FREERTOS_DIR}/include
-    ${FREERTOS_DIR}/portable/ThirdParty/GCC/Posix
-    ${FREERTOS_DIR}/portable/ThirdParty/GCC/Posix/utils
     ${IMGUI_DIR}
     ${IMGUI_DIR}/implot
     ${IMGUI_DIR}/backends
     ${IMGUIFD_DIR}
     ${EIGEN_DIR}
-)
-
-set(FreeRTOS_Src
-    ${FREERTOS_DIR}/croutine.c
-    ${FREERTOS_DIR}/event_groups.c
-    ${FREERTOS_DIR}/list.c
-    ${FREERTOS_DIR}/queue.c
-    ${FREERTOS_DIR}/stream_buffer.c
-    ${FREERTOS_DIR}/tasks.c
-    ${FREERTOS_DIR}/timers.c
-    ${FREERTOS_DIR}/portable/MemMang/heap_4.c
-    ${FREERTOS_DIR}/portable/ThirdParty/GCC/Posix/port.c
-    ${FREERTOS_DIR}/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c
 )
 
 set(IMGUI_SRC  
@@ -76,7 +58,6 @@ find_package(HDF5 REQUIRED COMPONENTS C CXX)
 
 add_library(host_platform STATIC)
 target_sources(host_platform PRIVATE
-    ${FreeRTOS_Src}
     ${IMGUI_SRC}
 )
 
