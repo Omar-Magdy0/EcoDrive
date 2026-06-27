@@ -1,4 +1,3 @@
-/* ---- Required hooks for the selected FreeRTOS POSIX configuration ---- */
 #include "platform.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,19 +36,29 @@ static inline uint64_t now_ns(void) {
 }
 
 // register a timer (frequency in Hz)
-bool register_timer(vtimer_manager_t* mgr, timer_callback_t cb, uint64_t timestep_ns) {
+unsigned int register_timer(vtimer_manager_t* mgr, timer_callback_t cb, uint64_t timestep_ns) {
     if (mgr->timer_index >= HOST_TIMERS) return false;
-
+    unsigned int idx = mgr->timer_index;
     vtimer_t* t = &mgr->timers[mgr->timer_index++];
     t->periodic_time_ns = (timestep_ns);
     t->last_time_ns = now_ns();
     t->cb = cb;
-
     if(timestep_ns < mgr->min_timestep_ns)
     {
         mgr->min_timestep_ns = timestep_ns;
     }
+    return idx;
+}
 
+bool configure_timer_timestep(vtimer_manager_t* mgr, unsigned int idx ,uint64_t timestep_ns)
+{
+    if(idx > mgr->timer_index)return false;
+    vtimer_t* t = &mgr->timers[idx];
+    t->periodic_time_ns = (timestep_ns);
+    if(timestep_ns < mgr->min_timestep_ns)
+    {
+        mgr->min_timestep_ns = timestep_ns;
+    }
     return true;
 }
 
@@ -89,12 +98,6 @@ void* tick_thread(void* arg) {
         struct timespec req = {0, sleep_ns};
         nanosleep(&req, NULL);
     }
-}
-
-void* freertos_thread(void* arg)
-{
-
-    return NULL;
 }
 
 
@@ -241,11 +244,6 @@ void gui_loop() {
 
 
 pthread_t t;
-void freeRtos_init()
-{
-    pthread_create(&t, NULL, freertos_thread, NULL);
-}
-
 
 void platform_init()
 {

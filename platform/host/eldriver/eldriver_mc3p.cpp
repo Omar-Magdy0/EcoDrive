@@ -10,7 +10,10 @@
 #define Q15_SQRT3_BY_2  28378   // 0.8660254 × 32768
 
 extern float vtime;
-float eldriver_mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel){}
+unsigned int sil_pwm_timer;
+unsigned int sil_to_pwm_freq = 1;
+
+float eldriver_mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel) { return 0.0; }
 #define SSAT(val, bits) \
     ({ \
         int32_t _v = (int32_t)(val); \
@@ -26,7 +29,7 @@ void postScanMethod()
 {
     eldriver_mc3p_sync_postScanCallback();
     sil_input.load_torque = (dummy_load.K * sil.state.omega + dummy_load.B) * sil.state.omega + dummy_load.Tc;
-    for(int i = 0; i <  SIL_TO_PWM_FREQ; i++) {
+    for(int i = 0; i < sil_to_pwm_freq; i++) {
         sil.step(sil_input);
         sil_hall_update();
         silgui_updateData();
@@ -51,7 +54,7 @@ static void dPsim_dTheta_Trapezoidal(double theta_e, double dPsi_dTheta[3])
 
 void eldriver_mc3p_init(eldriver_mc3p_t *h)
 {
-    sil_input.dt = 1.0f / h->config.pwm_Hz / SIL_TO_PWM_FREQ;
+    sil_input.dt = 1.0f / h->config.pwm_Hz / sil_to_pwm_freq;
     sil_input.load_torque = 0.00;
     sil_input.vcc = SIL_DEFAULT_VCC;
     sil.param.dPsim_dTheta = dPsim_dTheta_Sine;
@@ -77,14 +80,34 @@ void eldriver_mc3p_init(eldriver_mc3p_t *h)
     #ifdef ELDRIVER_MC3P_DTC_ACTIVE
     h->dtc_comp_q15 = (int16_t)(((float)h->config.deadtime_nS*h->config.pwm_Hz/1e9)*INT16_MAX + 0.5);
     #endif
-    register_timer(&timer_manager, postScanMethod, (uint64_t)(1e9/h->config.pwm_Hz));
+    sil_pwm_timer = register_timer(&timer_manager, postScanMethod, (uint64_t)(1e9/h->config.pwm_Hz));
     register_timer(&timer_manager, eldriver_xmc3p_tickerCallback, (uint64_t)(1e9/ELDRIVER_XMC3P_TICKFREQ));
 }
 
+void eldriver_mc3p_reconfigure_pwm(eldriver_mc3p_t *h)
+{
+    double min_sil_freq = 1.0/SIL_MAX_TIMESTEP;
+    if(h->config.pwm_Hz < min_sil_freq)
+    {
+        //Find the nearest integer multiple of pwm frequency larger than minimum sil frequency
+        double next_freq = 0;
+        for(int i = 1; i <= 1000; i++)
+        {
+            if(i * h->config.pwm_Hz > min_sil_freq)
+            {
+                sil_to_pwm_freq = i;
+            }
+        }
+    }
+    sil_input.dt = 1.0f / h->config.pwm_Hz / sil_to_pwm_freq;
+    sil.param.inv_pwm_freq = h->config.pwm_Hz;
+    configure_timer_timestep(&timer_manager, sil_pwm_timer, (uint64_t)(1e9/h->config.pwm_Hz));
+}
+
 void eldriver_mc3p_bg_startConv(eldriver_mc3p_t *h){}
-uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_t *h){}
-uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float* scanData){}
-uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_t *h){}
+uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_t *h){return 0;}
+uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float* scanData){return 0;}
+uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_t *h){return 0;}
 
 void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void* data)
 {    
@@ -167,7 +190,6 @@ void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_sta
     h->phase_state[0] = state_u;
     h->phase_state[1] = state_v;
     h->phase_state[2] = state_w;
-
 }
 
 // ===== KEY CHANGE: Send duty cycles to SIL =====
@@ -300,4 +322,25 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
     h->sector_last = sector;
 }
 
-void eldriver_mc3p_setGain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain){}
+void eldriver_mc3p_set_gain(eldriver_mc3p_t *h,  eldriver_mc3p_sync s, float gain)
+{
+    float scale = (s >= ELDRIVER_MC3P_CSU && s <= ELDRIVER_MC3P_CSW)? ELDRIVER_MC3P_CS_SCALE : ELDRIVER_MC3P_VS_SCALE;
+    h->sync_scale_q31[s][0] = ((gain * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * scale));
+}
+void eldriver_mc3p_set_sync_scale(eldriver_mc3p_t *h, const float scales[MC3P_SYNC_CHANNELS][2])
+{
+    for(uint8_t i = ELDRIVER_MC3P_VSBUS; i < MC3P_SYNC_CHANNELS; i++)
+    {
+        //Gains
+        eldriver_mc3p_set_gain(h, (eldriver_mc3p_sync)i, scales[i][0]);
+        //Offsets
+        if(i >= ELDRIVER_MC3P_VSBUS || i <= ELDRIVER_MC3P_VSW)
+        {
+            h->sync_scale_q31[i][1] = ELDRIVER_MC3P_FLOAT_TO_VS(scales[i][1]);
+        }
+        else if(i >= ELDRIVER_MC3P_CSV || i <= ELDRIVER_MC3P_CSW)
+        {
+            h->sync_scale_q31[i][1] = ELDRIVER_MC3P_FLOAT_TO_CS(scales[i][1]);
+        }
+    }
+}

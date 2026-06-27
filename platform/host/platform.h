@@ -18,7 +18,7 @@ typedef struct {
 
 typedef struct {
     vtimer_t timers[HOST_TIMERS];
-    int      timer_index;
+    unsigned int timer_index;
     int64_t  min_timestep_ns;
 } vtimer_manager_t;
 
@@ -26,10 +26,10 @@ extern vtimer_manager_t timer_manager;
 extern volatile uint64_t virtual_tick;
 extern float vtime;
 
-bool register_timer(vtimer_manager_t* mgr, timer_callback_t cb, uint64_t timestep_ns);
+unsigned int register_timer(vtimer_manager_t* mgr, timer_callback_t cb, uint64_t timestep_ns);
+bool configure_timer_timestep(vtimer_manager_t *mgr, unsigned int idx, uint64_t timestep_ns);
 
 void platform_init();
-void freeRtos_init();
 void gui_loop();
 
 #ifdef __cplusplus

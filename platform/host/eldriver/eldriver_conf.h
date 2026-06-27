@@ -72,9 +72,9 @@
 // SIL SIMULATION CONFIGURATION
 //================================================
 #define SIL_DEFAULT_VCC 36.0f
+#define SIL_MAX_TIMESTEP (1.0/20000.0)
 // Number of SIL steps to run for each PWM update 
 //(for better resolution in the scope plots, better simulation quality and for marginally low time constants)
-#define SIL_TO_PWM_FREQ 1
 #define SIL_HALL_OFFSET 0
 static const uint8_t SIL_HALL_TABLE_PI_3[6] = {
     ((1 << 2) | (1 << 1) | (0 << 0)), // 110

@@ -146,6 +146,7 @@ extern "C"
 #define ELDRIVER_MC3P_CS_TO_FLOAT(cs) ((float)(((int64_t)(cs) * ELDRIVER_MC3P_CS_SCALE) >> 31))
 #define ELDRIVER_MC3P_FLOAT_TO_VS(f) ((int32_t)(((float)(f) / ELDRIVER_MC3P_VS_SCALE) * INT32_MAX))
 #define ELDRIVER_MC3P_FLOAT_TO_CS(f) ((int32_t)(((float)(f) / ELDRIVER_MC3P_CS_SCALE) * INT32_MAX))
+#define ELDRIVER_MC3P_SYNC_CHANNELS_NUM()(MC3P_SYNC_CHANNELS)
 
     // TODO  FINISH ADC IMPLEMENTATION FOR 1)TRAP & 2)SVM
     void mc3p_irq_bind(eldriver_mc3p_t *h);
@@ -160,7 +161,7 @@ extern "C"
      * @param h Driver handle.
      */
     void eldriver_mc3p_init(eldriver_mc3p_t *h);
-
+    void eldriver_mc3p_reconfigure_pwm(eldriver_mc3p_t *h);
     /**
      * @brief Update scaling gain for a synced signal (voltage or current).
      *
@@ -168,8 +169,9 @@ extern "C"
      * @param s Signal selector.
      * @param gain Gain applied before Q31 scaling.
      */
-    void eldriver_mc3p_setGain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain);
+    void eldriver_mc3p_set_gain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain);
 
+    void eldriver_mc3p_set_sync_scale(eldriver_mc3p_t *h, const float scales[MC3P_SYNC_CHANNELS][2]);
     /**
      * @brief Start a regular-group ADC conversion for background scanning.
      *

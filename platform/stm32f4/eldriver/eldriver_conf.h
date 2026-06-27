@@ -55,8 +55,8 @@
 // USBCDC CONFIGURATION
 //================================================
 #define ELDRIVER_USBCDC_ENABLED
-#define ELDRIVER_USBCDC_TX_BUFFER_SIZE 4096
-#define ELDRIVER_USBCDC_RX_BUFFER_SIZE 1024
+#define ELDRIVER_USBCDC_TX_BUFFER_SIZE 64
+#define ELDRIVER_USBCDC_RX_BUFFER_SIZE 64
 
 /** @name Motor Control (MC3P) Configuration */
 //================================================
@@ -180,7 +180,7 @@
     #define ELDRIVER_MC3P_BG2_RANK
 #endif
 
-#define ELDRIVER_MC3P_OFFSET_CALIBRATION_SAMPLES 50
+#define ELDRIVER_MC3P_OFFSET_CALIBRATION_SAMPLES 128
 
 /** @name Hall Sensor Configuration */
 //================================================

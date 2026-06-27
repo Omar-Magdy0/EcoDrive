@@ -418,7 +418,19 @@ void eldriver_mc3p_init(eldriver_mc3p_t *h)
     if(h->offset_calibration)mc3p_offset_calibration(h);
     eldriver_mc3p_write_float(h);
 }
-
+void eldriver_mc3p_reconfigure_pwm(eldriver_mc3p_t *h)
+{
+    LL_TIM_SetAutoReload(TIM1, __LL_TIM_CALC_ARR(HAL_RCC_GetPCLK2Freq(), 1, h->config.pwm_Hz));
+    LL_TIM_OC_SetDeadTime(TIM1, (uint8_t)(__LL_TIM_CALC_DEADTIME(HAL_RCC_GetPCLK2Freq(), LL_TIM_GetClockDivision(TIM1), h->config.deadtime_nS)));
+    //GET TIMER MAX MAX VALUE TO BE USED FOR DUTY CALCULATION
+    h->timer_max_q15 = LL_TIM_GetAutoReload(TIM1);
+    h->duty_max_q15 = (uint16_t)((h->config.duty_max) * 0x7FFF);
+    h->duty_min_q15 = (uint16_t)((h->config.duty_min) * 0x7FFF);
+    //compute deadtme compensation
+    #ifdef ELDRIVER_MC3P_DTC_ACTIVE
+    h->dtc_comp_q15 = (uint16_t)(((float)h->config.deadtime_nS*h->config.pwm_Hz/1e9)*INT16_MAX + 0.5);
+    #endif
+}
 //======================================================
 // Phase Ouptut functions
 //======================================================
@@ -741,11 +753,27 @@ void DMA2_Stream0_IRQHandler(void)
     }
 }
 
-
-void eldriver_mc3p_setGain(eldriver_mc3p_t *h,  eldriver_mc3p_sync s, float gain)
+void eldriver_mc3p_set_gain(eldriver_mc3p_t *h,  eldriver_mc3p_sync s, float gain)
 {
     float scale = (s >= ELDRIVER_MC3P_CSU && s <= ELDRIVER_MC3P_CSW)? ELDRIVER_MC3P_CS_SCALE : ELDRIVER_MC3P_VS_SCALE;
     h->sync_scale_q31[s][0] = ((gain * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * scale));
+}
+void eldriver_mc3p_set_sync_scale(eldriver_mc3p_t *h, const float scales[MC3P_SYNC_CHANNELS][2])
+{
+    for(uint8_t i = 0; i < MC3P_SYNC_CHANNELS; i++)
+    {
+        //Gains
+        eldriver_mc3p_set_gain(h, (eldriver_mc3p_sync)i, scales[i][0]);
+        //Offsets
+        if(i >= ELDRIVER_MC3P_VSBUS || i <= ELDRIVER_MC3P_VSW)
+        {
+            h->sync_scale_q31[i][1] = ELDRIVER_MC3P_FLOAT_TO_VS(scales[i][1]);
+        }
+        else if(i >= ELDRIVER_MC3P_CSV || i <= ELDRIVER_MC3P_CSW)
+        {
+            h->sync_scale_q31[i][1] = ELDRIVER_MC3P_FLOAT_TO_CS(scales[i][1]);
+        }
+    }
 }
 
 void mc3p_offset_calibration(eldriver_mc3p_t *h)

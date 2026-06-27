@@ -98,13 +98,15 @@ typedef struct{
 
 #define ELDRIVER_MC3P_VS_TO_FLOAT(vs)(((float)vs*ELDRIVER_MC3P_VS_SCALE) / INT32_MAX )
 #define ELDRIVER_MC3P_CS_TO_FLOAT(cs)(((float)cs*ELDRIVER_MC3P_CS_SCALE) / INT32_MAX )
-#define ELDRIVER_MC3P_FLOAT_TO_VS(f)((int32_t)(((float)(f)/ELDRIVER_MC3P_VS_SCALE) * INT32_MAX ))   
-#define ELDRIVER_MC3P_FLOAT_TO_CS(f)((int32_t)(((float)(f)/ELDRIVER_MC3P_CS_SCALE) * INT32_MAX ))
+#define ELDRIVER_MC3P_FLOAT_TO_VS(f)((int32_t)(((f)/ELDRIVER_MC3P_VS_SCALE) * INT32_MAX ))   
+#define ELDRIVER_MC3P_FLOAT_TO_CS(f)((int32_t)(((f)/ELDRIVER_MC3P_CS_SCALE) * INT32_MAX ))
 
 
 //TODO  FINISH ADC IMPLEMENTATION FOR 1)TRAP & 2)SVM
 void eldriver_mc3p_init(eldriver_mc3p_t *h);
-void eldriver_mc3p_setGain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain);
+void eldriver_mc3p_reconfigure_pwm(eldriver_mc3p_t *h);
+void eldriver_mc3p_set_gain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain);
+void eldriver_mc3p_set_sync_scale(eldriver_mc3p_t *h, const float scales[MC3P_SYNC_CHANNELS][2]);
 void eldriver_mc3p_bg_startConv(eldriver_mc3p_t *h);
 uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_t *h);
 float eldriver_mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel);
