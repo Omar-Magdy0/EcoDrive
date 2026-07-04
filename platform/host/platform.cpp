@@ -82,7 +82,7 @@ void tick(uint64_t elapsed_ns)
             if (!t->cb) continue;
             if (sim.time_ns - t->last_time_ns >= t->periodic_time_ns)
             {
-                t->last_time_ns += t->periodic_time_ns; // advance by one period
+                t->last_time_ns = sim.time_ns; // advance by one period
                 t->cb();
             }
         }
@@ -223,7 +223,7 @@ void gui_deinit()
 }
 
 void gui_loop() {
-    while (!glfwWindowShouldClose(window)) {
+    if(!glfwWindowShouldClose(window)) {
         // Main loop
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

@@ -110,12 +110,12 @@ void HAL_ResumeTick(void)
 __attribute__((weak)) void eldriver_xmc3p_tickerCallback(void){}
 __attribute__((weak)) void eldriver_mc3p_sync_postScanCallback(void){}
 
-static eldriver_mc3p_t* s_mc3p = NULL;
-void mc3p_irq_bind(eldriver_mc3p_t* h)
+static eldriver_mc3p_handle_t* s_mc3p = NULL;
+void mc3p_irq_bind(eldriver_mc3p_handle_t* h)
 {
     s_mc3p = h;
 }
-__attribute__((weak)) void INTERNAL_mc3p_ADC_JEOS_IRQ(eldriver_mc3p_t *h){}
+__attribute__((weak)) void INTERNAL_mc3p_ADC_JEOS_IRQ(eldriver_mc3p_handle_t *h){}
 
 void ADC_IRQHandler(void)
 {

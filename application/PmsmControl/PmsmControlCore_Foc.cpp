@@ -31,21 +31,61 @@ void PmsmControlCore::Foc_init()
 }
 void PmsmControlCore::Foc_onEnter(MCMode prev_mct)
 {
-
+    //Foc_olstup_start();
 }
 void PmsmControlCore::Foc_onExit()
 {
 
 }
 
-void PmsmControlCore::Foc_olstup_start()
+void PmsmControlCore::Foc_xmcLoop()
 {
-    foc.olstup.tb_index = 0;
-    foc.olstup.time_start_ms = xTicks_to_ms(xTicks);
-    //Apply Align here..... lets say Set electrical angle to 0
-    state.eTheta_q31 = 0;
-    foc.olstup.complete = false;
-    foc.run_mode = Foc::RunMode::OL;
+    posDriver.xTickUpdate();
+    int64_t Theta_q32p31 = posDriver.getMechAng_q31p32();
+    state.mechAngv_RPXT_q7p24 = int32_t((Theta_q32p31 - state.mechTheta_q32p31)>>7); //we don't saturate here since speed range is humungous and won't go beyond
+    state.mechTheta_q32p31 = Theta_q32p31;
+    if (control.run_mode == RunMode::ClosedLoop)
+    { // Closed loop here , Controllers are active
+        int32_t ep_q31 = 0;
+        int32_t es_q7p24 = 0;
+        if (control.mech_mode == MechMode::Position)
+        {
+            ep_q31 = __SSAT(state.mechTheta_sp_q32p31 - state.mechTheta_q32p31 , 32); //saturate the position error to be a max of 1 rev (for higher position errors, a profiler should exist for stepping)
+        }
+        else
+        {
+            ep_q31 = 0;
+            control.position_pid.state[2] = state.mechAngv_RPXT_sp_q7p24;
+        }
+        state.mechAngv_RPXT_sp_q7p24 = arm_pid_q31(&control.position_pid, ep_q31);
+        // Clamping logic here for speed
+        if (control.mech_mode == MechMode::Position || control.mech_mode == MechMode::Speed)
+        {
+            es_q7p24 = state.mechAngv_RPXT_sp_q7p24 - state.mechAngv_RPXT_q7p24;
+        }
+        else
+        {
+            es_q7p24 = 0;
+            control.speed_pid.state[2] = state.torque_sp;
+        }
+        // Clamping logic here for Torque based on active controller
+        state.torque_sp = arm_pid_q31(&control.speed_pid, es_q7p24);
+        //Convert Torque Setpoint To Id/Iq
+        if(control.mpta_active)
+        {
+            foc.state.ECd_sp_q31 = 0;
+            foc.state.ECq_sp_q31 = state.torque_sp;
+        }else
+        {
+            foc.state.ECd_sp_q31 = 0;
+            foc.state.ECq_sp_q31 = state.torque_sp;
+        }
+        //Clamping logic here for Id/Iq based on active controller
+    }else//Override control pipeline
+    {
+        
+    }
+    state.eAngv_RPT_q31 = q31_t((state.eAngv_RPS / pwm_freq_hz) * (INT32_MAX / M_PI));
 }
 
 void PmsmControlCore::Foc_pwmLoop()
@@ -74,12 +114,12 @@ void PmsmControlCore::Foc_pwmLoop()
     }
     ed = ed >> 2;
     eq = eq >> 2;
-    foc.state.Vd_q31 = arm_pid_q31(&foc.state.Id_pid, ed) + foc.state.Id_feedforward;
-    foc.state.Vq_q31 = arm_pid_q31(&foc.state.Iq_pid, eq) + foc.state.Iq_feedforward;
+    foc.state.Vd_q31 = arm_pid_q31(&foc.state.Id_pid, ed);
+    foc.state.Vq_q31 = arm_pid_q31(&foc.state.Iq_pid, eq);
     //Circular overmodulation clamping + pid state update (anti-windup)
     //Here overmodulation logic is intended
     q31_t vmag_q31 = maxa_minb_2_q31(foc.state.Vd_q31, foc.state.Vq_q31);
-    int32_t vbus_lim_q31 = (state.Vbus_q31 * mc3p.duty_max_q15)>>15;
+    int32_t vbus_lim_q31 = ((int64_t)state.Vbus_q31 * mc3p.duty_max_q15)>>15;
     int32_t mod_idx_q3p12 = (((int32_t)(vmag_q31>>16) * SQRT3_Q3P12)/(vbus_lim_q31>>16));
     if(mod_idx_q3p12 > foc.state.mod_idx_max_q3p12)
     {
@@ -95,43 +135,3 @@ void PmsmControlCore::Foc_pwmLoop()
     dbeta_q15 = (vbeta_q31)/ (state.Vbus_q31 >> 15);
     eldriver_mc3p_write_svm(&mc3p, dalpha_q15, dbeta_q15);
 }
-
-void PmsmControlCore::Foc_xmcLoop()
-{
-    if(foc.run_mode == Foc::RunMode::OL)
-    {//Open loop operation
-        if (!foc.olstup.complete)
-        {//Startup
-            // Interpolate angular velocity and duty cycle and do appropiate updates
-            float et_ms = (xTicks_to_ms(xTicks) - foc.olstup.time_start_ms);
-            if (foc.olstup.tb_index < (OLSTUP_TABLE_SIZE - 1) && et_ms > foc.olstup.cfg.time_ms_tb[foc.olstup.tb_index + 1])
-            {
-                foc.olstup.tb_index++;
-            }
-            bool complete = et_ms >= foc.olstup.cfg.time_ms_tb[OLSTUP_TABLE_SIZE - 1];
-            if (!complete)
-            {
-                // We interpolate here for duty cycle and angular velocity
-                float ret_slp = (float)(et_ms - foc.olstup.cfg.time_ms_tb[foc.olstup.tb_index]) / (foc.olstup.cfg.time_ms_tb[foc.olstup.tb_index + 1] - foc.olstup.cfg.time_ms_tb[foc.olstup.tb_index]);
-                float ecq_sp = foc.olstup.cfg.ec_tb[foc.olstup.tb_index] + ret_slp * (foc.olstup.cfg.ec_tb[foc.olstup.tb_index + 1] - foc.olstup.cfg.ec_tb[foc.olstup.tb_index]);
-                float rpm = foc.olstup.cfg.rpm_tb[foc.olstup.tb_index] + ret_slp * (foc.olstup.cfg.rpm_tb[foc.olstup.tb_index + 1] - foc.olstup.cfg.rpm_tb[foc.olstup.tb_index]);
-                state.eAngv_RPS = rpm * model.pole_pairs * (float)(60.0/2*M_PI);
-                if(control.elec_mode == ElecMode::Voltage){
-                    foc.state.ECq_sp_q31 = ELDRIVER_MC3P_FLOAT_TO_VS(ecq_sp);
-                }else{
-                    foc.state.ECq_sp_q31 = ELDRIVER_MC3P_FLOAT_TO_CS(ecq_sp);
-                }
-            }
-            foc.olstup.complete = complete;
-        }else{//Normal openloop
-            // TODO : SUPPORT COMMANDING VOLTAGE , CURRENT AND FREQUENCY AND DOING NECCESSARY UPDATES
-
-
-        }
-    }else{//Closed loop operation
-        //Torque, Speed, Position Controllers
-
-    }
-    state.eAngv_RPT_q31 = q31_t( (state.eAngv_RPS / pwm_freq_hz) * (INT32_MAX/M_PI) );
-}
-

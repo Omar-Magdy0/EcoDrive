@@ -15,8 +15,7 @@ set(STM32F4xx_HAL_DRIVER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32F4xx_HAL_D
 set(CMSIS_DEVICE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32F4xx/Include)
 set(CMSIS_CORE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Include)
 set(CMSIS_DSP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS-DSP)
-set(USBD_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library)
-set(USB_CLASS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library)
+set(TINYUSB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tinyusb)
 
 # Common include directories for all STM32 targets
 set(STM32_COMMON_INCLUDES
@@ -68,16 +67,6 @@ set(STM32_Drivers_Src
     ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_ll_usart.c
 )
 
-set(USB_Device_Library_Src
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/usb_device.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/usbd_desc.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/usbd_cdc_if.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/usbd_conf.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c
-)
 
 set(Platform_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/startup_stm32f401xc.s
@@ -88,6 +77,47 @@ set(Platform_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/syscalls.c
 )
 
+set(TinyUsb_Src
+    ${CMAKE_CURRENT_SOURCE_DIR}/usb_desc.c  
+    ${TINYUSB_DIR}/src/tusb.c
+	${TINYUSB_DIR}/src/common/tusb_fifo.c
+	${TINYUSB_DIR}/src/device/usbd.c
+	${TINYUSB_DIR}/src/typec/usbc.c
+	${TINYUSB_DIR}/src/class/audio/audio_device.c
+	${TINYUSB_DIR}/src/class/cdc/cdc_device.c
+	${TINYUSB_DIR}/src/class/dfu/dfu_device.c
+	${TINYUSB_DIR}/src/class/dfu/dfu_rt_device.c
+	${TINYUSB_DIR}/src/class/hid/hid_device.c
+	${TINYUSB_DIR}/src/class/midi/midi_device.c
+	${TINYUSB_DIR}/src/class/midi/midi2_device.c
+	${TINYUSB_DIR}/src/class/msc/msc_device.c
+	${TINYUSB_DIR}/src/class/mtp/mtp_device.c
+	${TINYUSB_DIR}/src/class/net/ecm_rndis_device.c
+	${TINYUSB_DIR}/src/class/net/ncm_device.c
+	${TINYUSB_DIR}/src/class/printer/printer_device.c
+	${TINYUSB_DIR}/src/class/usbtmc/usbtmc_device.c
+	${TINYUSB_DIR}/src/class/video/video_device.c
+	${TINYUSB_DIR}/src/class/vendor/vendor_device.c
+    ${TINYUSB_DIR}/src/host/usbh.c
+    ${TINYUSB_DIR}/src/host/hub.c
+    ${TINYUSB_DIR}/src/class/cdc/cdc_host.c
+    ${TINYUSB_DIR}/src/class/hid/hid_host.c
+    ${TINYUSB_DIR}/src/class/midi/midi_host.c
+    ${TINYUSB_DIR}/src/class/midi/midi2_host.c
+    ${TINYUSB_DIR}/src/class/msc/msc_host.c
+    ${TINYUSB_DIR}/src/class/vendor/vendor_host.c
+    ${TINYUSB_DIR}/src/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
+    ${TINYUSB_DIR}/src/portable/st/stm32_fsdev/fsdev_common.c
+    ${TINYUSB_DIR}/src/portable/st/stm32_fsdev/hcd_stm32_fsdev.c
+    ${TINYUSB_DIR}/src/portable/st/typec/typec_stm32.c
+    ${TINYUSB_DIR}/src/portable/synopsys/dwc2/dcd_dwc2.c
+    ${TINYUSB_DIR}/src/portable/synopsys/dwc2/hcd_dwc2.c
+    ${TINYUSB_DIR}/src/portable/synopsys/dwc2/dwc2_common.c
+)
+
+set(TinyUsb_Includes
+    ${TINYUSB_DIR}/src
+)
 
 set(CMSISCORE ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS)
 add_subdirectory(${CMSIS_DSP_DIR}/Source)
@@ -103,10 +133,10 @@ file(GLOB_RECURSE Driver_Core_Src
 add_library(stm32f4_platform STATIC)
 target_sources(stm32f4_platform PRIVATE
     ${STM32_Drivers_Src}
-    ${USB_Device_Library_Src}
+    ${TinyUsb_Src}
 )
 
-target_include_directories(stm32f4_platform PUBLIC ${STM32_COMMON_INCLUDES} ${CMSIS_DSP_DIR}/Include)
+target_include_directories(stm32f4_platform PUBLIC ${STM32_COMMON_INCLUDES} ${CMSIS_DSP_DIR}/Include ${TinyUsb_Includes})
 target_compile_definitions(stm32f4_platform PUBLIC ${DEVICE_DEFINITIONS})
 
 # =============================================

@@ -2,31 +2,48 @@
 #include <array>
 #include <cstdint>
 #include <cstddef>
+#include "eldriver/eldriver_mc3p.h"
 #include "arm_math.h"
 
 namespace PmsmControlTypes
 {
-    enum class Direction : int8_t
+    enum class Direction : uint8_t
     {
-        Forward = 1,  /** Forward rotation. */
-        Backward = -1 /** Reverse rotation. */
+        Forward = 0,  /** Forward rotation. */
+        Backward = 1 /** Reverse rotation. */
     };
 
+    enum class RunMode : uint8_t
+    {
+        Override,
+        ClosedLoop
+    };
+    
     enum class MechMode : uint8_t
     {
-        None = 0,
+        SKIP,
         Torque,
         Speed,
-        Position
+        Position,
+        OpenSpeed
+    };
+
+    enum class PosDriverFsm : uint8_t
+    {
+        Unsync,
+        Align,
+        Ramp,
+        OpenLocked,
+        OpenDec
     };
 
     enum class MCMode : uint8_t
     {
+        SKIP,
         None = 0,
         Idle,
         Fault,
         Foc, /** Open-loop V/Hz (V/F) commutation. */
-        Trap,
         SComm /** Self-commissioning / parameter identification. */
     };
 
@@ -41,6 +58,12 @@ namespace PmsmControlTypes
         COAST,
         RAMP,
         EMERGENCY_PLUG
+    };
+
+    enum class PosDriverType
+    {
+        Open,
+        Hall,
     };
 
     enum class ERR : uint8_t
@@ -91,7 +114,7 @@ namespace PmsmControlTypes
         float Kt;           /** Torque constant. */
         float J;            /** Rotor inertia. */
         float B;            /** Viscous friction coefficient. */
-        uint8_t pole_pairs = 1; /** Motor pole pairs (electrical). */
+        uint8_t pole_pairs = 6; /** Motor pole pairs (electrical). */
     };
 
     inline static constexpr size_t OLSTUP_TABLE_SIZE = 6; /** STUP profile table size. */
@@ -101,8 +124,6 @@ namespace PmsmControlTypes
         uint16_t time_ms_tb[OLSTUP_TABLE_SIZE];
         float ec_tb[OLSTUP_TABLE_SIZE];
         float rpm_tb[OLSTUP_TABLE_SIZE];
-        eldriver_mc3p_sector_t init_sector;
-        ElecMode elec_mode;
     };
 
     struct ConfigElecLimits

@@ -52,13 +52,13 @@ add_subdirectory(${CMSIS_DSP_DIR}/Source ${CMAKE_CURRENT_BINARY_DIR}/cmsis_dsp_h
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED)
-# This looks for the glfw3 library you installed via apt
 find_package(glfw3 REQUIRED)
 find_package(HDF5 REQUIRED COMPONENTS C CXX)
 
 add_library(host_platform STATIC)
 target_sources(host_platform PRIVATE
     ${IMGUI_SRC}
+    ${CMAKE_CURRENT_SOURCE_DIR}/TCPServer.cpp
 )
 
 target_include_directories(host_platform PUBLIC ${HOST_COMMON_INCLUDES})

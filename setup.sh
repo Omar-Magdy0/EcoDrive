@@ -32,3 +32,4 @@ sudo apt install libboost-system-dev libboost-thread-dev libboost-date-time-dev
 
 #Install Libglfw3 and opengl if needed
 sudo apt install libglfw3-dev libgl1-mesa-dev libhdf5-dev
+sudo apt-get install libusb-1.0-0-dev

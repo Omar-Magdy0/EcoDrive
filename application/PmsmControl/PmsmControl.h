@@ -15,19 +15,16 @@ public:
     PmsmControlTypes::ERR init();
 
     // Control
-    PmsmControlTypes::ERR setSetpoint(float sp);
-    PmsmControlTypes::ERR setMechmode(PmsmControlTypes::MechMode mech_mode);
+    PmsmControlTypes::ERR setSetpoint(float sp, PmsmControlTypes::MechMode mech_mode = PmsmControlTypes::MechMode::SKIP);
     PmsmControlTypes::ERR estop(PmsmControlTypes::ConfigEstop cfg);
 
     // Configuration
-    PmsmControlTypes::ERR configControlMode(PmsmControlTypes::MCMode mc_mode, PmsmControlTypes::ElecMode elec_mode);
+    PmsmControlTypes::ERR configControlMode(PmsmControlTypes::MCMode mc_mode, PmsmControlTypes::MechMode mech_mod);
     PmsmControlTypes::ERR configElecLimits(PmsmControlTypes::ConfigElecLimits elim);
     PmsmControlTypes::ERR configMechLimits(PmsmControlTypes::ConfigMechLimits mechlim);
     PmsmControlTypes::ERR configPwm(PmsmControlTypes::ConfigPwm cfg);
     PmsmControlTypes::ERR configFocPid(PmsmControlTypes::Pid Id_pid, PmsmControlTypes::Pid Iq_pid);
     PmsmControlTypes::ERR configFocOlstup(PmsmControlTypes::ConfigOlstup cfg);
-    PmsmControlTypes::ERR configTrapPid(PmsmControlTypes::Pid Ibus_pid);
-    PmsmControlTypes::ERR configTrapOlstup(PmsmControlTypes::ConfigOlstup cfg);
     PmsmControlTypes::ERR configSComm(PmsmControlTypes::ConfigSComm cfg);
 
     // Status and Error

@@ -33,7 +33,7 @@ void eldriver_core_init(eldriver_core_t *h);
  * @brief  Starts a profiling tick using the DWT Cycle Count Register.
  * @retval uint32_t: Current cycle count.
  */
-static inline uint32_t eldriver_core_prof_tick()
+static inline uint32_t eldriver_prof_tick()
 {
     return DWT->CYCCNT;
 };
@@ -43,7 +43,7 @@ static inline uint32_t eldriver_core_prof_tick()
  * @param  start: The initial cycle count from prof_tick.
  * @retval uint32_t: Elapsed cycles.
  */
-static inline uint32_t eldriver_core_prof_tock(uint32_t start)
+static inline uint32_t eldriver_prof_tock(uint32_t start)
 {
     return (DWT->CYCCNT - start);
 };
@@ -141,6 +141,30 @@ static inline void eldriver_gpio_toggle(eldriver_pin_t pin_num) {
 static inline eldriver_gpio_state_t eldriver_gpio_read(eldriver_pin_t pin_num) {
     return (eldriver_gpio_state_t)LL_GPIO_IsInputPinSet(ELDRIVER_GPIO_TO_PORT(pin_num), 
                                                        ELDRIVER_GPIO_TO_PIN(pin_num));
+}
+
+/**
+ * @brief  Disables interrupts to start an atomic section.
+ * @retval uint32_t: Saved interrupt state (PRIMASK value).
+ */
+static inline uint32_t eldriver_atomic_start(void) {
+    uint32_t primask = __get_PRIMASK();
+    __disable_irq();
+    return primask;
+}
+
+/**
+ * @brief  Restores interrupts to end an atomic section.
+ * @param  primask: The saved interrupt state from eldriver_atomic_start().
+ */
+static inline void eldriver_atomic_end(uint32_t primask) {
+    __set_PRIMASK(primask);
+}
+
+#include "stm32f4xx_hal.h"
+static inline void eldriver_delay(uint32_t delay_ms)
+{
+    HAL_Delay(delay_ms);
 }
 
 #endif // ELDRIVER_STM32_LL_GPIO_H

@@ -22,5 +22,5 @@ static constexpr float MC3P_SYNC_SCALE[7][2] =
 
 //SCOMM
 static constexpr uint8_t OVERSAMPLE_BITS = 15;
-static constexpr uint16_t ESETTLE_MIN_TICKS = 10000;
+static constexpr uint16_t ESETTLE_MIN_TICKS = 20000;
 };

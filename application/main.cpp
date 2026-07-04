@@ -1,10 +1,8 @@
 #include "sys.h"
-
+#include "eldriver/eldriver_core.h"
 
 int main(){
     Sys::init();
-    while (true) {
 
-    }
     return 0;
 }

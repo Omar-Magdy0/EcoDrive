@@ -80,7 +80,7 @@ typedef struct{
     int phase_state[3];
     uint16_t dtc_comp_q15;
     uint8_t dtc_state;
-}eldriver_mc3p_t;
+}eldriver_mc3p_handle_t;
 
 typedef struct
 {   
@@ -103,24 +103,24 @@ typedef struct{
 
 
 //TODO  FINISH ADC IMPLEMENTATION FOR 1)TRAP & 2)SVM
-void eldriver_mc3p_init(eldriver_mc3p_t *h);
-void eldriver_mc3p_reconfigure_pwm(eldriver_mc3p_t *h);
-void eldriver_mc3p_set_gain(eldriver_mc3p_t *h, eldriver_mc3p_sync s, float gain);
-void eldriver_mc3p_set_sync_scale(eldriver_mc3p_t *h, const float scales[MC3P_SYNC_CHANNELS][2]);
-void eldriver_mc3p_bg_startConv(eldriver_mc3p_t *h);
-uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_t *h);
-float eldriver_mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel);
+void eldriver_mc3p_init(eldriver_mc3p_handle_t *h);
+void eldriver_mc3p_reconfigure_pwm(eldriver_mc3p_handle_t *h);
+void eldriver_mc3p_set_gain(eldriver_mc3p_handle_t *h, eldriver_mc3p_sync s, float gain);
+void eldriver_mc3p_set_sync_scale(eldriver_mc3p_handle_t *h, const float scales[MC3P_SYNC_CHANNELS][2]);
+void eldriver_mc3p_bg_startConv(eldriver_mc3p_handle_t *h);
+uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_handle_t *h);
+float eldriver_mc3p_adc_read_single(eldriver_mc3p_handle_t *h, uint32_t channel);
 
-uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float *scanData);
-uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_t *h);
-void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void* scanData);
+uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_handle_t *h, float *scanData);
+uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_handle_t *h);
+void eldriver_mc3p_read_sync(eldriver_mc3p_handle_t *h, void* scanData);
 
-void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_state_t state_u, eldriver_mc3p_phase_state_t state_v, eldriver_mc3p_phase_state_t state_w);
-void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, int16_t duty_u_q15, int16_t duty_v_q15, int16_t duty_w_q15);
+void eldriver_mc3p_write_phase_state(eldriver_mc3p_handle_t *h, eldriver_mc3p_phase_state_t state_u, eldriver_mc3p_phase_state_t state_v, eldriver_mc3p_phase_state_t state_w);
+void eldriver_mc3p_write_phase_duty(eldriver_mc3p_handle_t *h, int16_t duty_u_q15, int16_t duty_v_q15, int16_t duty_w_q15);
 
-void eldriver_mc3p_write_float(eldriver_mc3p_t *h);
-void eldriver_mc3p_write_trap(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector, uint16_t duty_q15);
-void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta_q15);
+void eldriver_mc3p_write_float(eldriver_mc3p_handle_t *h);
+void eldriver_mc3p_write_trap(eldriver_mc3p_handle_t *h, eldriver_mc3p_sector_t sector, uint16_t duty_q15);
+void eldriver_mc3p_write_svm(eldriver_mc3p_handle_t *h, int16_t alpha_q15, int16_t beta_q15);
 
 __attribute__((weak)) void eldriver_xmc3p_tickerCallback(void);
 __attribute__((weak)) void eldriver_mc3p_sync_postScanCallback(void);

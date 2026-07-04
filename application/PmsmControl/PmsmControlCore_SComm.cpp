@@ -7,8 +7,9 @@ void PmsmControlCore::SComm_init()
 }
 void PmsmControlCore::SComm_onEnter(MCMode prev_mct)
 {
-    control.elec_mode = ElecMode::Voltage; // Voltage control mode for now
     scomm.idstage = SComm::IDStage::RS_ID;
+    control.run_mode = RunMode::Override;
+    control.elec_mode = ElecMode::Voltage;
 }
 
 void PmsmControlCore::SComm_onExit()

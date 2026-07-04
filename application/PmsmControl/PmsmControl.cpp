@@ -14,11 +14,36 @@ PmsmControlTypes::ERR PmsmControl::init()
     return ERR::OK;
 }
 
-PmsmControlTypes::ERR PmsmControl::configControlMode(PmsmControlTypes::MCMode mc_mode, PmsmControlTypes::ElecMode elec_mode)
+PmsmControlTypes::ERR PmsmControl::setSetpoint(float sp, PmsmControlTypes::MechMode mech_mode)
+{
+    if(mech_mode != PmsmControlTypes::MechMode::SKIP)
+    {
+        if(mech_mode < PmsmControlTypes::MechMode::Torque || mech_mode > PmsmControlTypes::MechMode::OpenSpeed){return ERR::CONFIG_BAD;}
+        mc.control.mech_mode = mech_mode;
+    }
+    switch (mc.control.mech_mode)
+    {
+    case PmsmControlTypes::MechMode::Speed:
+    case PmsmControlTypes::MechMode::OpenSpeed:
+        mc.state.mechAngv_RPXT_sp_q7p24 = mc.rps_to_rpxt(sp);
+        break;
+    case PmsmControlTypes::MechMode::Position:
+        break;
+    case PmsmControlTypes::MechMode::Torque:
+        break;
+    default:
+        break;
+    }
+    return ERR::OK;
+}
+
+PmsmControlTypes::ERR PmsmControl::configControlMode(PmsmControlTypes::MCMode mc_mode, PmsmControlTypes::MechMode mech_mode)
 {
     if(mc_mode != MCMode::Idle && mc.control.mc_mode != MCMode::Idle){return ERR::CONFIG_NOT_ALLOWED_MOTOR_RUNNING;}
-    if(elec_mode != ElecMode::Current && elec_mode != ElecMode::Voltage){return ERR::CONFIG_BAD;}
-    mc.setControlMode(mc_mode, elec_mode);
+    uint32_t mask = eldriver_atomic_start();
+    mc.setControlMode(mc_mode);
+    mc.control.mech_mode = mech_mode;
+    eldriver_atomic_end(mask);
     return ERR::OK;
 }
 
@@ -31,6 +56,7 @@ PmsmControlTypes::ERR PmsmControl::configElecLimits(PmsmControlTypes::ConfigElec
 
 PmsmControlTypes::ERR PmsmControl::configMechLimits(PmsmControlTypes::ConfigMechLimits mechlim)
 {
+    if(mc.control.mc_mode != MCMode::Idle){return ERR::CONFIG_NOT_ALLOWED_MOTOR_RUNNING;}
     return ERR::OK;
 }
 
@@ -43,7 +69,9 @@ PmsmControlTypes::ERR PmsmControl::configPwm(PmsmControlTypes::ConfigPwm cfg)
     if(cfg.duty_min < 0 || cfg.duty_min > 1){return ERR::CONFIG_BAD;}
     if(cfg.duty_min > cfg.duty_max){return ERR::CONFIG_BAD;}
     //Atomic operation we do this quick
+    uint32_t mask = eldriver_atomic_start();
     mc.pwmConfigUpdate(cfg);
+    eldriver_atomic_end(mask);
     return ERR::OK;
 }
 
@@ -64,8 +92,10 @@ PmsmControlTypes::ERR PmsmControl::configFocPid(PmsmControlTypes::Pid Id_pid, Pm
     mc.foc.state.Iq_pid.Ki = Iq_pid.Ki * INT32_MAX;
     mc.foc.state.Iq_pid.Kd = Iq_pid.Kd * INT32_MAX;
     //Atomic operation , We do this quick
+    uint32_t mask = eldriver_atomic_start();
     arm_pid_init_q31(&mc.foc.state.Id_pid, 0);
     arm_pid_init_q31(&mc.foc.state.Iq_pid, 0);
+    eldriver_atomic_end(mask);
     return ERR::OK;
 }
 
@@ -83,47 +113,12 @@ PmsmControlTypes::ERR PmsmControl::configFocOlstup(PmsmControlTypes::ConfigOlstu
         if(cfg.ec_tb[i] < 0){return ERR::CONFIG_BAD;}
         if(cfg.rpm_tb[i] < 0){return ERR::CONFIG_BAD;}
     }
-    if(cfg.elec_mode != ElecMode::Current && cfg.elec_mode != ElecMode::Voltage){return ERR::CONFIG_BAD;}
     if(cfg.vbus_init <= 0){return ERR::CONFIG_BAD;}
     mc.foc.olstup.cfg = cfg;
     return ERR::OK;
 }
 
-PmsmControlTypes::ERR PmsmControl::configTrapPid(PmsmControlTypes::Pid Ibus_pid)
-{
-    //Sanity checks
-    if(Ibus_pid.Kp > 1 || Ibus_pid.Kp < -1){return ERR::CONFIG_BAD;}
-    if(Ibus_pid.Ki > 1 || Ibus_pid.Ki < -1){return ERR::CONFIG_BAD;}
-    if(Ibus_pid.Kd > 1 || Ibus_pid.Kd < -1){return ERR::CONFIG_BAD;}
-    //fixed point scaling and conversion
-    mc.trap.state.I_pid.Kp = Ibus_pid.Kp * INT32_MAX;
-    mc.trap.state.I_pid.Ki = Ibus_pid.Ki * INT32_MAX;
-    mc.trap.state.I_pid.Kd = Ibus_pid.Kd * INT32_MAX;
-    //Atomic operation , We do this quick
-    arm_pid_init_q31(&mc.trap.state.I_pid, 0);
-    return ERR::OK;
-}
 
-PmsmControlTypes::ERR PmsmControl::configTrapOlstup(PmsmControlTypes::ConfigOlstup cfg)
-{
-    if(mc.control.mc_mode != MCMode::Idle){return ERR::CONFIG_NOT_ALLOWED_MOTOR_RUNNING;}
-    //Table sanity checks
-    if(cfg.time_ms_tb[0] != 0){return ERR::CONFIG_BAD;}
-    for(int i = 0; i < olstup_tb_size() - 1; i++)
-    {
-        if(cfg.time_ms_tb[i + 1] < cfg.time_ms_tb[i]){return ERR::CONFIG_BAD;}
-    }
-    for(int i = 0; i < olstup_tb_size(); i++)
-    {
-        if(cfg.ec_tb[i] < 0){return ERR::CONFIG_BAD;}
-        if(cfg.rpm_tb[i] < 0){return ERR::CONFIG_BAD;}
-    }
-    if(cfg.elec_mode != ElecMode::Current && cfg.elec_mode != ElecMode::Voltage){return ERR::CONFIG_BAD;}
-    if(cfg.vbus_init <= 0){return ERR::CONFIG_BAD;}
-    if(cfg.init_sector < ELDRIVER_MC3P_SECTOR_TRAP1 || cfg.init_sector > ELDRIVER_MC3P_SECTOR_TRAP6){return ERR::CONFIG_BAD;}
-    mc.trap.olstup.cfg = cfg;
-    return ERR::OK;
-}
 
 PmsmControlTypes::ERR PmsmControl::configSComm(PmsmControlTypes::ConfigSComm cfg)
 {

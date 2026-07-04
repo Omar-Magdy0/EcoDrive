@@ -75,10 +75,10 @@ static volatile uint8_t mc3p_bg_active_buffer = 0; // 0 or 1
 volatile uint8_t isReady = 0;
 
 
-void mc3p_adc_svm_update(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector);
-void mc3p_adc_trap_update(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector);
-void mc3p_adc_mode(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector);
-void mc3p_offset_calibration(eldriver_mc3p_t *h);
+void mc3p_adc_svm_update(eldriver_mc3p_handle_t *h, eldriver_mc3p_sector_t sector);
+void mc3p_adc_trap_update(eldriver_mc3p_handle_t *h, eldriver_mc3p_sector_t sector);
+void mc3p_adc_mode(eldriver_mc3p_handle_t *h, eldriver_mc3p_sector_t sector);
+void mc3p_offset_calibration(eldriver_mc3p_handle_t *h);
 
 uint16_t adc1_Sample_Single_Channel_Temporary(uint32_t channel)
 {
@@ -105,13 +105,13 @@ uint16_t adc1_Sample_Single_Channel_Temporary(uint32_t channel)
     return result;
 }
 
-float mc3p_adc_read_single(eldriver_mc3p_t *h, uint32_t channel)
+float mc3p_adc_read_single(eldriver_mc3p_handle_t *h, uint32_t channel)
 {
   uint16_t readVal = adc1_Sample_Single_Channel_Temporary(channel);
   return ((float)(readVal)/( 1<< ELDRIVER_MC3P_ADCRES)) * h->adc_ref_V;
 }
 
-void mc3p_adc_calibrate(eldriver_mc3p_t *h)
+void mc3p_adc_calibrate(eldriver_mc3p_handle_t *h)
 {
     //Enable VREFINT and internalTEMP sensor
     ADC->CCR |= ADC_CCR_TSVREFE_Msk;
@@ -149,7 +149,7 @@ void mc3p_adc_calibrate(eldriver_mc3p_t *h)
 }
 
 
-void mc3p_adc_init(eldriver_mc3p_t *h)
+void mc3p_adc_init(eldriver_mc3p_handle_t *h)
 {
         __HAL_RCC_ADC1_CLK_ENABLE();
     LL_ADC_CommonInitTypeDef adc1CommonInitStruct = {
@@ -338,7 +338,7 @@ void mc3p_interrupt_init(){
 }
 
 
-static void mc3p_tim1_init(eldriver_mc3p_t *h){
+static void mc3p_tim1_init(eldriver_mc3p_handle_t *h){
     //ENABLE Peripheral CLOCK
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
     //===================================================== 
@@ -399,7 +399,7 @@ static void mc3p_tim1_init(eldriver_mc3p_t *h){
 }
 
 
-void eldriver_mc3p_init(eldriver_mc3p_t *h)
+void eldriver_mc3p_init(eldriver_mc3p_handle_t *h)
 {
     mc3p_gpio_init();
     mc3p_tim1_init(h);
@@ -418,7 +418,7 @@ void eldriver_mc3p_init(eldriver_mc3p_t *h)
     if(h->offset_calibration)mc3p_offset_calibration(h);
     eldriver_mc3p_write_float(h);
 }
-void eldriver_mc3p_reconfigure_pwm(eldriver_mc3p_t *h)
+void eldriver_mc3p_reconfigure_pwm(eldriver_mc3p_handle_t *h)
 {
     LL_TIM_SetAutoReload(TIM1, __LL_TIM_CALC_ARR(HAL_RCC_GetPCLK2Freq(), 1, h->config.pwm_Hz));
     LL_TIM_OC_SetDeadTime(TIM1, (uint8_t)(__LL_TIM_CALC_DEADTIME(HAL_RCC_GetPCLK2Freq(), LL_TIM_GetClockDivision(TIM1), h->config.deadtime_nS)));
@@ -434,7 +434,7 @@ void eldriver_mc3p_reconfigure_pwm(eldriver_mc3p_t *h)
 //======================================================
 // Phase Ouptut functions
 //======================================================
-void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_state_t state_u, eldriver_mc3p_phase_state_t state_v, eldriver_mc3p_phase_state_t state_w)
+void eldriver_mc3p_write_phase_state(eldriver_mc3p_handle_t *h, eldriver_mc3p_phase_state_t state_u, eldriver_mc3p_phase_state_t state_v, eldriver_mc3p_phase_state_t state_w)
 {
     uint32_t ccer_shadow = TIM1->CCER;
     uint32_t ccmr1_shadow = TIM1->CCMR1;
@@ -478,7 +478,7 @@ void eldriver_mc3p_write_phase_state(eldriver_mc3p_t *h, eldriver_mc3p_phase_sta
     TIM1->EGR |= TIM_EGR_COMG;
 }
 
-void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, int16_t dutyu_q15, int16_t dutyv_q15, int16_t dutyw_q15)
+void eldriver_mc3p_write_phase_duty(eldriver_mc3p_handle_t *h, int16_t dutyu_q15, int16_t dutyv_q15, int16_t dutyw_q15)
 {
     uint32_t compare_u = ((uint32_t)SATURATE(dutyu_q15, h->duty_min_q15, h->duty_max_q15) * h->timer_max_q15) >> 15;
     uint32_t compare_v = ((uint32_t)SATURATE(dutyv_q15, h->duty_min_q15, h->duty_max_q15) * h->timer_max_q15) >> 15;
@@ -488,7 +488,7 @@ void eldriver_mc3p_write_phase_duty(eldriver_mc3p_t *h, int16_t dutyu_q15, int16
     TIM1->CCR3 = compare_w;
 }
 
-void eldriver_mc3p_write_float(eldriver_mc3p_t *h)
+void eldriver_mc3p_write_float(eldriver_mc3p_handle_t *h)
 {    
     eldriver_mc3p_write_phase_state(h, ELDRIVER_MC3P_PHASE_FLOAT, ELDRIVER_MC3P_PHASE_FLOAT, ELDRIVER_MC3P_PHASE_FLOAT);
     eldriver_mc3p_write_phase_duty(h, 0, 0, 0);
@@ -511,7 +511,7 @@ static const mc3p_trap_sector_map_t trap_table[6] = {
     [ELDRIVER_MC3P_SECTOR_TRAP6 - 1] = { {ELDRIVER_MC3P_PHASE_FLOAT, ELDRIVER_MC3P_PHASE_L_ON, ELDRIVER_MC3P_PHASE_COMP}},
 };
 
-void eldriver_mc3p_write_trap(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector, uint16_t duty_q15)
+void eldriver_mc3p_write_trap(eldriver_mc3p_handle_t *h, eldriver_mc3p_sector_t sector, uint16_t duty_q15)
 {
     if(!IS_TRAP_SECTOR(h->sector_last))
     {
@@ -544,7 +544,7 @@ void eldriver_mc3p_write_trap(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector,
     eldriver_mc3p_write_phase_duty(h, h->dutyu_q15, h->dutyv_q15, h->dutyw_q15);
 }
 
-void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta_q15) 
+void eldriver_mc3p_write_svm(eldriver_mc3p_handle_t *h, int16_t alpha_q15, int16_t beta_q15) 
 {
     int32_t vmax, vmin, voff;
     if(!IS_SVM_SECTOR(h->sector_last))
@@ -609,7 +609,7 @@ void eldriver_mc3p_write_svm(eldriver_mc3p_t *h, int16_t alpha_q15, int16_t beta
 //==============================================
 // Analog Reading functions
 //==============================================
-void mc3p_adc_mode(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector)
+void mc3p_adc_mode(eldriver_mc3p_handle_t *h, eldriver_mc3p_sector_t sector)
 {
     uint8_t is_svm = IS_SVM_SECTOR(sector);
     uint8_t is_trap = IS_TRAP_SECTOR(sector);
@@ -626,13 +626,13 @@ void mc3p_adc_mode(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector)
         h->sync_rank_scale[3] = ELDRIVER_MC3P_CSW;
     }else if(is_trap)
     {
-        LL_ADC_INJ_SetSequencerLength(ADC1, LL_ADC_INJ_SEQ_SCAN_ENABLE_3RANKS);
+        LL_ADC_INJ_SetSequencerLength(ADC1, LL_ADC_INJ_SEQ_SCAN_ENABLE_4RANKS);
         LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_INJ_RANK_1, ELDRIVER_MC3P_VSBUS_ADC_CHANNEL);
         h->sync_rank_scale[0] = ELDRIVER_MC3P_VSBUS;
     }
 }
 
-void mc3p_adc_svm_update(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector)
+void mc3p_adc_svm_update(eldriver_mc3p_handle_t *h, eldriver_mc3p_sector_t sector)
 {
     
 }
@@ -653,7 +653,7 @@ static const mc3p_adc_map_t adc_trap_table[6] = {
     [ELDRIVER_MC3P_SECTOR_TRAP6 - 1] = { ELDRIVER_MC3P_VSU_ADC_CHANNEL, ELDRIVER_MC3P_CSV_ADC_CHANNEL, ELDRIVER_MC3P_VSU, ELDRIVER_MC3P_CSV},
 };
 
-void mc3p_adc_trap_update(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector)
+void mc3p_adc_trap_update(eldriver_mc3p_handle_t *h, eldriver_mc3p_sector_t sector)
 {
     const mc3p_adc_map_t *map = &adc_trap_table[sector - 1];
     LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_INJ_RANK_2, map->rank2_channel);
@@ -661,7 +661,7 @@ void mc3p_adc_trap_update(eldriver_mc3p_t *h, eldriver_mc3p_sector_t sector)
 }
 
 #include <string.h>
-void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void *data)
+void eldriver_mc3p_read_sync(eldriver_mc3p_handle_t *h, void *data)
 {
 #define DTC_UPDATE_POLARITY(current, bit)         \
     do                                            \
@@ -706,7 +706,7 @@ void eldriver_mc3p_read_sync(eldriver_mc3p_t *h, void *data)
     }
 }
 
-uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float* scanData)
+uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_handle_t *h, float* scanData)
 {
     uint8_t readBuffer = 1 - mc3p_bg_active_buffer; // Always read from inactive buffer
     for(int i = 0; i < ELDRIVER_MC3P_BG_CHANNELS; i++)
@@ -719,18 +719,18 @@ uint8_t eldriver_mc3p_read_bg(eldriver_mc3p_t *h, float* scanData)
 }
 
 
-void eldriver_mc3p_bg_startConv(eldriver_mc3p_t *h)
+void eldriver_mc3p_bg_startConv(eldriver_mc3p_handle_t *h)
 {
     isReady = 0;
     LL_ADC_REG_StartConversionSWStart(ADC1);
 }
 
-uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_t *h)
+uint8_t eldriver_mc3p_bg_channels(eldriver_mc3p_handle_t *h)
 {
     return ELDRIVER_MC3P_BG_CHANNELS;
 }
 
-uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_t *h)
+uint8_t eldriver_mc3p_bg_isReady(eldriver_mc3p_handle_t *h)
 {
     return isReady;
 }
@@ -753,12 +753,12 @@ void DMA2_Stream0_IRQHandler(void)
     }
 }
 
-void eldriver_mc3p_set_gain(eldriver_mc3p_t *h,  eldriver_mc3p_sync s, float gain)
+void eldriver_mc3p_set_gain(eldriver_mc3p_handle_t *h,  eldriver_mc3p_sync s, float gain)
 {
     float scale = (s >= ELDRIVER_MC3P_CSU && s <= ELDRIVER_MC3P_CSW)? ELDRIVER_MC3P_CS_SCALE : ELDRIVER_MC3P_VS_SCALE;
     h->sync_scale_q31[s][0] = ((gain * h->adc_to_uV * (INT32_MAX) + 0.5)/(1000000.0 * scale));
 }
-void eldriver_mc3p_set_sync_scale(eldriver_mc3p_t *h, const float scales[MC3P_SYNC_CHANNELS][2])
+void eldriver_mc3p_set_sync_scale(eldriver_mc3p_handle_t *h, const float scales[MC3P_SYNC_CHANNELS][2])
 {
     for(uint8_t i = 0; i < MC3P_SYNC_CHANNELS; i++)
     {
@@ -776,7 +776,7 @@ void eldriver_mc3p_set_sync_scale(eldriver_mc3p_t *h, const float scales[MC3P_SY
     }
 }
 
-void mc3p_offset_calibration(eldriver_mc3p_t *h)
+void mc3p_offset_calibration(eldriver_mc3p_handle_t *h)
 {
     // Set all phases to Loww (0,0,0)
     // Set mode to calibration
@@ -820,7 +820,7 @@ void mc3p_offset_calibration(eldriver_mc3p_t *h)
     eldriver_mc3p_write_float(h);
 }
 
-void INTERNAL_mc3p_ADC_JEOS_IRQ(eldriver_mc3p_t *h)
+void INTERNAL_mc3p_ADC_JEOS_IRQ(eldriver_mc3p_handle_t *h)
 {
     switch (h->mode)
     {
