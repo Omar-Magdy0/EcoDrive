@@ -9,7 +9,7 @@
 #include <cmath>
 #include <iostream>
 #include <pthread.h>
-#include "core/ElcoreScopeStream.hpp"
+#include "ScopeStream.h"
 #include "sil.h"
 
 #define GL_SILENCE_DEPRECATION
@@ -27,7 +27,7 @@ constexpr float GENERAL_PANEL_WIDTH = 0.25f;
 
 inline float channel_buffer[CHANNELS][SAMPLE_DEPTH];
 inline float scope_buffer[CHANNELS * SAMPLE_DEPTH];
-inline ElcoreScopeStream<float> scope(scope_buffer, CHANNELS, SAMPLE_DEPTH);
+inline ScopeStream<float> scope(scope_buffer, CHANNELS, SAMPLE_DEPTH);
 
 // Add mutex for thread safety
 inline pthread_mutex_t scope_mutex = PTHREAD_MUTEX_INITIALIZER;

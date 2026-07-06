@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 //=======================================================
-
+#include "IDV.h"
 
 #include "eldriver/eldriver_core.h"
 

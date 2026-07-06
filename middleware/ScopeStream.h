@@ -5,7 +5,7 @@
 
 
 template <typename T>
-class ElcoreScopeStream {
+class ScopeStream {
 public:
     T* buf;
     
@@ -27,7 +27,7 @@ public:
         return sample_depth * channels * sizeof(T);
     }
 
-    ElcoreScopeStream(T* storage, uint8_t channels, uint32_t sample_depth) {
+    ScopeStream(T* storage, uint8_t channels, uint32_t sample_depth) {
         buf = storage;
         channels_num = channels;
         decimation = 1;

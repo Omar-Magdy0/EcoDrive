@@ -1,86 +1,123 @@
-// aebfStream.h
 #pragma once
 
 #include <stdint.h>
-#include <stdbool.h>
+#include <cstring>
 
+/**
+ * @brief ABFV0 (Asynchronous Binary Frame version 0)
+ * 
+ * Frame format:
+ * [0x00 SYNC_BYTE][1Byte Payload Size][1Byte ServiceID][1Byte MCOBS_CODE][CRC8][MCOBS_ENCODED(Payload)]
+ * Total Header: 5 bytes (0x00 + Size + ServiceID + MCOBS_Code + CRC8)
+ */
 
-//==================DESCRIPTION============================
-/*
-    
-    AEBFV0 (Asynchronous Expandable Binary frame version 0)
-
-    Frame format:
-    [0x00 SYNC_BYTE][1Byte Payload Size][1Byte ServiceID][1Byte MCOBS_CODE][CRC8][MCOBS_ENCODED(Payload)]
-    1(0x00) + 1(Payload Size) + 1(ServiceID) + 1(MCOBS firstCodeByte) + 1(CRC8) = 5
-*/
-
-// ================== FUNCTION PROTOTYPES ==================
-#define AEBF_HEADER_SIZE 5
 // ================== CONSTANTS ==================
-#define AEBF_SYNC_BYTE          0x00
-#define AEBF_MAX_PAYLOAD_SIZE   255
+constexpr uint8_t ABF_HEADER_SIZE = 5;
+constexpr uint8_t ABF_SYNC_BYTE = 0x00;
+constexpr uint8_t ABF_MAX_PAYLOAD_SIZE = 255;
 
-typedef enum {
-    AEBF_ERROR_OK = 0,
-    AEBF_ERROR_PAYLOAD_INCOMPLETE = 1,
-    AEBF_ERROR_PAYLOAD_LARGER_THAN_EXPECTED = 2,
-    AEBF_ERROR_CRC_MISMATCH = 3,
-    AEBF_ERROR_UNKNOWN = 255
-} aebf_error_code_t;
+// ================== ENUMS ==================
+enum class ABFErrorCode : uint8_t {
+    OK = 0,
+    FRAME_COMPLETE = 1,
+    PAYLOAD_INCOMPLETE = 2,
+    PAYLOAD_LARGER_THAN_EXPECTED = 3,
+    HEADER_CRC_MISMATCH = 4,
+    RX_BUFFER_SMALL = 5,
+    UNKNOWN = 255
+};
 
-typedef enum {
-    STATE_HUNT_SYNC,       // Looking for sync byte (0x00)
-    STATE_READ_HEADER,     // Got sync, expecting length byte
-    STATE_READ_PAYLOAD,    // Reading payload data
-    STATE_VALIDATE         // Frame complete, ready to validate
-} aebfStream_state_t;
+enum class ABFState : uint8_t {
+    HUNT_SYNC = 0,        // Looking for sync byte (0x00)
+    READ_HEADER = 1,      // Got sync, expecting length byte
+    READ_PAYLOAD = 2,     // Reading payload data
+    VALIDATE = 3          // Frame complete, ready to validate
+};
 
-typedef struct {
-    uint32_t frames_received;
-    uint32_t frames_valid;
-    uint32_t frames_corrupted;
-    uint32_t resync_events;
-} aebfStream_stats_t;
+// ================== STRUCTURES ==================
+struct ABFStats {
+    uint32_t framesReceived = 0;
+    uint32_t framesValid = 0;
+    uint32_t framesCorrupted = 0;
+    uint32_t resyncEvents = 0;
+};
 
-typedef struct {
+/**
+ * @brief ABF (Asynchronous Binary Frame) Protocol Handler
+ * 
+ * Handles encoding and decoding of ABF protocol frames with MCOBS encoding
+ * and CRC-8 AUTOSAR error detection.
+ */
+class ABFStream {
+public:
+    /**
+     * @brief Construct ABFStream with a pre-allocated buffer
+     * 
+     * @param buffer Pointer to receive payload buffer
+     * @param bufferSize Maximum payload buffer size
+     */
+    ABFStream(uint8_t* buffer, uint16_t bufferSize);
+
+    /**
+     * @brief Destructor
+     */
+    ~ABFStream() = default;
+
+    /**
+     * @brief Process incoming data stream
+     * 
+     * @param data Input data bytes
+     * @param length Number of bytes in input
+     * @param serviceId [out] Service ID of decoded frame
+     * @param payloadLength [out] Length of decoded payload
+     * @return ABFErrorCode status
+     */
+    ABFErrorCode process(const uint8_t* data, uint16_t length, 
+                        uint8_t& serviceId, uint8_t& payloadLength);
+
+    /**
+     * @brief Encode a frame for transmission
+     * 
+     * @param header [out] Header buffer (must be at least 5 bytes)
+     * @param payload Payload data to encode
+     * @param serviceId Service identifier
+     * @param payloadLen Payload length
+     * @return ABFErrorCode status
+     */
+    ABFErrorCode encode(uint8_t* header, uint8_t* payload, 
+                       uint8_t serviceId, uint8_t payloadLen);
+
+    /**
+     * @brief Reset parser state machine
+     */
+    void reset();
+
+    /**
+     * @brief Get protocol statistics
+     * 
+     * @return ABFStats structure
+     */
+    ABFStats getStats() const;
+
+private:
     // ===== Frame Accumulation Buffer =====
-    uint16_t frame_buf_size;
-    uint16_t frame_pos;                        // Current position in frame_buf
-    uint16_t frame_buf_end;
-    
+    uint8_t* m_rxPayload;
+    uint16_t m_rxCapacity;
+    uint16_t m_rxPos;
+    uint8_t m_rxNextZero;
+    uint8_t m_header[ABF_HEADER_SIZE];
+    uint8_t m_headerPos;
+
     // ===== Frame Parsing State =====
-    aebfStream_state_t state;
-    
-    // Current frame metadata (populated as bytes arrive)
-    uint16_t bytes_expected;   // Total bytes expected (sync + len + hdr + payload + crc)
-    
-    // ===== Statistics for Error Detection =====
-    aebfStream_stats_t stats;
-    
-    // ===== Callbacks (called from ISR context) =====
-    void (*on_frame)(const uint16_t serviceID, const uint8_t* payload, const uint16_t payload_len, void* user_data);
-    void (*on_error)(char error_code, void* user_data);    
-} aebfStream_t;
+    ABFState m_state;
+    ABFStats m_stats;
 
-void aebfStream_init(aebfStream_t* stream,
-                      uint8_t* buffer, 
-                      uint16_t buffer_size,
-                      void (*on_frame)(const uint8_t serviceID, const uint8_t* payload, const uint16_t payload_len, void* user_data),
-                      void (*on_error)(char, void* user_data)
-                    );
-
-       //             
-void aebfStream_process(aebfStream_t* stream, const uint8_t* data, uint16_t length);
-
-void aebfStream_reset(aebfStream_t* stream);
-
-uint8_t aebfStream_encode_frame(uint8_t* output_buffer,
-                            uint8_t service_id,
-                            uint8_t payload_len);
-
-uint8_t aebfStream_decode_frame(uint8_t* frame_buffer, uint16_t frame_len,
-                            uint8_t *service_id,
-                            uint8_t *payload_len);
-
-aebfStream_stats_t aebfStream_get_stats(aebfStream_t* stream);
+    /**
+     * @brief Calculate CRC-8 AUTOSAR
+     * 
+     * @param data Input data
+     * @param len Data length
+     * @return CRC-8 value
+     */
+    static uint8_t crc8Calculate(const uint8_t* data, uint8_t len);
+};

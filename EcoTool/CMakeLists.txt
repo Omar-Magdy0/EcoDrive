@@ -21,7 +21,7 @@ pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 add_executable(${PROJECT_NAME}
     EcoTool.cpp
     # Header files are listed for IDE visibility, not strictly required for build
-    Usbxch.hpp
+    Usbxch.cpp
     Serial.hpp
 )
 

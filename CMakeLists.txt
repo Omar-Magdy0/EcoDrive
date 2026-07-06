@@ -58,10 +58,6 @@ else()
    
     add_subdirectory(platform/stm32f4)
 endif()
-#add_library(tinycbor STATIC IMPORTED)
-#set_target_properties(tinycbor PROPERTIES
-#    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/middleware/tinycbor/build/libtinycbor.a
-#)
 
 message(STATUS "LIBRARIES TO LINK: ${PLATFORM_LIB}")
 
@@ -71,7 +67,7 @@ include_directories(${PLATFORM_INCLUDES})
 
 
 set(MIDDLEWARE_SRC
-    ${CMAKE_SOURCE_DIR}/middleware/ABFStream.c
+    ${CMAKE_SOURCE_DIR}/middleware/ABFStream.cpp
 )
 
 file(GLOB_RECURSE APPLICATION_SRC
@@ -97,14 +93,11 @@ add_executable(${PROJECT_NAME} ${APPLICATION_SRC} ${DRIVER_SRC} ${CORE_SRC} ${MI
 # Add eld sources directly to the executable to ensure strong IRQ handlers
 # override weak startup symbols (avoids linker archive symbol resolution issues)
 target_sources(${PROJECT_NAME} PRIVATE ${PLATFORM_SOURCE})
-#target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/middleware/tinycbor/src)
-#target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/middleware/tinycbor/build)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${PLATFORM_INTERFACE}
     ${PLATFORM_LIB}
     ${TOOLCHAIN_LINK_LIBRARIES}
-    #tinycbor
 )
 
 # BUILD TEST CODE
@@ -116,7 +109,6 @@ if(PLATFORM_NAME STREQUAL "host")
         ${PLATFORM_INTERFACE}
         ${PLATFORM_LIB}
         ${TOOLCHAIN_LINK_LIBRARIES}
-        #tinycbor
     )
 
     add_executable(test_sil ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sil.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
@@ -125,7 +117,13 @@ if(PLATFORM_NAME STREQUAL "host")
         ${PLATFORM_INTERFACE}
         ${PLATFORM_LIB}
         ${TOOLCHAIN_LINK_LIBRARIES}
-        #tinycbor
+    )
+    add_executable(test_abf ${CMAKE_CURRENT_SOURCE_DIR}/test/test_abf.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
+    target_sources(test_abf PRIVATE ${PLATFORM_SOURCE})
+    target_link_libraries(test_abf PRIVATE
+        ${PLATFORM_INTERFACE}
+        ${PLATFORM_LIB}
+        ${TOOLCHAIN_LINK_LIBRARIES}
     )
 
 endif()

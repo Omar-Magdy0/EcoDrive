@@ -31,6 +31,18 @@
             "type": "shell",
             "command": "sudo socat -d -d pty,link=/dev/ttyACM_CDC0,raw,echo=0,mode=666 pty,link=/dev/ttyACM_CDC1,raw,echo=0,mode=666",
             "isBackground": true
+        },
+        {
+            "label": "EcoTool Clean",
+            "type": "shell",
+            "command": "cd EcoTool/build && rm -rf *",
+            "isBackground": true
+        },
+        {
+            "label": "EcoTool Build",
+            "type": "shell",
+            "command": "cd EcoTool/build && cmake .. && make -j4",
+            "isBackground": true
         }
     ]
 }

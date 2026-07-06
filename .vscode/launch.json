@@ -29,10 +29,10 @@
             ]
         },
         {
-            "name": "(gdb) Launch sil_test",
+            "name": "(gdb) Launch abf_test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/build/bin/test_sil",
+            "program": "${workspaceRoot}/build/bin/test_abf",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -56,7 +56,7 @@
             "name": "(gdb) Launch EcoTool",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/EcoTool/EcoTool",
+            "program": "${workspaceRoot}/EcoTool/build/EcoTool",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",

@@ -20,7 +20,7 @@ static int display_h = 1000;
 
 
 // Assuming your template class is in this header
-#include "ElcoreScopeStream.hpp"
+#include "ScopeStream.h"
 
 static inline void DrawScopeTest() {
     static int ratio_cnt = 0;
@@ -28,7 +28,7 @@ static inline void DrawScopeTest() {
     static const int SAMPLE_DEPTH = 500;
 
     static float storage[SAMPLE_DEPTH * CHANNELS];
-    static ElcoreScopeStream<float> scope(storage, CHANNELS, SAMPLE_DEPTH);
+    static ScopeStream<float> scope(storage, CHANNELS, SAMPLE_DEPTH);
     static float display_buffer[SAMPLE_DEPTH * CHANNELS];
     static float time_accum = 0.0f;
 
@@ -242,7 +242,7 @@ static inline void run_gui() {
 #include <vector>
 #include <string>
 #include <sstream>
-#include "ElcoreScopeStream.hpp"
+#include "ScopeStream.h"
 
 // Mock of your elcore_rstream logic if not linked
 // (Replace with your actual includes if available)
@@ -269,7 +269,7 @@ void run_cli_test() {
     float storage[DEPTH * CHANNELS] = {0};
     float display_out[DEPTH * CHANNELS] = {0};
 
-    ElcoreScopeStream<float> scope(storage, CHANNELS, DEPTH);
+    ScopeStream<float> scope(storage, CHANNELS, DEPTH);
     
     // Test Configuration
     scope.trigger_level = 5.0f;

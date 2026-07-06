@@ -99,7 +99,7 @@ bool TCPServer::write(const uint8_t *bytes, uint32_t len)
     uint32_t remaining = len;
 
     while (remaining > 0) {
-        ssize_t sent = ::send(client_sock_, ptr, remaining, 0);
+        ssize_t sent = ::send(client_sock_, ptr, remaining, MSG_NOSIGNAL);
         if (sent < 0) {
             if (errno == EINTR)
                 continue;
