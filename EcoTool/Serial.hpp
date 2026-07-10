@@ -94,7 +94,7 @@ public:
         return connected_;
     }
 
-    bool write(const uint8_t* data, size_t length) {
+    int write(const uint8_t* data, size_t length) {
         if (!connected_) {
             std::cerr << "[Serial] Write failed: Not connected\n";
             return false;
@@ -112,7 +112,7 @@ public:
         return (pushed == length);
     }
 
-    bool write(const std::vector<uint8_t>& data) {
+    int write(const std::vector<uint8_t>& data) {
         return write(data.data(), data.size());
     }
 
@@ -122,7 +122,7 @@ public:
     }
 
     // Read from RX ring buffer (non-blocking)
-    size_t read(uint8_t* data, size_t max_len) {
+    int read(uint8_t* data, size_t max_len) {
         return rx_buffer_.pop(data, max_len);
     }
 

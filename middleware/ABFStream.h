@@ -7,7 +7,7 @@
  * @brief ABFV0 (Asynchronous Binary Frame version 0)
  * 
  * Frame format:
- * [0x00 SYNC_BYTE][1Byte Payload Size][1Byte ServiceID][1Byte MCOBS_CODE][CRC8][MCOBS_ENCODED(Payload)]
+ * [0x00 SYNC_BYTE][1Byte ServiceID][1Byte Payload Size][1Byte MCOBS_CODE][CRC8][MCOBS_ENCODED(Payload)]
  * Total Header: 5 bytes (0x00 + Size + ServiceID + MCOBS_Code + CRC8)
  */
 
@@ -56,7 +56,7 @@ public:
      * @param buffer Pointer to receive payload buffer
      * @param bufferSize Maximum payload buffer size
      */
-    ABFStream(uint8_t* buffer, uint16_t bufferSize);
+    ABFStream(uint8_t* buffer, uint8_t bufferSize, void *_context, void(*onFrame)(void *context, uint8_t, uint8_t*, uint8_t), void(*onError)(void *context, uint8_t));
 
     /**
      * @brief Destructor
@@ -72,8 +72,7 @@ public:
      * @param payloadLength [out] Length of decoded payload
      * @return ABFErrorCode status
      */
-    ABFErrorCode process(const uint8_t* data, uint16_t length, 
-                        uint8_t& serviceId, uint8_t& payloadLength);
+    ABFErrorCode process(const uint8_t* data, uint16_t length);
 
     /**
      * @brief Encode a frame for transmission
@@ -111,6 +110,9 @@ private:
     // ===== Frame Parsing State =====
     ABFState m_state;
     ABFStats m_stats;
+    void* context = nullptr;
+    void(*onFrame)(void* context, uint8_t serviceId, uint8_t* payload, uint8_t payloadLength);
+    void(*onError)(void* context, uint8_t error);
 
     /**
      * @brief Calculate CRC-8 AUTOSAR

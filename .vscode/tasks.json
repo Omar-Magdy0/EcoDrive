@@ -39,9 +39,15 @@
             "isBackground": true
         },
         {
-            "label": "EcoTool Build",
+            "label": "EcoTool Build Debug",
             "type": "shell",
-            "command": "cd EcoTool/build && cmake .. && make -j4",
+            "command": "cd EcoTool/build && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j4",
+            "isBackground": true
+        },
+        {
+            "label": "EcoTool Build Release",
+            "type": "shell",
+            "command": "cd EcoTool/build && cmake .. -DCMAKE_BUILD_TYPE=Release && make -j4",
             "isBackground": true
         }
     ]

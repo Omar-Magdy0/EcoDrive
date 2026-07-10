@@ -25,7 +25,7 @@
 
 #ifndef TUSB_CONFIG_H_
 #define TUSB_CONFIG_H_
-
+#include "eldriver/eldriver_conf.h"
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -97,9 +97,9 @@
 #define CFG_TUD_VENDOR           1
 
 
-#define CFG_TUD_VENDOR_EP_BUFSIZE  64
-#define CFG_TUD_VENDOR_RX_BUFSIZE 256
-#define CFG_TUD_VENDOR_TX_BUFSIZE 256
+#define CFG_TUD_VENDOR_EP_BUFSIZE 64
+#define CFG_TUD_VENDOR_RX_BUFSIZE ELDRIVER_USBXCH_RX_BUFFSIZE
+#define CFG_TUD_VENDOR_TX_BUFSIZE ELDRIVER_USBXCH_TX_BUFFSIZE
 
 
 

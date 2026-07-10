@@ -40,14 +40,18 @@ uint8_t ABFStream::crc8Calculate(const uint8_t* data, uint8_t len)
 // ============================================
 // Constructor & Destructor
 // ============================================
-ABFStream::ABFStream(uint8_t* buffer, uint16_t bufferSize)
+ABFStream::ABFStream(uint8_t* buffer, uint8_t bufferSize, void *_context, void(*_onFrame)(void*, uint8_t, uint8_t*, uint8_t), void(*_onError)(void*, uint8_t))
     : m_rxPayload(buffer),
       m_rxCapacity(bufferSize),
       m_rxPos(0),
       m_rxNextZero(0),
       m_headerPos(0),
-      m_state(ABFState::HUNT_SYNC)
-{
+      m_state(ABFState::HUNT_SYNC),
+      context(_context),
+      onFrame(_onFrame),
+      onError(_onError)
+
+{  
     std::memset(m_header, 0, sizeof(m_header));
 }
 
@@ -63,22 +67,22 @@ ABFErrorCode ABFStream::encode(uint8_t* header, uint8_t* payload,
         return ABFErrorCode::UNKNOWN;
     
     header[0] = ABF_SYNC_BYTE;
-    header[1] = payloadLen;
-    header[2] = serviceId;
+    header[1] = serviceId;
+    header[2] = payloadLen;
     
-    uint8_t* lastZeroPos = header + 3;
+    uint8_t* nextZeroPos = header + 3;
     uint8_t zeroDistance = 0;
     
     for (uint8_t i = 0; i < payloadLen; i++) {
         zeroDistance++;
         if (payload[i] == 0) {
-            *lastZeroPos = zeroDistance;
-            lastZeroPos = payload + i;
+            *nextZeroPos = zeroDistance;
+            nextZeroPos = payload + i;
             zeroDistance = 0;
         }
     }
     
-    *lastZeroPos = zeroDistance + 1;
+    *nextZeroPos = zeroDistance + 1;
     
     uint8_t headerCrc = crc8Calculate(&header[1], 3);
     if (headerCrc == 0x00)
@@ -88,8 +92,7 @@ ABFErrorCode ABFStream::encode(uint8_t* header, uint8_t* payload,
     return ABFErrorCode::OK;
 }
 
-ABFErrorCode ABFStream::process(const uint8_t* data, uint16_t length,
-                                uint8_t& serviceId, uint8_t& payloadLength)
+ABFErrorCode ABFStream::process(const uint8_t* data, uint16_t length)
 {
     for (int i = 0; i < length; i++) {
         switch (m_state) {
@@ -110,7 +113,7 @@ ABFErrorCode ABFStream::process(const uint8_t* data, uint16_t length,
                     
                     if (crc8 != m_header[4]) {
                         reset();
-                        return ABFErrorCode::HEADER_CRC_MISMATCH;
+                        onError(context, (uint8_t)ABFErrorCode::HEADER_CRC_MISMATCH);
                     }
                     
                     m_rxNextZero = m_header[3];
@@ -121,31 +124,31 @@ ABFErrorCode ABFStream::process(const uint8_t* data, uint16_t length,
                 break;
                 
             case ABFState::READ_PAYLOAD:
-                if (m_rxPos < m_header[1]) {
+                if (m_rxPos < m_header[2]) {
                     if (data[i] == 0x00) {
                         reset();
-                        return ABFErrorCode::PAYLOAD_INCOMPLETE;
+                        onError(context, (uint8_t)ABFErrorCode::PAYLOAD_INCOMPLETE);
                     }
                     
                     if (m_rxPos < m_rxCapacity) {
-                        m_rxNextZero--;
-                        if (m_rxNextZero == 0) {
+                        if (m_rxNextZero == 1) {
                             m_rxPayload[m_rxPos++] = 0x00;
                             m_rxNextZero = data[i];
                         } else {
                             m_rxPayload[m_rxPos++] = data[i];
+                            m_rxNextZero--;
                         }
                     } else {
                         reset();
-                        return ABFErrorCode::RX_BUFFER_SMALL;
+                        onError(context, (uint8_t)ABFErrorCode::RX_BUFFER_SMALL);
                     }
                 }
                 
-                if (m_rxPos == m_header[1]) {
+                if (m_rxPos == m_header[2]) {
                     reset();
-                    serviceId = m_header[2];
-                    payloadLength = m_header[1];
-                    return ABFErrorCode::FRAME_COMPLETE;
+                    uint8_t serviceId = m_header[1];
+                    uint8_t payloadLength = m_header[2];
+                    onFrame(context, serviceId, m_rxPayload, payloadLength);
                 }
                 break;
                 
@@ -153,7 +156,6 @@ ABFErrorCode ABFStream::process(const uint8_t* data, uint16_t length,
                 break;
         }
     }
-    
     return ABFErrorCode::OK;
 }
 

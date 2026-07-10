@@ -1,232 +1,106 @@
 #pragma once
 
-#include <string>
-#include <cstring>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 #include <fcntl.h>
-#include <cerrno>
+#include <netinet/in.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
-/**
- * @brief Simple non-blocking TCP client implementation
- * 
- * Provides basic TCP operations with non-blocking API:
- * - connect/disconnect
- * - non-blocking read/write
- * - connection status check
- */
+#include <cerrno>
+#include <cstdint>
+#include <cstring>
+#include <string>
+
 class TcpClient
 {
 public:
-    /**
-     * @brief Constructor - initializes socket to invalid state
-     */
-    TcpClient() : m_socket(-1) {}
+    TcpClient() = default;
 
-    /**
-     * @brief Destructor - ensures socket is closed
-     */
     ~TcpClient()
     {
         disconnect();
     }
 
-    /**
-     * @brief Connect to remote TCP server
-     * 
-     * @param host IP address or hostname (e.g., "127.0.0.1" or "localhost")
-     * @param port Port number (1-65535)
-     * @return true on successful connection, false on failure
-     */
     bool connect(const std::string& host, uint16_t port)
     {
-        if (is_connected())
+        disconnect();
+
+        sock_ = socket(AF_INET, SOCK_STREAM, 0);
+        if (sock_ < 0)
+            return false;
+
+        int buffer_size = 4 * 1024 * 1024;
+        setsockopt(sock_, SOL_SOCKET, SO_SNDBUF,
+                   &buffer_size, sizeof(buffer_size));
+        setsockopt(sock_, SOL_SOCKET, SO_RCVBUF,
+                   &buffer_size, sizeof(buffer_size));
+                   
+        sockaddr_in addr{};
+        addr.sin_family = AF_INET;
+        addr.sin_port = htons(port);
+
+        if (inet_pton(AF_INET, host.c_str(), &addr.sin_addr) != 1)
         {
             disconnect();
-        }
-
-        // Create socket
-        m_socket = ::socket(AF_INET, SOCK_STREAM, 0);
-        if (m_socket < 0)
-        {
             return false;
         }
 
-        // Set non-blocking mode
-        if (!set_non_blocking(true))
+        if (::connect(sock_, (sockaddr*)&addr, sizeof(addr)) < 0)
         {
-            ::close(m_socket);
-            m_socket = -1;
+            disconnect();
             return false;
         }
 
-        // Prepare server address
-        struct sockaddr_in server_addr;
-        std::memset(&server_addr, 0, sizeof(server_addr));
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons(port);
-
-        // Convert IP address
-        if (::inet_pton(AF_INET, host.c_str(), &server_addr.sin_addr) <= 0)
-        {
-            ::close(m_socket);
-            m_socket = -1;
-            return false;
-        }
-
-        // Attempt connection (will return EINPROGRESS for non-blocking)
-        if (::connect(m_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0)
-        {
-            if (errno != EINPROGRESS)
-            {
-                ::close(m_socket);
-                m_socket = -1;
-                return false;
-            }
-        }
+        int flags = fcntl(sock_, F_GETFL, 0);
+        fcntl(sock_, F_SETFL, flags | O_NONBLOCK);
 
         return true;
     }
 
-    /**
-     * @brief Disconnect from remote server
-     */
     void disconnect()
     {
-        if (m_socket >= 0)
+        if (sock_ >= 0)
         {
-            ::close(m_socket);
-            m_socket = -1;
+            close(sock_);
+            sock_ = -1;
         }
     }
 
-    /**
-     * @brief Check if currently connected to server
-     * 
-     * @return true if socket is valid and connected
-     */
     bool is_connected() const
     {
-        if (m_socket < 0)
-        {
-            return false;
-        }
-
-        // Check if socket is still valid
-        int error = 0;
-        socklen_t len = sizeof(error);
-        if (::getsockopt(m_socket, SOL_SOCKET, SO_ERROR, &error, &len) < 0)
-        {
-            return false;
-        }
-
-        return error == 0;
+        return sock_ >= 0;
     }
 
-    /**
-     * @brief Get number of bytes available to read (non-blocking)
-     * 
-     * @return Number of bytes available in read buffer, or -1 on error
-     */
     int available() const
     {
-        if (m_socket < 0)
-        {
+        if (sock_ < 0)
             return -1;
-        }
 
-        int bytes_available = 0;
-        if (::ioctl(m_socket, FIONREAD, &bytes_available) < 0)
-        {
+        int bytes = 0;
+
+        if (ioctl(sock_, FIONREAD, &bytes) < 0)
             return -1;
-        }
 
-        return bytes_available;
+        return bytes;
     }
 
-    /**
-     * @brief Write data to socket (non-blocking)
-     * 
-     * @param data Pointer to data buffer
-     * @param length Number of bytes to write
-     * @return Number of bytes written, or -1 on error (check errno for EAGAIN/EWOULDBLOCK)
-     */
     int write(const void* data, size_t length)
     {
-        if (m_socket < 0)
-        {
-            errno = EBADF;
+        if (sock_ < 0)
             return -1;
-        }
 
-        ssize_t bytes_sent = ::send(m_socket, data, length, MSG_NOSIGNAL);
-        return static_cast<int>(bytes_sent);
+        return send(sock_, data, length, MSG_NOSIGNAL);
     }
 
-    /**
-     * @brief Read data from socket (non-blocking)
-     * 
-     * @param buffer Pointer to receive buffer
-     * @param length Maximum number of bytes to read
-     * @return Number of bytes read, 0 if connection closed, or -1 on error 
-     *         (check errno for EAGAIN/EWOULDBLOCK meaning no data available)
-     */
     int read(void* buffer, size_t length)
     {
-        if (m_socket < 0)
-        {
-            errno = EBADF;
+        if (sock_ < 0)
             return -1;
-        }
 
-        ssize_t bytes_read = ::recv(m_socket, buffer, length, 0);
-        return static_cast<int>(bytes_read);
-    }
-
-    /**
-     * @brief Get the underlying socket file descriptor
-     * 
-     * @return Socket FD (-1 if not connected)
-     */
-    int get_socket() const
-    {
-        return m_socket;
+        return recv(sock_, buffer, length, 0);
     }
 
 private:
-    int m_socket;
-
-    /**
-     * @brief Set socket to blocking or non-blocking mode
-     * 
-     * @param non_blocking true for non-blocking, false for blocking
-     * @return true on success
-     */
-    bool set_non_blocking(bool non_blocking)
-    {
-        if (m_socket < 0)
-        {
-            return false;
-        }
-
-        int flags = ::fcntl(m_socket, F_GETFL, 0);
-        if (flags < 0)
-        {
-            return false;
-        }
-
-        if (non_blocking)
-        {
-            flags |= O_NONBLOCK;
-        }
-        else
-        {
-            flags &= ~O_NONBLOCK;
-        }
-
-        return ::fcntl(m_socket, F_SETFL, flags) >= 0;
-    }
+    int sock_ = -1;
 };

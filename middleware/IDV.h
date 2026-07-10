@@ -26,8 +26,8 @@ class IDV
         buffer_idx += sizeof(value);
         return IDVErr::OK;
     }
-
 public:
+    IDV() = delete;
     IDV(uint8_t *_buffer, uint16_t _buffer_capacity) : buffer(_buffer), buffer_capacity(_buffer_capacity) {};
     IDVErr add_UINT8(uint8_t id, uint8_t value) { return addPrimitive(id, value); }
     IDVErr add_INT8(uint8_t id, int8_t value) { return addPrimitive(id, value); }
@@ -54,19 +54,31 @@ public:
                       const T* data,
                       uint8_t count)
     {
+        static_assert(std::is_trivially_copyable_v<T>, "IDV::add() requires a trivially copyable type");
         return add_BINARY(id,
                           reinterpret_cast<const uint8_t*>(data),
                           sizeof(T) * count);
     }
+    template<typename T>
+    IDVErr add(uint8_t id, const T& value)
+    {
+        static_assert(std::is_trivially_copyable_v<T>);
+        return add_BINARY(
+            id,
+            reinterpret_cast<const uint8_t*>(&value),
+            sizeof(T));
+    }
     template <typename T>
     static constexpr inline uint8_t PRIMITIVE_SIZE() { return sizeof(T) + 2; }
+    template <typename T>
+    static constexpr inline uint8_t SERIALIZED_SIZE(){return sizeof(T) + 2;}
     static constexpr inline uint8_t BINARY_SIZE(uint8_t length) { return length + 2; }
     uint16_t size() const { return buffer_idx; }
     void reset()
     {
         buffer_idx = 0;
     }
-    const uint8_t *data() const
+    uint8_t *data() const
     {
         return buffer;
     }
@@ -132,3 +144,4 @@ public:
         return idv_id;
     }
 };
+

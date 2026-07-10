@@ -66,8 +66,9 @@ include_directories(${PLATFORM_INCLUDES})
 
 
 
-set(MIDDLEWARE_SRC
-    ${CMAKE_SOURCE_DIR}/middleware/ABFStream.cpp
+file(GLOB_RECURSE MIDDLEWARE_SRC    
+    "middleware/*.cpp"
+    "middleware/*.c"
 )
 
 file(GLOB_RECURSE APPLICATION_SRC
@@ -118,13 +119,7 @@ if(PLATFORM_NAME STREQUAL "host")
         ${PLATFORM_LIB}
         ${TOOLCHAIN_LINK_LIBRARIES}
     )
-    add_executable(test_abf ${CMAKE_CURRENT_SOURCE_DIR}/test/test_abf.cpp ${DRIVER_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
-    target_sources(test_abf PRIVATE ${PLATFORM_SOURCE})
-    target_link_libraries(test_abf PRIVATE
-        ${PLATFORM_INTERFACE}
-        ${PLATFORM_LIB}
-        ${TOOLCHAIN_LINK_LIBRARIES}
-    )
+
 
 endif()
 

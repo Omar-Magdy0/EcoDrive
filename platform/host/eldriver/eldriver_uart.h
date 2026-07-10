@@ -1,5 +1,5 @@
 #pragma once
-#include "elcore.h"
+#include "elcore_rstream.h"
 
 #ifdef __cplusplus
 extern "C" {

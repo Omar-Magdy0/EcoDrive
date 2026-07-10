@@ -29,7 +29,6 @@ void PmsmControlCore::init()
 {
     pTicks = 0;
     xTicks = 0;
-    /* instance bindings */
     
     /* mode initialization*/
     voltage_q31_to_float(state.Vbus_q31);
@@ -37,7 +36,6 @@ void PmsmControlCore::init()
     angle_q31_to_float(state.eTheta_q31);
 
     mc3p.offset_calibration = true;
-    //Trap_init();
     SComm_init();
     Foc_init();
     /* hardware initialization */
@@ -46,15 +44,13 @@ void PmsmControlCore::init()
     eldriver_mc3p_init(&mc3p);
     eldriver_mc3p_write_float(&mc3p);
 };
+
 void PmsmControlCore::xmcLoop()
 {
     if (control.mc_mode == MCMode::None)
         return;
     switch (control.mc_mode)
     {
-    //case MCMode::Trap: //Obsolete
-    //    Trap_xmcLoop();
-    //    break;
     case MCMode::Foc:
         Foc_xmcLoop();
         break;
@@ -70,7 +66,7 @@ void PmsmControlCore::xmcLoop()
 void PmsmControlCore::pwmConfigUpdate(PmsmControlTypes::ConfigPwm cfg)
 {
     pwm_freq_hz = cfg.pwm_freq_hz;
-    pTick_period_ns = 1'000'000'000.0f / static_cast<float>(pwm_freq_hz);
+    pTick_period_ns = static_cast<uint32_t>(1'000'000'000 / static_cast<float>(pwm_freq_hz));
     mc3p.config.pwm_Hz = pwm_freq_hz;
     mc3p.config.deadtime_nS = cfg.deadtime_ns;
     mc3p.config.duty_min = cfg.duty_min;
@@ -86,9 +82,6 @@ void PmsmControlCore::pwmLoop()
     eldriver_mc3p_read_sync(&mc3p, &mc3p_sync_meas);
     switch (control.mc_mode)
     {
-    //case MCMode::Trap:    //Obsolete
-    //    Trap_pwmLoop();
-    //    break;
     case MCMode::Foc:
         Foc_pwmLoop();
         break;
@@ -110,9 +103,6 @@ void PmsmControlCore::setControlMode(MCMode mc_mode)
         // Exit current mode
         switch (control.mc_mode)
         {
-        //case MCMode::Trap:
-        //    Trap_onExit();
-        //    break;
         case MCMode::Foc:
             Foc_onExit();
             break;
@@ -125,9 +115,6 @@ void PmsmControlCore::setControlMode(MCMode mc_mode)
         // Enter new mode
         switch (mc_mode)
         {
-        //case MCMode::Trap:
-        //    Trap_onEnter(control.mc_mode);
-        //    break;
         case MCMode::Foc:
             Foc_onEnter(control.mc_mode);
             break;
@@ -140,5 +127,3 @@ void PmsmControlCore::setControlMode(MCMode mc_mode)
         control.mc_mode = mc_mode;
     }
 }
-
-

@@ -17,12 +17,25 @@ endif()
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 
+
+
+file(GLOB_RECURSE MIDDLEWARE_SRC    
+    "../middleware/*.cpp"
+    "../middleware/*.c"
+)
+
+file(GLOB_RECURSE CORE_SRC    
+    "../middleware/*.cpp"
+    "../middleware/*.c"
+)
+
 # Add executable
 add_executable(${PROJECT_NAME}
     EcoTool.cpp
     # Header files are listed for IDE visibility, not strictly required for build
     Usbxch.cpp
     Serial.hpp
+    ${MIDDLEWARE_SRC}
 )
 
 find_package(PkgConfig REQUIRED)
@@ -41,6 +54,8 @@ target_link_libraries(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${LIBUSB_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}
+    "../middleware"
+    "../core"
 )
 
 # Compiler flags (optional - remove if not needed)

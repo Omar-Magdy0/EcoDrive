@@ -126,7 +126,7 @@ void UsbxchLibusb::disconnect()
 
 bool UsbxchLibusb::isConnected() const { return connected_; }
 
-bool UsbxchLibusb::write(const uint8_t *data, size_t length)
+int UsbxchLibusb::write(const uint8_t *data, size_t length)
 {
     if (!connected_ || !handle_ || !data || length == 0)
         return false;
@@ -152,10 +152,11 @@ bool UsbxchLibusb::write(const uint8_t *data, size_t length)
         return false;
     }
 
+    speed_tracker_.update(0, transferred);
     return transferred == static_cast<int>(length);
 }
 
-size_t UsbxchLibusb::read(uint8_t *data, size_t max_len)
+int UsbxchLibusb::read(uint8_t *data, size_t max_len)
 {
     if (!data || max_len == 0)
         return 0;
@@ -166,6 +167,10 @@ size_t UsbxchLibusb::available()
 {
     return rx_buffer_.available();
 }
+
+double UsbxchLibusb::getRxSpeedBytesPerSecond() const { return speed_tracker_.rxBps(); }
+double UsbxchLibusb::getTxSpeedBytesPerSecond() const { return speed_tracker_.txBps(); }
+void UsbxchLibusb::resetSpeeds() { speed_tracker_.reset(); }
 
 void UsbxchLibusb::ioLoop()
 {
@@ -192,6 +197,8 @@ void UsbxchLibusb::ioLoop()
                         transfer.data(),
                         transferred);
 
+                speed_tracker_.update(transferred, 0);
+
                 if (pushed != static_cast<size_t>(transferred))
                 {
                     std::cerr
@@ -217,14 +224,35 @@ UsbxchTcp::~UsbxchTcp()
     disconnect();
 }
 
+#include <iostream>
 bool UsbxchTcp::connect(const std::string &serial_number, uint16_t vid, uint16_t pid, int interface_number, unsigned char bulk_in_ep, unsigned char bulk_out_ep, int timeout_ms)
 {
-    client.connect("127.0.0.1", 4001);
-    return false;
+    disconnect();
+
+    if (!client.connect("127.0.0.1", 4001))
+    {
+        return false;
+    }
+
+    connected_ = true;
+    running_ = true;
+    timeout_ms_ = timeout_ms;
+    interface_number_ = interface_number;
+
+    io_thread_ = std::thread([this]()
+                             { ioLoop(); });
+    std::cout << "USBXCH CONNECTED TO TCP localhost:4001" << std::endl;
+    return true;
 }
 
 void UsbxchTcp::disconnect()
 {
+    connected_ = false;
+    running_ = false;
+
+    if (io_thread_.joinable())
+        io_thread_.join();
+
     client.disconnect();
 }
 
@@ -233,17 +261,39 @@ bool UsbxchTcp::isConnected() const
     return client.is_connected();
 }
 
-bool UsbxchTcp::write(const uint8_t *data, size_t length)
+int UsbxchTcp::write(const uint8_t *data, size_t length)
 {
-    return client.write(data, length);
+    const int result = client.write(data, length);
+    if (result > 0)
+    {
+        speed_tracker_.update(0, static_cast<size_t>(result));
+    }
+    return result;
 }
 
-size_t UsbxchTcp::read(uint8_t *data, size_t max_len)
+int UsbxchTcp::read(uint8_t *data, size_t max_len)
 {
-    return client.read(data, max_len);
+    const int result = client.read(data, max_len);
+    if (result > 0)
+    {
+        speed_tracker_.update(static_cast<size_t>(result), 0);
+    }
+    return result;
 }
 
 size_t UsbxchTcp::available()
 {
     return client.available();
 }
+
+void UsbxchTcp::ioLoop()
+{
+    while (running_)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
+
+double UsbxchTcp::getRxSpeedBytesPerSecond() const { return speed_tracker_.rxBps(); }
+double UsbxchTcp::getTxSpeedBytesPerSecond() const { return speed_tracker_.txBps(); }
+void UsbxchTcp::resetSpeeds() { speed_tracker_.reset(); }

@@ -1,4 +1,3 @@
-
 struct Foc
 {
     struct
@@ -11,15 +10,11 @@ struct Foc
         q31_t Iq_q31 = 0;
         q31_t ECq_sp_q31 = 0;
         q31_t ECd_sp_q31 = 0;
-        volatile int16_t mod_idx_max_q3p12 = ((int16_t)(1 * INT16_MAX) >> 3);
+        volatile int16_t mod_idx_max_q3p12 = static_cast<int16_t>((1 * INT16_MAX) >> 3);
     } state;
 
     Olstup olstup;
 } foc;
-//======================================================
-//  CALLBACK DEFINITIONS
-//======================================================
-void Foc_hall_ComCallback();
 
 //======================================================
 // CORE MODE API
@@ -30,4 +25,3 @@ void Foc_onEnter(PmsmControlTypes::MCMode prev_mct);
 void Foc_onExit();
 void Foc_pwmLoop();
 void Foc_xmcLoop();
-

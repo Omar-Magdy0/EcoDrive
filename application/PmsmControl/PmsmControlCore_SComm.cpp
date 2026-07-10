@@ -126,8 +126,8 @@ void PmsmControlCore::SComm_xmcLoop()
         case SComm::IDSubStage::Active_Sampling:
             if (scomm.samples_counter == 0)
             {
-                q31_t Idd = (scomm.accumulate0 >> (PmsmControlConf::OVERSAMPLE_BITS) );// Since accumulator accumulates I/2 we compensate in shift 
-                q31_t Idq = (scomm.accumulate1 >> (PmsmControlConf::OVERSAMPLE_BITS) );// Since accumulator accumulates I/2 we compensate in shift
+                q31_t Idd = scomm.accumulate0 >> PmsmControlConf::OVERSAMPLE_BITS;
+                q31_t Idq = scomm.accumulate1 >> PmsmControlConf::OVERSAMPLE_BITS;
                 q31_t Imag2 = (((int64_t)Idd*Idd) + ((int64_t)Idq*Idq))>>31; 
                 q31_t Imag;
                 arm_sqrt_q31(Imag2, &Imag);
@@ -141,6 +141,7 @@ void PmsmControlCore::SComm_xmcLoop()
         default:
             break;
         }
+        // Fall-through to REST0 intended
     case SComm::IDStage::REST0:
     {
         switch (scomm.idsub)
@@ -190,8 +191,8 @@ void PmsmControlCore::SComm_xmcLoop()
         case SComm::IDSubStage::Active_Sampling:
             if (scomm.samples_counter == 0)
             {
-                q31_t Iqd = (scomm.accumulate0 >> (PmsmControlConf::OVERSAMPLE_BITS) );// Since accumulator accumulates I/2 we compensate in shift 
-                q31_t Iqq = (scomm.accumulate1 >> (PmsmControlConf::OVERSAMPLE_BITS) );// Since accumulator accumulates I/2 we compensate in shift
+                q31_t Iqd = scomm.accumulate0 >> (PmsmControlConf::OVERSAMPLE_BITS);
+                q31_t Iqq = scomm.accumulate1 >> (PmsmControlConf::OVERSAMPLE_BITS);
                 q31_t Imag2 = (((int64_t)Iqd*Iqd) + ((int64_t)Iqq*Iqq))>>31; 
                 q31_t Imag;
                 arm_sqrt_q31(Imag2, &Imag);

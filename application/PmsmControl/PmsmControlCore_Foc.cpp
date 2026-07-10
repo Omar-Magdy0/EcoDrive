@@ -1,10 +1,14 @@
 #include "PmsmControlCore.h"
 
-constexpr q31_t a0 = (127/128.0)*INT32_MAX;
-constexpr q31_t a1 = (27/32.0)*INT32_MAX;
-constexpr q31_t b0 = (3/16.0)*INT32_MAX;
-constexpr q31_t b1 = (71/128.0)*INT32_MAX;
+// Fixed-point filter coefficients for current magnitude estimation (max_a_min_b approximation)
+constexpr q31_t MAXA_MINB_A0 = (127/128.0)*INT32_MAX;
+constexpr q31_t MAXA_MINB_A1 = (27/32.0)*INT32_MAX;
+constexpr q31_t MAXA_MINB_B0 = (3/16.0)*INT32_MAX;
+constexpr q31_t MAXA_MINB_B1 = (71/128.0)*INT32_MAX;
 constexpr q15_t SQRT3_Q3P12 = ((int32_t)(1.73205080757*INT16_MAX)>>3);
+
+// Speed scaling: convert from Q32.31 delta-angle to Q7.24 angular velocity
+constexpr int SPEED_FROM_DELTA_SHIFT = 7;
 
 using namespace PmsmControlTypes;
 static inline q31_t maxa_minb_2_q31(q31_t i1,q31_t i2)
@@ -20,8 +24,8 @@ static inline q31_t maxa_minb_2_q31(q31_t i1,q31_t i2)
         max = i2;
         min = i1;
     }
-    q31_t z0 = (((int64_t)a0*max + (int64_t)b0*min)>>31);
-    q31_t z1 = (((int64_t)a1*max + (int64_t)b1*min)>>31);
+    q31_t z0 = (((int64_t)MAXA_MINB_A0*max + (int64_t)MAXA_MINB_B0*min)>>31);
+    q31_t z1 = (((int64_t)MAXA_MINB_A1*max + (int64_t)MAXA_MINB_B1*min)>>31);
     return z0>z1?z0:z1;
 }
 

@@ -32,6 +32,18 @@ bool eldriver_usbxch_connected(eldriver_usbxch_handle_t *h)
 
 void eldriver_usbxch_update(eldriver_usbxch_handle_t *h)
 {
-    h->tcps.waitForClient();
+    h->tcps.pollClient();
 }
 
+uint32_t eldriver_usbxch_write_available(eldriver_usbxch_handle_t *h)
+{
+    return UINT16_MAX;
+}
+uint32_t eldriver_usbxch_flush(eldriver_usbxch_handle_t *h)
+{
+    return 0;
+}
+uint32_t eldriver_usbxch_read_available(eldriver_usbxch_handle_t *h)
+{
+    return h->tcps.available();
+}

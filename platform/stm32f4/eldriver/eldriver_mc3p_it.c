@@ -6,6 +6,9 @@
 #include "stm32f4xx_hal_tim.h"
 #include "eldriver_mc3p.h"
 #include "eldriver_conf.h"
+
+#ifdef ELDRIVER_MC3P_ENABLED
+
 TIM_HandleTypeDef        htim11;
 
 /**
@@ -146,3 +149,5 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void)
         trg_cnt++;
     }
 }
+
+#endif

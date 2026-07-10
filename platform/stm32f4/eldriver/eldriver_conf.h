@@ -54,9 +54,16 @@
 //================================================
 // USBCDC CONFIGURATION
 //================================================
-#define ELDRIVER_USBCDC_ENABLED
+//#define ELDRIVER_USBCDC_ENABLED
 #define ELDRIVER_USBCDC_TX_BUFFER_SIZE 64
 #define ELDRIVER_USBCDC_RX_BUFFER_SIZE 64
+
+//================================================
+// USBXCH CONFIGURATION
+//================================================
+#define ELDRIVER_USBXCH_ENABLED
+#define ELDRIVER_USBXCH_TX_BUFFSIZE 4096
+#define ELDRIVER_USBXCH_RX_BUFFSIZE 256
 
 /** @name Motor Control (MC3P) Configuration */
 //================================================

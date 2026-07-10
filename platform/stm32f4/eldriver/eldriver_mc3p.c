@@ -10,6 +10,8 @@
 #include "eldriver_mc3p.h"
 
 
+#ifdef ELDRIVER_MC3P_ENABLED
+
 #define SATURATE(v , min , max)(( v > max)?max: ((v < min)?0:v))
 #define Q15_HALF        16384   // 0.5 × 32768
 #define Q15_SQRT3_BY_2  28378   // 0.8660254 × 32768
@@ -838,3 +840,5 @@ void INTERNAL_mc3p_ADC_JEOS_IRQ(eldriver_mc3p_handle_t *h)
         break;
     }
 }
+
+#endif

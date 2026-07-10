@@ -1,6 +1,7 @@
 #pragma once
 #include "PmsmControlCore.h"
 #include "PmsmControlTypes.h"
+#include "DAQSessionAPP.h"
 
 class PmsmControl
 {

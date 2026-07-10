@@ -10,23 +10,6 @@
 #define ELDRIVER_BEMFZC_ENABLED
 #endif
 
-static inline eldriver_mc3p_sector_t TrapIncrement(eldriver_mc3p_sector_t sector, PmsmControlTypes::Direction dir)
-{
-    return static_cast<eldriver_mc3p_sector_t>(
-        (dir == PmsmControlTypes::Direction::Forward)
-            ? elmath_increment_roll(sector, ELDRIVER_MC3P_SECTOR_TRAP1, ELDRIVER_MC3P_SECTOR_TRAP6)
-            : elmath_decrement_roll(sector, ELDRIVER_MC3P_SECTOR_TRAP1, ELDRIVER_MC3P_SECTOR_TRAP6));
-}
-static inline constexpr std::array<eldriver_mc3p_sector_t, 8> HALL_TRAP_TABLE = /** Hall->trap sector LUT (idx=hall 0..7). */ {
-    ELDRIVER_MC3P_SECTOR_FLOAT,
-    ELDRIVER_MC3P_SECTOR_TRAP5,
-    ELDRIVER_MC3P_SECTOR_TRAP3,
-    ELDRIVER_MC3P_SECTOR_TRAP4,
-    ELDRIVER_MC3P_SECTOR_TRAP1,
-    ELDRIVER_MC3P_SECTOR_TRAP6,
-    ELDRIVER_MC3P_SECTOR_TRAP2,
-    ELDRIVER_MC3P_SECTOR_FLOAT};
-
 class PmsmControlCore;
 template <typename Impl>
 class PosDriverBase
