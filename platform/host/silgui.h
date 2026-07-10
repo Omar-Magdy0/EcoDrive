@@ -91,7 +91,7 @@ struct DataSummary
 inline DataSummary summary;
 
 // ======================= PANELS =======================
-#include "ImGuiFileDialog/ImGuiFileDialog.h"
+#include "ImGuiFileDialog.h"
 inline ImGuiFileDialog fileDialog;
 // ---------- Control ----------
 static void drawControlPanel()

@@ -10,26 +10,28 @@ set(DEVICE_DEFINITIONS
 )
 
 # Path configurations
-set(HAL_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(STM32F4xx_HAL_DRIVER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver)
-set(CMSIS_DEVICE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32F4xx/Include)
-set(CMSIS_CORE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Include)
-set(CMSIS_DSP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS-DSP)
-set(TINYUSB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tinyusb)
+set(HAL_CONFIG_DIR ${CMAKE_SOURCE_DIR})
+set(STM32F4xx_HAL_DRIVER_DIR ${CMAKE_SOURCE_DIR}/thirdparty/stm32/STM32F4xx_HAL_Driver)
+set(CMSIS_DEVICE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/CMSIS/Device/ST/STM32F4xx/Include)
+set(CMSIS_CORE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/CMSIS)
+set(CMSIS_DSP_DIR ${CMAKE_SOURCE_DIR}/thirdparty/CMSIS-DSP)
+set(TINYUSB_DIR ${CMAKE_SOURCE_DIR}/thirdparty/tinyusb)
+set(CMSIS_DSP_PRIVATE_INCLUDES
+    ${CMSIS_DSP_DIR}/PrivateInclude
+    ${CMSIS_DSP_DIR}/Include/dsp  # Sometimes needed
+)
+
 
 # Common include directories for all STM32 targets
 set(STM32_COMMON_INCLUDES
+    ${CMSIS_CORE_DIR}/Include
+    ${CMSIS_CORE_DIR}/Core/Include
+    ${CMSIS_DSP_PRIVATE_INCLUDES}
     ${STM32F4xx_HAL_DRIVER_DIR}/Inc
     ${STM32F4xx_HAL_DRIVER_DIR}/Inc/Legacy  # Important for HAL/LL compatibility
     ${CMSIS_DEVICE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMSIS_CORE_DIR}
     ${HAL_CONFIG_DIR}
-    ${USBD_LIB_DIR}/Core/Inc
-    ${USB_CLASS_DIR}/Class/CDC/Inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/
-    ${CMAKE_CURRENT_SOURCE_DIR}/USB_DEVICE/
-    ${CMAKE_CURRENT_SOURCE_DIR}/driver_impl
 )
 
 # ===== HAL DRIVERS (for complex protocols) =====
@@ -119,8 +121,8 @@ set(TinyUsb_Includes
     ${TINYUSB_DIR}/src
 )
 
-set(CMSISCORE ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS)
-add_subdirectory(${CMSIS_DSP_DIR}/Source)
+set(CMSISCORE ${CMAKE_SOURCE_DIR}/thirdparty/CMSIS)
+add_subdirectory(${CMSIS_DSP_DIR}/Source ${CMAKE_CURRENT_BINARY_DIR}/cmsis_dsp_stm32f4)
 
 # Driver core sources are NOT added to the static library to avoid linker archive issues
 # where weak startup symbols prevent strong handler definitions from being linked.

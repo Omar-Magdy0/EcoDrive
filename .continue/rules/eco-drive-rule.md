@@ -1,162 +1,263 @@
-# EcoDrive Coding Rules
+# EcoDrive Agent Rules
 
-## Project-Specific Patterns
-
-### 1. Hardware Abstraction Layer (HAL)
-
-#### Driver Naming Convention
-```cpp
-// All platform drivers follow this pattern:
-eldriver_[module]_[function]  // e.g., eldriver_mc3p_init()
-eldriver_[module]_[action]    // e.g., eldriver_gpio_write()
-
-// Use platform detection for host vs embedded
-#ifdef PLATFORM_HOST
-    // Host simulation implementation
-#else
-    // STM32F4 implementation
-#endif
-
-// FOC/SComm/Trap modes share this structure:
-void [Mode]_init()              // Initialize mode
-void [Mode]_onEnter(MCMode prev) // Enter mode
-void [Mode]_onExit()            // Exit mode  
-void [Mode]_pwmLoop()           // High-frequency (PWM rate)
-void [Mode]_xmcLoop()           // Low-frequency (control rate)
-
-// Use config structs with defaults
-struct Config[Feature] {
-    // Members with default values
-};
-ERR config[Feature](Config[Feature] cfg);
-
-// Use q31_t for fixed-point operations
-// Constants use _q31 suffix or q31_ prefix
-q31_t angle_q31 = /* ... */;
-float angle_float = angle_q31 * (M_PI / INT32_MAX);
-
-// Q15 for PWM duty cycles (-1.0 to 1.0)
-int16_t duty_q15; // Q15 format
-// Scale to float: duty_float = duty_q15 / 32767.0f
-
-enum class ERR : uint8_t {
-    OK = 0,
-    ERR_GENERIC,
-    ERR_CONFIG,
-    // ...
-};
-
-ERR function() {
-    if (condition) return ERR::ERR_TYPE;
-    return ERR::OK;
-}
-
-// Standard callback signatures
-void onFrame(void* ctx, uint8_t id, uint8_t* payload, uint8_t payload_len);
-void onError(void* ctx, uint8_t id);
-
-// Register callbacks
-void setOnFrame(void (*callback)(void* ctx, uint8_t id, uint8_t*, uint8_t));
-
-// Use elcore_smem for static allocation
-elcore_smem_t memory_pool;
-elcore_smem_init(&memory_pool, buffer, buffer_size);
-void* ptr = elcore_smem_alloc(&memory_pool, size);
-
-
-// Use elcore_rstream for circular buffers
-elcore_rstream_t stream;
-elcore_rstream_init(&stream, buffer, buffer_size);
-// Write: elcore_rstream_commitWrite()
-// Read: elcore_rstream_releaseRead()
-
-// Use Sil class for HDF5 logging
-Sil sil;
-sil.logStart("filename.h5");
-sil.log(state, input);  // Log frame
-sil.logStop();
-
-// Separate control panel and signal displays
-void drawControlPanel();    // Parameters & controls
-void drawPhaseCurrentPlot(); // Real-time plots (ImPlot)
-void drawMechanical();      // Speed, torque, etc.
-
-
+## Primary Goal
+Implement the requested feature with minimal changes while preserving architecture, determinism, portability, and embedded performance.
 
 ---
 
-## **`.continue/prompts/mcp-rules.md`**
+## Before writing code
 
-```markdown
-# MCP (Motor Control Protocol) Rules
+1. Read all files directly involved.
+2. Understand the architecture before modifying anything.
+3. Never guess APIs or behavior.
+4. Search for existing implementations before creating new ones.
+5. Reuse existing abstractions whenever possible.
 
-## Core Modules
+---
+## Repository Layout
 
-### 1. PMSM Control Core
-**Files**: `application/PmsmControl/PmsmControlCore_*.cpp`
+EcoDrive/
+    application/
+        High-level application logic
 
-**Key Functions**:
-- `Foc_pwmLoop()` - FOC high-frequency (current control)
-- `Foc_xmcLoop()` - FOC low-frequency (speed/position)
-- `SComm_pwmLoop()` - Sensorless commutation
-- `Trap_pwmLoop()` - Trapezoidal control
+    middleware/
+        Communication protocols
+        Serialization
+        DAQ
+        IDV
+        ABF
 
-**Dependencies**:
-- `eldriver_mc3p_*` - ADC reading, PWM output
-- `elmath.h` - Math utilities
-- `CMSIS-DSP` - Clarke/Park transforms
+    core/
+        Platform-independent utilities
 
-### 2. Position/Speed Sensing
-**Files**: `PosDriver.h`, `PosDriver.cpp`, `eldriver_hall.*`
+    platform/
+        Hardware-specific implementations
 
-**Sensor Types**:
-- Hall sensors (`PosDriverType::Hall`)
-- Sensorless (`PosDriverType::Open`)
-- Resolver/Encoder (future)
+            stm32f4/
+                Firmware
 
-### 3. PWM Generation
-**Files**: `eldriver_mc3p.*`
+            host/
+                Linux simulation and testing
 
-**Modes**:
-- **SVM** (Space Vector Modulation) - FOC mode
-- **Trap** (Trapezoidal) - BLDC mode
+    EcoTool/
+        Desktop host application
 
-**Key Functions**:
-- `eldriver_mc3p_write_svm(alpha_q15, beta_q15)` - SVM output
-- `eldriver_mc3p_write_trap(sector, duty_q15)` - Trapezoidal output
+## Design Rules
 
-### 4. Data Acquisition
-**Files**: `DAQStream.*`, `ABFStream.*`, `ScopeStream.h`
+- Prefer extending existing modules over creating new ones.
+- Keep interfaces stable.
+- Avoid unnecessary abstraction.
+- Do not introduce frameworks or large dependencies.
+- Favor compile-time solutions over runtime allocation.
+- Minimize RAM usage.
+- Minimize flash usage.
+- Keep ISR execution deterministic.
+- No hidden dynamic allocation unless explicitly requested.
 
-**Key Functions**:
-- `DAQSession::process()` - Parse IDV frames
-- `ABFStream::process()` - Parse ABF frames
-- `ScopeStream::write()` - Buffer samples
+---
 
-## Critical Data Structures
+## Coding Style
 
-### `PmsmControlTypes.h`
-Contains all type definitions:
-- `MCMode` - Control mode enumeration
-- `ConfigPwm` - PWM configuration
-- `ConfigFocPid` - PID gains for FOC
-- `ConfigOlstup` - Open-loop startup parameters
-- `Pid` - PID controller structure
+- Match existing naming conventions.
+- Match formatting of surrounding code.
+- Avoid duplicate code.
+- Prefer constexpr/static inline when appropriate.
+- Keep functions small and single-purpose.
+- Avoid macros unless already used by the project.
 
-### `Sil` (Host Only)
-Software-in-the-Loop simulation:
-- `state` - Motor state (current, speed, position)
-- `input` - Control input (voltage, PWM)
-- `electrical_solve()` - Electrical model
-- `log()` - HDF5 logging
+---
 
-## Communication Protocols
+## Embedded Rules
 
-### ABF Protocol
-**Files**: `ABFStream.*`
+Assume this project targets STM32 unless stated otherwise.
 
-# Whole Repo digest
-This is under .continue/repomix-output-EcoDrive.xml
+Always consider:
+
+- interrupt safety
+- DMA interaction
+- cache coherency (where applicable)
+- USB throughput
+- memory alignment
+- stack usage
+- timing determinism
+
+Never introduce unnecessary copies.
+
+---
+
+## Architecture Rules
+
+Respect existing layers.
+
+Application
+↓
+Middleware
+↓
+Platform
+↓
+Driver
+
+Never bypass a layer unless explicitly instructed.
+
+Platform-specific code must remain inside platform folders.
+
+---
+
+## Performance Rules
+
+Every change should consider:
+
+- CPU cycles
+- RAM usage
+- Flash size
+- Latency
+- Throughput
+
+Avoid premature optimization, but avoid obvious inefficiencies.
+
+---
+
+## Before Adding Code
+
+Ask:
+
+- Does this already exist?
+- Can I reuse it?
+- Can I simplify instead?
+- Is there a cleaner extension point?
+
+---
+
+## Bug Fix Rules
+
+Fix the root cause.
+
+Never patch symptoms.
+
+Do not silence warnings without understanding them.
+
+---
+
+## Refactoring Rules
+
+Refactor only if it improves:
+
+- readability
+- maintainability
+- correctness
+- performance
+
+Do not perform cosmetic refactors during unrelated tasks.
+
+---
+
+## Documentation
+
+When adding a feature:
+
+- explain the design briefly
+- explain important tradeoffs
+- document public APIs
+
+Avoid redundant comments.
+
+Code should explain itself.
+
+---
+
+## Communication
+
+When finished always report:
+
+1. Files modified.
+2. Reason for each modification.
+3. Possible side effects.
+4. Remaining limitations.
+5. Suggested next improvements.
+
+---
+
+## If Requirements Are Ambiguous
+
+Never invent behavior.
+
+State assumptions clearly.
+
+If a decision affects architecture, stop and ask.
+
+---
+
+## Forbidden
+
+Do not:
+
+- rewrite unrelated files
+- rename APIs unnecessarily
+- change formatting globally
+- introduce dependencies
+- break backward compatibility
+- remove existing functionality unless requested
+
+---
+
+## Preferred Mindset
+
+Act as a senior embedded systems engineer working on a production firmware.
+
+Priorities:
+
+Correctness
+>
+Architecture
+>
+Maintainability
+>
+Performance
+>
+Convenience
 
 
-**Structure**:
+## Repository Understanding
+
+Before making changes:
+
+1. Use the Repomix XML digest to understand project structure. located at repomix.zip.xml
+2. Use the digest to locate candidate files.
+3. Only inspect source files that are relevant to the requested task.
+4. Never scan the repository blindly if the digest provides sufficient indexing.
+5. Treat the digest as read-only documentation of the repository.
+
+## Using the Repomix Digest
+
+The digest is the preferred way to:
+
+- locate classes
+- locate functions
+- understand dependencies
+- understand module ownership
+- identify file locations
+
+Only open full source files after identifying them through the digest.
+
+Do not repeatedly search the repository if the digest already contains sufficient information.
+
+Use the digest for:
+
+- architecture
+- navigation
+- locating code
+- dependency discovery
+
+Do not rely solely on the digest for:
+
+- exact implementations
+- debugging
+- line-level edits
+
+Always inspect the original source before modifying code.
+
+The host and MCU based implementations expose equivalent functionality whenever possible.
+When working on host-only code (silgui, platform/host), relax MCU and real time constraints.
+Changes affecting one platform should consider whether the other implementation also requires modification.
+
+Do not break interface compatibility.

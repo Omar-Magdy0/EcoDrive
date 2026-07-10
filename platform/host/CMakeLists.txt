@@ -5,20 +5,18 @@ cmake_minimum_required(VERSION 3.20)
 set(DEVICE_DEFINITIONS
     USE_FULL_ASSERT
 )
-set(CMSIS_DSP_DIR ${CMAKE_SOURCE_DIR}/platform/host/CMSIS-DSP)
-set(CMSISCORE ${CMAKE_SOURCE_DIR}/platform/stm32f4/Drivers/CMSIS)
-set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/platform/host/imgui)
-set(IMGUIFD_DIR ${CMAKE_SOURCE_DIR}/platform/host/ImGuiFileDialog)
-set(EIGEN_DIR ${CMAKE_SOURCE_DIR}/platform/host/Eigen)
-
-
-
+set(CMSIS_DSP_DIR ${CMAKE_SOURCE_DIR}/thirdparty/CMSIS-DSP)
+set(CMSISCORE ${CMAKE_SOURCE_DIR}/thirdparty/CMSIS)
+set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/thirdparty/imgui)
+set(IMPLOT_DIR ${CMAKE_SOURCE_DIR}/thirdparty/implot)
+set(IMGUIFD_DIR ${CMAKE_SOURCE_DIR}/thirdparty/ImGuiFileDialog)
 
 set(HOST_COMMON_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${IMGUI_DIR}
-    ${IMGUI_DIR}/implot
+    ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
+    ${IMPLOT_DIR}
     ${IMGUIFD_DIR}
     ${EIGEN_DIR}
 )
@@ -29,9 +27,9 @@ set(IMGUI_SRC
     ${IMGUI_DIR}/imgui_widgets.cpp
     ${IMGUI_DIR}/imgui.cpp
     ${IMGUI_DIR}/imgui_demo.cpp
-    ${IMGUI_DIR}/implot/implot_items.cpp
-    ${IMGUI_DIR}/implot/implot.cpp
-    ${IMGUI_DIR}/implot/implot_demo.cpp
+    ${IMPLOT_DIR}/implot_items.cpp
+    ${IMPLOT_DIR}/implot.cpp
+    ${IMPLOT_DIR}/implot_demo.cpp
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
     ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
 
