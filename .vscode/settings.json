@@ -1,5 +1,12 @@
 {
     "C_Cpp.errorSquiggles": "disabled",
+    "editor.tokenColorCustomizations": {
+        "comments": "#8A6A80",
+        "keywords": "#C04D9D",
+        "strings": "#D35F7A",
+        "functions": "#7A5DE8",
+        "types": "#2D8ABF"
+    },
     "files.associations": {
         "core.h": "c",
         "stdint.h": "c",

@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--dependency-file=CMakeFiles/cbordump.dir/link.d CMakeFiles/cbordump.dir/cbordump.c.o -o cbordump  ../../libtinycbor.a -lm

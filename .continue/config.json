@@ -1,0 +1,43 @@
+{
+  "models": [
+    {
+      "title": "DeepSeek Coder",
+      "provider": "deepseek",
+      "model": "deepseek-coder",
+      "apiKey": "sk-73eb6546b40c477ca88e172c317201cc",
+      "apiBase": "https://api.deepseek.com/v4",
+      "contextLength": 128000,
+      "systemMessage": "You are an expert embedded systems and motor control developer working on EcoDrive, a PMSM drive system. Follow the rules in .continue/prompts/"
+    }
+  ],
+  "customCommands": [
+    {
+      "name": "explain",
+      "description": "Explain code in motor control context",
+      "prompt": "Explain this code in the context of our PMSM control system. Reference .continue/prompts/context.md for architecture."
+    },
+    {
+      "name": "refactor",
+      "description": "Refactor following project patterns",
+      "prompt": "Refactor this code following our embedded C++ patterns from .continue/prompts/rules.md"
+    },
+    {
+      "name": "motor",
+      "description": "Analyze motor control implications",
+      "prompt": "Analyze this code for motor control and PMSM implications. Reference .continue/prompts/mcp-rules.md"
+    }
+  ],
+  "contextProviders": [
+    {
+      "name": "codebase",
+      "params": {
+        "directory": ".",
+        "maxFiles": 50
+      }
+    },
+    {
+      "name": "file",
+      "params": {}
+    }
+  ]
+}

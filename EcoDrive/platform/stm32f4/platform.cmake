@@ -1,0 +1,1 @@
+set(CMAKE_TOOLCHAIN_FILE "${THIRDPARTY_DIR}/stm32/f4/toolchain/gcc-arm-none-eabi.cmake")

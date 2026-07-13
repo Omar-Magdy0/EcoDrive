@@ -1,8 +1,0 @@
-numpy
-pyserial
-PyQt6
-pyside6
-sympy
-pycparser
-pyqtgraph
-npy-append-array
