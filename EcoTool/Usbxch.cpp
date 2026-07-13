@@ -12,30 +12,26 @@ bool UsbxchLibusb::connect(const std::string &serial_number,
 {
     disconnect();
 
-    libusb_context *ctx = nullptr;
-    if (libusb_init(&ctx) != 0)
-    {
-        std::cerr << "[USBXCH] libusb_init failed\n";
+    if (libusb_init(&context_) != LIBUSB_SUCCESS)
         return false;
-    }
 
     libusb_device **dev_list = nullptr;
-    ssize_t cnt = libusb_get_device_list(ctx, &dev_list);
-    if (cnt < 0)
+    ssize_t dev_count = libusb_get_device_list(context_, &dev_list);
+    if (dev_count < 0)
     {
-        std::cerr << "[USBXCH] Failed to enumerate devices\n";
-        libusb_exit(ctx);
+        libusb_exit(context_);
+        context_ = nullptr;
         return false;
     }
 
     bool found = false;
-    libusb_device_handle *handle = nullptr;
 
-    for (ssize_t i = 0; i < cnt; ++i)
+    for (ssize_t i = 0; i < dev_count && !found; ++i)
     {
         libusb_device *dev = dev_list[i];
-        libusb_device_descriptor desc{};
-        if (libusb_get_device_descriptor(dev, &desc) != 0)
+
+        libusb_device_descriptor desc;
+        if (libusb_get_device_descriptor(dev, &desc) != LIBUSB_SUCCESS)
             continue;
 
         if (desc.idVendor != vid || desc.idProduct != pid)
@@ -43,58 +39,80 @@ bool UsbxchLibusb::connect(const std::string &serial_number,
 
         if (!serial_number.empty())
         {
-            if (desc.iSerialNumber <= 0)
+            if (desc.iSerialNumber == 0)
                 continue;
 
             libusb_device_handle *tmp = nullptr;
-            if (libusb_open(dev, &tmp) == 0)
-            {
-                char serial[256] = {0};
-                int rc = libusb_get_string_descriptor_ascii(
-                    tmp, desc.iSerialNumber,
-                    reinterpret_cast<unsigned char *>(serial), sizeof(serial) - 1);
-                libusb_close(tmp);
-                if (rc <= 0 || serial_number != std::string(serial))
-                    continue;
-            }
+            if (libusb_open(dev, &tmp) != LIBUSB_SUCCESS)
+                continue;
+
+            char serial[256] = {};
+            int rc = libusb_get_string_descriptor_ascii(
+                tmp,
+                desc.iSerialNumber,
+                reinterpret_cast<unsigned char *>(serial),
+                sizeof(serial));
+
+            libusb_close(tmp);
+
+            if (rc <= 0 || serial != serial_number)
+                continue;
         }
 
-        if (libusb_open(dev, &handle) != 0)
+        if (libusb_open(dev, &handle_) != LIBUSB_SUCCESS)
             continue;
 
-        libusb_set_auto_detach_kernel_driver(handle, 1);
-        if (libusb_claim_interface(handle, interface_number) != 0)
+        libusb_set_auto_detach_kernel_driver(handle_, 1);
+
+        int current_config = 0;
+        libusb_get_configuration(handle_, &current_config);
+
+        libusb_config_descriptor *cfg = nullptr;
+        int rc = libusb_get_active_config_descriptor(dev, &cfg);
+
+        if (rc != LIBUSB_SUCCESS)
         {
-            libusb_close(handle);
-            handle = nullptr;
+            libusb_close(handle_);
+            handle_ = nullptr;
+            continue;
+        }
+
+        rc = libusb_claim_interface(handle_, interface_number);
+
+        libusb_free_config_descriptor(cfg);
+
+        if (rc != LIBUSB_SUCCESS)
+        {
+            libusb_close(handle_);
+            handle_ = nullptr;
             continue;
         }
 
         found = true;
-        break;
     }
 
     libusb_free_device_list(dev_list, 1);
+
     if (!found)
     {
-        libusb_exit(ctx);
+        libusb_exit(context_);
+        context_ = nullptr;
         return false;
     }
 
-    context_ = ctx;
-    handle_ = handle;
     interface_number_ = interface_number;
     bulk_in_ep_ = bulk_in_ep;
     bulk_out_ep_ = bulk_out_ep;
     timeout_ms_ = timeout_ms;
+
     connected_ = true;
     running_ = true;
 
-    io_thread_ = std::thread([this]()
-                             { ioLoop(); });
+    io_thread_ = std::thread([this]
+    {
+        ioLoop();
+    });
 
-    std::cout << "[USBXCH] Connected to " << vid << ":" << pid
-              << " (serial: " << serial_number << ")\n";
     return true;
 }
 

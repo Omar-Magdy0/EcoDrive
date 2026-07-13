@@ -1,5 +1,6 @@
 #pragma once
 #include "IDV.h"
+#include "Codec.h"
 
 namespace DAQ_IDV
 {

@@ -3,6 +3,13 @@ cmake_minimum_required(VERSION 3.10)
 # Project name and version
 project(EcoTool VERSION 1.0.0 LANGUAGES CXX)
 
+set(PLATFORM_NAME "host" CACHE STRING "Target platform (host, stm32f4)")
+set(MIDDLEWARE_DIR ${CMAKE_SOURCE_DIR}/../middleware)
+set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/../thirdparty)
+set(ELCORE_DIR ${CMAKE_SOURCE_DIR}/../core)
+set(ELDRIVER_DIR ${CMAKE_SOURCE_DIR}/../eldriver)
+set(PMSMCONTROL_DIR ${CMAKE_SOURCE_DIR}/PmsmControl)
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,13 +27,13 @@ pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 
 
 file(GLOB_RECURSE MIDDLEWARE_SRC    
-    "../middleware/*.cpp"
-    "../middleware/*.c"
+    ${MIDDLEWARE_DIR}/*.cpp
+    ${MIDDLEWARE_DIR}/*.c
 )
 
 file(GLOB_RECURSE CORE_SRC    
-    "../middleware/*.cpp"
-    "../middleware/*.c"
+    ${ELCORE_DIR}/*.cpp
+    ${ELCORE_DIR}/*.c
 )
 
 # Add executable
@@ -36,6 +43,7 @@ add_executable(${PROJECT_NAME}
     Usbxch.cpp
     Serial.hpp
     ${MIDDLEWARE_SRC}
+    ${CORE_SRC}
 )
 
 find_package(PkgConfig REQUIRED)
@@ -54,8 +62,8 @@ target_link_libraries(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${LIBUSB_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    "../middleware"
-    "../core"
+    ${MIDDLEWARE_DIR}
+    ${ELCORE_DIR}
 )
 
 # Compiler flags (optional - remove if not needed)

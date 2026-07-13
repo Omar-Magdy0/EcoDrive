@@ -2,29 +2,53 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Release",
+            "label": "EcoDrive: MCU Release",
             "type": "shell",
-            "command": "cd build  && cmake .. -DCMAKE_BUILD_TYPE=Release && make -j4"
+            "command": "cd EcoDrive/build  && cmake .. -DCMAKE_BUILD_TYPE=Release -DPLATFORM_NAME=stm32f4 && make -j4",
+            "group": "build",
+            "problemMatcher": ["$gcc"] 
         },
         {
-            "label": "Debug",
+            "label": "EcoDrive: MCU Debug",
             "type": "shell",
-            "command": "cd build  && cmake .. -DCMAKE_BUILD_TYPE=Debug -DPLATFORM_NAME=stm32f4 && make -j4"
+            "command": "cd EcoDrive/build  && cmake .. -DCMAKE_BUILD_TYPE=Debug -DPLATFORM_NAME=stm32f4 && make -j4",
+            "group": "build",
+            "problemMatcher": ["$gcc"] 
         },
         {   
-            "label": "Clean",
+            "label": "EcoDrive: Clean",
             "type": "shell", 
-            "command": "cd build  && rm -rf *"
+            "command": "cd EcoDrive/build  && rm -rf *",
+            "group": "build",
+            "problemMatcher": ["$gcc"] 
         },
         {
-            "label": "Host Debug",
+            "label": "EcoDrive: Host Debug",
             "type": "shell",
-            "command": "cd build  && cmake .. -DCMAKE_BUILD_TYPE=Debug -DPLATFORM_NAME=host && make -j4"
+            "command": "cd EcoDrive/build  && cmake .. -DCMAKE_BUILD_TYPE=Debug -DPLATFORM_NAME=host && make -j4",
+            "group": "build",
+            "problemMatcher": ["$gcc"] 
         },
-        {   
-            "label": "CMake Only",
-            "type": "shell", 
-            "command": "cd build  && cmake .."
+       // EcoTool
+        {
+            "label": "EcoTool: Debug",
+            "type": "shell",
+            "command": "cd EcoTool/build && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j4",
+            "group": "build",
+            "problemMatcher": ["$gcc"] 
+        },
+        {
+            "label": "EcoTool: Release",
+            "type": "shell",
+            "command": "cd EcoTool/build && cmake .. -DCMAKE_BUILD_TYPE=Release && make -j4",
+            "group": "build",
+            "problemMatcher": ["$gcc"] 
+        },
+        {
+            "label": "EcoTool: Clean",
+            "type": "shell",
+            "command": "cd EcoTool/build && rm -rf *",
+            "problemMatcher": ["$gcc"] 
         },
         {
             "label": "Virtual PORTS",
@@ -32,23 +56,5 @@
             "command": "sudo socat -d -d pty,link=/dev/ttyACM_CDC0,raw,echo=0,mode=666 pty,link=/dev/ttyACM_CDC1,raw,echo=0,mode=666",
             "isBackground": true
         },
-        {
-            "label": "EcoTool Clean",
-            "type": "shell",
-            "command": "cd EcoTool/build && rm -rf *",
-            "isBackground": true
-        },
-        {
-            "label": "EcoTool Build Debug",
-            "type": "shell",
-            "command": "cd EcoTool/build && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j4",
-            "isBackground": true
-        },
-        {
-            "label": "EcoTool Build Release",
-            "type": "shell",
-            "command": "cd EcoTool/build && cmake .. -DCMAKE_BUILD_TYPE=Release && make -j4",
-            "isBackground": true
-        }
     ]
 }

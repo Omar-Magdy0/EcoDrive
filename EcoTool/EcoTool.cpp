@@ -35,6 +35,8 @@ ABFStream abfStream = ABFStream(abf_rx_buf, sizeof(abf_rx_buf), NULL, onFrame, o
 
 static inline void onFrame(void *ctx, uint8_t id, uint8_t *payload, uint8_t payload_len)
 {
+    std::cout << "ID : " << id << std::endl;
+    print_buffer(payload, payload_len);
     daq->process(payload, payload_len);
 }
 static inline void onError(void *ctx, uint8_t id)
@@ -46,7 +48,7 @@ using Clock = std::chrono::steady_clock;
 int main()
 {
     auto nextEvent = Clock::now() + std::chrono::seconds(5);
-    usb = new UsbxchTcp;
+    usb = new UsbxchLibusb;
     daq = new DAQSessionAPP(abfStream, *usb, idv_rx_buf, sizeof(idv_rx_buf));
     while(!usb->connect(
         "",     // serial number (empty = first matching device)
