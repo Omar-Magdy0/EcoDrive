@@ -4,11 +4,8 @@ cmake_minimum_required(VERSION 3.10)
 project(EcoTool VERSION 1.0.0 LANGUAGES CXX)
 
 set(PLATFORM_NAME "host" CACHE STRING "Target platform (host, stm32f4)")
-set(MIDDLEWARE_DIR ${CMAKE_SOURCE_DIR}/../middleware)
 set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/../thirdparty)
-set(ELCORE_DIR ${CMAKE_SOURCE_DIR}/../core)
-set(ELDRIVER_DIR ${CMAKE_SOURCE_DIR}/../eldriver)
-set(PMSMCONTROL_DIR ${CMAKE_SOURCE_DIR}/PmsmControl)
+set(ECOLIB_DIR ${CMAKE_SOURCE_DIR}/../ecolib)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -27,13 +24,13 @@ pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 
 
 file(GLOB_RECURSE MIDDLEWARE_SRC    
-    ${MIDDLEWARE_DIR}/*.cpp
-    ${MIDDLEWARE_DIR}/*.c
+    ${ECOLIB_DIR}/middleware/*.cpp
+    ${ECOLIB_DIR}/middleware/*.c
 )
 
 file(GLOB_RECURSE CORE_SRC    
-    ${ELCORE_DIR}/*.cpp
-    ${ELCORE_DIR}/*.c
+    ${ECOLIB}/el/*.cpp
+    ${ECOLIB}/el/*.c
 )
 
 # Add executable
@@ -62,8 +59,8 @@ target_link_libraries(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${LIBUSB_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${MIDDLEWARE_DIR}
-    ${ELCORE_DIR}
+    ${ECOLIB_DIR}/middleware
+    ${ECOLIB}/el
 )
 
 # Compiler flags (optional - remove if not needed)

@@ -95,7 +95,7 @@ void PmsmControlCore::SComm_xmcLoop()
         case SComm::IDSubStage::Active_Sampling:
             if (scomm.samples_counter == 0)
             {
-                scomm.model.R = ELDRIVER_MC3P_VS_TO_FLOAT(scomm.dc_vinj_q31) / ELDRIVER_MC3P_CS_TO_FLOAT((scomm.accumulate0 >> PmsmControlConf::OVERSAMPLE_BITS));
+                scomm.model.R = EL_MC3P_VS_TO_FLOAT(scomm.dc_vinj_q31) / EL_MC3P_CS_TO_FLOAT((scomm.accumulate0 >> PmsmControlConf::OVERSAMPLE_BITS));
                 scomm.idstage = SComm::IDStage::LD_ID;
                 scomm.idsub = SComm::IDSubStage::ESettle_Start;
             }

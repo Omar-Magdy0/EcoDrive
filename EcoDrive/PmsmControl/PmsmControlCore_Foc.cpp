@@ -137,5 +137,5 @@ void PmsmControlCore::Foc_pwmLoop()
     arm_inv_park_q31(foc.state.Vd_q31, foc.state.Vq_q31, &valpha_q31, &vbeta_q31, sin, cos);
     dalpha_q15 = (valpha_q31) / (state.Vbus_q31 >> 15);
     dbeta_q15 = (vbeta_q31)/ (state.Vbus_q31 >> 15);
-    eldriver_mc3p_write_svm(&mc3p, dalpha_q15, dbeta_q15);
+    el_mc3p_write_svm(&mc3p, dalpha_q15, dbeta_q15);
 }

@@ -262,19 +262,19 @@ typedef void (*pDAC_CallbackTypeDef)(DAC_HandleTypeDef *hdac);
 
 /** @brief Enable the DAC channel.
   * @param  __HANDLE__ specifies the DAC handle.
-  * @param  __DAC_Channel__ specifies the DAC channel
+  * @param  __DAC_Channel_ specifies the DAC channel
   * @retval None
   */
-#define __HAL_DAC_ENABLE(__HANDLE__, __DAC_Channel__) \
-  ((__HANDLE__)->Instance->CR |=  (DAC_CR_EN1 << ((__DAC_Channel__) & 0x10UL)))
+#define __HAL_DAC_ENABLE(__HANDLE__, __DAC_Channel_) \
+  ((__HANDLE__)->Instance->CR |=  (DAC_CR_EN1 << ((__DAC_Channel_) & 0x10UL)))
 
 /** @brief Disable the DAC channel.
   * @param  __HANDLE__ specifies the DAC handle
-  * @param  __DAC_Channel__ specifies the DAC channel.
+  * @param  __DAC_Channel_ specifies the DAC channel.
   * @retval None
   */
-#define __HAL_DAC_DISABLE(__HANDLE__, __DAC_Channel__) \
-  ((__HANDLE__)->Instance->CR &=  ~(DAC_CR_EN1 << ((__DAC_Channel__) & 0x10UL)))
+#define __HAL_DAC_DISABLE(__HANDLE__, __DAC_Channel_) \
+  ((__HANDLE__)->Instance->CR &=  ~(DAC_CR_EN1 << ((__DAC_Channel_) & 0x10UL)))
 
 /** @brief Set DHR12R1 alignment.
   * @param  __ALIGNMENT__ specifies the DAC alignment

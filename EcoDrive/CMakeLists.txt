@@ -3,10 +3,8 @@ cmake_minimum_required(VERSION 3.20)
 
 # Select target platform
 set(PLATFORM_NAME "host" CACHE STRING "Target platform (host, stm32f4)")
-set(MIDDLEWARE_DIR ${CMAKE_SOURCE_DIR}/../middleware)
+set(ECOLIB_DIR ${CMAKE_SOURCE_DIR}/../ecolib)
 set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/../thirdparty)
-set(ELCORE_DIR ${CMAKE_SOURCE_DIR}/../core)
-set(ELDRIVER_DIR ${CMAKE_SOURCE_DIR}/../eldriver)
 set(PMSMCONTROL_DIR ${CMAKE_SOURCE_DIR}/PmsmControl)
 
 ####platform specific settings
@@ -46,8 +44,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # Include directories
 include_directories(
     ${CMAKE_SOURCE_DIR}
-    ${ELCORE_DIR}
-    ${MIDDLEWARE_DIR}
+    ${ECOLIB_DIR}
+    ${ECOLIB_DIR}/middleware
     ${PMSMCONTROL_DIR}
 )
 
@@ -61,8 +59,8 @@ message(STATUS "LIBRARIES TO LINK: ${PLATFORM_LIB}")
 include_directories(${PLATFORM_INCLUDES})
 
 file(GLOB_RECURSE MIDDLEWARE_SRC    
-    ${MIDDLEWARE_DIR}/*.cpp
-    ${MIDDLEWARE_DIR}/*.c
+    ${ECOLIB_DIR}/middleware/*.cpp
+    ${ECOLIB_DIR}/middleware/*.c
 )
 
 
@@ -79,8 +77,8 @@ set(APPLICATION_SRC
 
 
 file(GLOB_RECURSE CORE_SRC
-    ${ELCORE_DIR}/*.cpp
-    ${ELCORE_DIR}/*.c
+    ${ECOLIB_DIR}/el/*.cpp
+    ${ECOLIB_DIR}/el/*.c
 )
 
 

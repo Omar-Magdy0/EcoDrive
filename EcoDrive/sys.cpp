@@ -7,8 +7,8 @@
 void Sys::init()
 {   
     platform_init();
-    eldriver_usbxch_init(&usbxch);
-    eldriver_core_init(&core);
+    el_usbxch_init(&usbxch);
+    el_core_init(&core);
     //enable motor control function
     
     //Control modes configuration 
@@ -41,8 +41,8 @@ void Sys::init()
     err = pmsmC1.setSetpoint(300.0*(2*M_PI/60.0), PmsmControlTypes::MechMode::OpenSpeed);
     int madsad = sizeof(PmsmControl);
     
-    DAQChannel channels[9];
-    DAQStream streams[3];
+    daq::Channel channels[9];
+    daq::Stream streams[3];
     constexpr char chan[] = "CHAN";
     constexpr char str[] = "STR";
     
@@ -67,11 +67,11 @@ void Sys::init()
     daq.streams_num = 3;
 
     while (true) {
-        eldriver_usbxch_update(&usbxch);
-        uint16_t read_len = eldriver_usbxch_read(&usbxch, abfStream_rx_buffer, sizeof(abfStream_rx_buffer));
+        el_usbxch_update(&usbxch);
+        uint16_t read_len = el_usbxch_read(&usbxch, abfStream_rx_buffer, sizeof(abfStream_rx_buffer));
         abfStream.process(abfStream_rx_buffer, read_len);
         daq.process(nullptr, 0);
-        eldriver_delay(1);
+        el_delay(1);
         #ifdef PLATFORM_HOST
             gui_loop();
         #endif

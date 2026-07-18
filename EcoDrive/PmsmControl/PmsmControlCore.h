@@ -1,12 +1,12 @@
 
 #include "arm_math.h"
-#include "elcore.h"
-#include "eldriver_mc3p.h"
-#include "eldriver_conf.h"
-#include "eldriver_hall.h"
-#include "eldriver_core.h"
+#include "el/core.h"
+#include "el_mc3p.h"
+#include "eld_conf.h"
+#include "el_hall.h"
+#include "el_core.h"
 #include "PosDriver.h"
-#include "elmath.h"
+#include "el/math.h"
 #include <array>
 #include <cstdint>
 #include <cstddef>
@@ -15,7 +15,7 @@
 
 #define READ_VOLATILE(x) (*(volatile typeof(x) *)&(x))
 
-#ifdef ELDRIVER_HALL1_ENABLED
+#ifdef EL_HALL1_ENABLED
 #define HALL_ENABLED
 #endif
 class PmsmControl;
@@ -29,28 +29,28 @@ class PmsmControlCore
 
     #define RPM_TO_RPS(rpm)(rpm * (2*M_PI/60.0))
     volatile uint32_t xTicks;
-    const uint32_t xTicks_period_us = (uint32_t)ELDRIVER_XMC3P_TICKPERIOD_US;
+    const uint32_t xTicks_period_us = (uint32_t)EL_XMC3P_TICKPERIOD_US;
     volatile uint32_t pTicks{};                                                       /** PWM period in ticks (timer ticks). */
     uint32_t pwm_freq_hz;                                               /** PWM carrier frequency (Hz). */
     uint32_t pTick_period_ns{ (uint32_t)(1'000'000'000.0f / static_cast<float>(10000)) }; /** PWM tick period (us). */
-    float voltage_q31_to_float(q31_t voltage_q31) const { return ELDRIVER_MC3P_VS_TO_FLOAT(voltage_q31); }
-    float current_q31_to_float(q31_t current_q31) const { return ELDRIVER_MC3P_CS_TO_FLOAT(current_q31); }
+    float voltage_q31_to_float(q31_t voltage_q31) const { return EL_MC3P_VS_TO_FLOAT(voltage_q31); }
+    float current_q31_to_float(q31_t current_q31) const { return EL_MC3P_CS_TO_FLOAT(current_q31); }
     float angle_q31_to_float(q31_t eAngle_q31) const { return (float)eAngle_q31 * (M_PI / INT32_MAX);}
     inline uint32_t xTicks_to_us(uint32_t ticks)const{return ticks*xTicks_period_us;};
     inline uint32_t xTicks_to_ms(uint32_t ticks)const{return xTicks_to_us(ticks)/1000;};
     inline int32_t rps_to_rpxt(float rps){    
-        return  (int32_t)((rps) * (ELDRIVER_XMC3P_TICKPERIOD_US / 1000000.0f / PI) * (1<<24));
+        return  (int32_t)((rps) * (EL_XMC3P_TICKPERIOD_US / 1000000.0f / PI) * (1<<24));
     }
     inline float rpxt_to_rps(int32_t rpxt){
-        return ((float)rpxt * ((M_PI*1000000.0f)/ELDRIVER_XMC3P_TICKPERIOD_US))/(1<<24);
+        return ((float)rpxt * ((M_PI*1000000.0f)/EL_XMC3P_TICKPERIOD_US))/(1<<24);
     }
     // Owned hardware elements
-    eldriver_mc3p_handle_t mc3p{}; /** Underlying MC3P driver instance. */
+    el_mc3p_handle_t mc3p{}; /** Underlying MC3P driver instance. */
     PosDriver posDriver;
     union
     {
-        eldriver_mc3p_svm_data_t svm;
-        eldriver_mc3p_trap_data_t trap;
+        el_mc3p_svm_data_t svm;
+        el_mc3p_trap_data_t trap;
     } mc3p_sync_meas{};
 
     // Control variables
