@@ -1,7 +1,8 @@
 #pragma once
 #include <stdint.h>
 #include <assert.h>
-
+#include <etl/span.h>
+#ifdef __cplusplus
 class UnitTest;
 namespace el
 {
@@ -9,28 +10,28 @@ namespace el
     class ring_fast
     {
         friend UnitTest;
-        uint16_t size;
+        uint16_t capacity_;
         uint16_t mask_;
 
     public:
-        ring_fast(T *buffer, uint16_t size_) : size(size_), head_(0), tail_(0), buffer_(buffer)
+        ring_fast(T *buffer, uint16_t size_) : capacity_(size_), head_(0), tail_(0), buffer_(buffer)
         {
-            assert(size > 0);
-            assert((size & (size - 1)) == 0);
-            assert(size <= 32768);
-            mask_ = size - 1;
+            assert(capacity_ > 0);
+            assert((capacity_ & (capacity_ - 1)) == 0);
+            assert(capacity_ <= 32768);
+            mask_ = capacity_ - 1;
+        }
+        ring_fast(etl::span<T> buffer) : capacity_(buffer.size()), head_(0), tail_(0), buffer_(buffer.data())
+        {
+            assert(capacity_ > 0);
+            assert((capacity_ & (capacity_ - 1)) == 0);
+            assert(capacity_ <= 32768);
+            mask_ = capacity_ - 1;
         }
 
         bool isPowerOfTwo(uint16_t x)
         {
             return x && ((x & (x - 1)) == 0);
-        }
-
-        bool isPowerOfTwoAssert(uint16_t x)
-        {
-            bool s = x && ((x & (x - 1)) == 0);
-            assert(s);
-            return s;
         }
 
         // Push element - ISR safe (single producer)
@@ -73,30 +74,30 @@ namespace el
             item = buffer_[tail_];
             return true;
         }
-        bool peekRaw(T &item, uint16_t idx) const
+        bool peek(T &item, uint16_t idx) const
         {
-            if (idx > size)
+            if (idx > capacity_)
                 return false;
             item = buffer_[idx];
             return true;
         }
         bool advance(uint16_t n)
         {
-            if (n > count())
+            if (n > size())
                 return false;
             tail_ = (tail_ + n) & mask_;
             return true;
         }
         bool distanceFromTail(int16_t idx, uint16_t &distance)
         {
-            if (idx >= size)
+            if (idx >= capacity_)
                 return false;
 
             // Distance from tail to idx (modulo buffer size)
             uint32_t d = (idx - tail_) & mask_;
 
             // Is idx inside the valid FIFO contents?
-            if (d >= count())
+            if (d >= size())
                 return false;
 
             distance = d;
@@ -111,21 +112,21 @@ namespace el
 
         bool empty() const { return head_ == tail_; }
         bool full() const { return ((head_ + 1) & mask_) == tail_; }
-        uint16_t free() const { return (capacity() - count()); }
-        uint16_t count() const { return (head_ - tail_) & mask_; }
-        uint16_t capacity() const { return size - 1; }
+        uint16_t free() const { return (capacity() - size()); }
+        uint16_t size() const { return (head_ - tail_) & mask_; }
+        uint16_t capacity() const { return capacity_ - 1; }
 
         // Multibyte Reserve/Commit pattern
         //  Reserve space for writing 'count' elements.
         // Returns false if insufficient space.
-        bool reserveWrite(
+        bool write_reserve(
             uint16_t count,
             T **writeptr1,
             uint16_t *cont1,
             T **writeptr2,
             uint16_t *cont2)
         {
-            if (count > (capacity() - this->count()))
+            if (count > (capacity() - this->size()))
             {
                 *writeptr1 = nullptr;
                 *writeptr2 = nullptr;
@@ -158,17 +159,17 @@ namespace el
 
             return true;
         }
-        void commitWrite(uint16_t count)
+        void write_commit(uint16_t count)
         {
             head_ = (head_ + count) & mask_;
         }
-        bool peekRead(
+        bool read_reserve(
             T **readptr1,
             uint16_t *cont1,
             T **readptr2,
             uint16_t *cont2)
         {
-            uint16_t cnt = this->count();
+            uint16_t cnt = this->size();
 
             if (cnt == 0)
             {
@@ -182,7 +183,7 @@ namespace el
             uint16_t cont_space;
 
             if (tail_ >= head_)
-                cont_space = size - tail_;
+                cont_space = capacity_ - tail_;
             else
                 cont_space = head_ - tail_;
 
@@ -203,7 +204,7 @@ namespace el
 
             return true;
         }
-        void releaseRead(uint16_t count)
+        void read_commit(uint16_t count)
         {
             tail_ = (tail_ + count) & mask_;
         }
@@ -211,8 +212,13 @@ namespace el
         uint16_t head() const { return head_; }
 
     private:
-        T *buffer_;
         volatile uint16_t head_;
         volatile uint16_t tail_;
+        T *buffer_;
     };
 }
+
+#else
+
+
+#endif

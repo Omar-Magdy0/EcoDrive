@@ -67,20 +67,6 @@ uint8_t el_uart1_write(el_uart_handle_t *handle, const uint8_t* data, uint8_t le
 uint16_t el_uart1_read(el_uart_handle_t *handle, uint8_t* data, uint8_t len);
 
 /**
- * @brief  Returns RX stream statistics.
- * @param  handle: Pointer to the UART handle.
- * @retval el_ring_stats_t: Statistics structure.
- */
-el_ring_stats_t el_uart1_rx_stats(el_uart_handle_t *handle);
-
-/**
- * @brief  Returns TX stream statistics.
- * @param  handle: Pointer to the UART handle.
- * @retval el_ring_stats_t: Statistics structure.
- */
-el_ring_stats_t el_uart1_tx_stats(el_uart_handle_t *handle);
-
-/**
  * @brief  Resets UART1 statistics.
  * @param  handle: Pointer to the UART handle.
  */

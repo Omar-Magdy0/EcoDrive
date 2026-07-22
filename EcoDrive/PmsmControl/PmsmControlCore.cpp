@@ -2,7 +2,7 @@
 
 using namespace PmsmControlTypes;
 
-void PmsmControlCore::olstup_lut_run(Olstup &stup, q31_t &ec_sp_q31, float &rps)
+void PmsmControlCore::olstup_lut(Olstup &stup, q31_t &ec_sp_q31, float &rps)
 {
     // Interpolate angular velocity and duty cycle and do appropiate updates
     float et_ms = (xTicks_to_ms(xTicks) - stup.time_start_ms);

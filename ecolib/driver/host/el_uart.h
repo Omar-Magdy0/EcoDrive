@@ -29,9 +29,6 @@ typedef struct{
 void el_uart1_init(el_uart_handle_t *handle);
 uint8_t el_uart1_write(el_uart_handle_t *handle, const uint8_t* data, uint8_t len);
 uint16_t el_uart1_read(el_uart_handle_t *handle, uint8_t* data, uint8_t len);
-el_ring_stats_t el_uart1_rx_stats(el_uart_handle_t *handle);
-el_ring_stats_t el_uart1_tx_stats(el_uart_handle_t *handle);
-void el_uart1_resetStats(el_uart_handle_t *handle);
 
 
 #ifdef __cplusplus

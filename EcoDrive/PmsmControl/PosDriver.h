@@ -2,7 +2,7 @@
 #include "eld_conf.h"
 #include "el_hall.h"
 #include "PmsmControlTypes.h"
-#include "el/math.h"
+#include "math/math.h"
 #include "el_mc3p.h"
 #include <cstdint>
 

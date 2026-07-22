@@ -33,7 +33,7 @@ public:
         return ss.str();
     }
 
-    static std::string toStringHex(const uint8_t* data, size_t length)
+    static std::string toStringHex(const uint8_t *data, size_t length)
     {
         std::ostringstream oss;
 
@@ -113,7 +113,7 @@ public:
         ss
             << "Head : " << fifo.head() << '\n'
             << "Tail : " << fifo.tail() << '\n'
-            << "Count: " << fifo.count() << '\n';
+            << "Count: " << fifo.size() << '\n';
 
         ss << "[";
 
@@ -122,7 +122,7 @@ public:
         while (idx != fifo.head())
         {
             T value;
-            fifo.peekRaw(value, idx);
+            fifo.peek(value, idx);
 
             ss << toString(value);
 
@@ -149,7 +149,7 @@ public:
         while (idx != fifo.head_)
         {
             T value;
-            fifo.peekRaw(value, idx);
+            fifo.peek(value, idx);
 
             const uint8_t *bytes =
                 reinterpret_cast<const uint8_t *>(&value);
@@ -196,5 +196,27 @@ public:
             return false;
 
         return std::equal(buf1, buf1 + size1, buf2);
+    }
+
+    static bool ComparePrefix(
+        const std::vector<std::vector<int16_t>> &expected,
+        const std::vector<std::vector<int16_t>> &actual)
+    {
+        if (expected.size() != actual.size())
+            return false;
+
+        for (size_t ch = 0; ch < expected.size(); ++ch)
+        {
+            if (actual[ch].size() > expected[ch].size())
+                return false;
+
+            for (size_t i = 0; i < actual[ch].size(); ++i)
+            {
+                if (expected[ch][i] != actual[ch][i])
+                    return false;
+            }
+        }
+
+        return true;
     }
 };

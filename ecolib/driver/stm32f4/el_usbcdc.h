@@ -40,12 +40,6 @@ uint8_t el_usbcdc_write(el_uart_handle_t *handle, uint8_t* data, uint8_t len);
  */
 uint16_t el_usbcdc_read(el_uart_handle_t *handle, uint8_t* data, uint8_t len);
 
-/** @brief Returns USB CDC receive stream statistics. */
-el_ring_stats_t el_usbcdc_rx_stats(el_uart_handle_t *handle);
-
-/** @brief Returns USB CDC transmit stream statistics. */
-el_ring_stats_t el_usbcdc_tx_stats(el_uart_handle_t *handle);
-
 /** @brief Resets all USB CDC traffic statistics. */
 void el_usbcdc_resetStats(el_uart_handle_t *handle);
 

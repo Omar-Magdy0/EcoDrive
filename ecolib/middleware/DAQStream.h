@@ -1,7 +1,7 @@
 #pragma once
 #include "IDV.h"
 #include "DAQCodec.h"
-
+#include <etl/span.h>
 namespace daq
 {
     enum class ID : uint8_t
@@ -40,10 +40,8 @@ namespace daq
         friend Stream;
         friend Session;
         uint8_t id;
-
     public:
         const char *Meta;
-        uint8_t meta_size = 0;
         float scale;
         float offset;
         idv::Err serialize(idv::Writer &writer, uint8_t parent_id);
@@ -55,12 +53,11 @@ namespace daq
         int32_t ticks;
         int32_t sample_time_ns;
         uint8_t id;
-
-    public:
+        etl::span<Channel> channels;
         const char *Meta;
-        uint8_t meta_size = 0;
-        Channel *channels;
-        uint8_t channels_num = 0;
+        Stream() = delete;
+    public:
+        Stream(etl::span<Channel> channels_, const char *Meta_): channels(channels_), Meta(Meta_){}
         idv::Err sample(int16_t *samples);
         idv::Err serialize(idv::Writer &writer, uint8_t parent_id);
     };
@@ -71,13 +68,12 @@ namespace daq
         idv::Writer writer;
         idv::Reader reader;
         uint8_t id;
-
-    public:
         const char *Meta;
-        uint8_t meta_size = 0;
-        Stream *streams;
-        uint8_t streams_num = 0;
-        Session(uint8_t *write_buffer, uint16_t buffer_capacity) : writer(write_buffer, buffer_capacity) {}
+        etl::span<Stream> streams;
+        Session() = delete;
+    public:
+        Session(const char *Meta_, etl::span<uint8_t> writer_buffer) : writer(writer_buffer), Meta(Meta_){}
+        void registerStreams(etl::span<Stream> streams_){streams = streams_;}
         virtual uint8_t send() = 0;
         virtual uint8_t on_mark(MARKER mark, bool entry) { return 0; };
         virtual uint8_t on_field(ID field, idv::Reader &r) { return 0; };

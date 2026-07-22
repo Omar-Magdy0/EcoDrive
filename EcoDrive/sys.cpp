@@ -1,18 +1,14 @@
 #include "sys.h"
 
-
-
-
-
 void Sys::init()
-{   
+{
     platform_init();
     el_usbxch_init(&usbxch);
     el_core_init(&core);
-    //enable motor control function
-    
-    //Control modes configuration 
-    //Open loop startup sequence
+    // enable motor control function
+
+    // Control modes configuration
+    // Open loop startup sequence
     constexpr uint16_t time[PmsmControl::olstup_tb_size()] = {0, 1000, 3000, 5000, 7000, 9000};
     constexpr float EC_FOC[PmsmControl::olstup_tb_size()] = {3, 5, 7, 9, 10.5, 13};
     constexpr float RPM[PmsmControl::olstup_tb_size()] = {0, 100, 200, 300, 400, 500};
@@ -32,48 +28,54 @@ void Sys::init()
     scomm_cfg.dc_vinj = 1;
     scomm_cfg.hfi_N = 20;
     scomm_cfg.hfi_vinj = 12;
-    err = pmsmC1.configControlMode(PmsmControlTypes::MCMode::Idle, PmsmControlTypes::MechMode::OpenSpeed);while(err != PmsmControlTypes::ERR::OK);
-    err = pmsmC1.configPwm(pwm_cfg);while(err != PmsmControlTypes::ERR::OK);
-    err = pmsmC1.configFocOlstup(foc_olstup_cfg);while(err != PmsmControlTypes::ERR::OK);
-    err = pmsmC1.configSComm(scomm_cfg);while(err != PmsmControlTypes::ERR::OK);
+    err = pmsmC1.configControlMode(PmsmControlTypes::MCMode::Idle, PmsmControlTypes::MechMode::OpenSpeed);
+    while (err != PmsmControlTypes::ERR::OK)
+        ;
+    err = pmsmC1.configPwm(pwm_cfg);
+    while (err != PmsmControlTypes::ERR::OK)
+        ;
+    err = pmsmC1.configFocOlstup(foc_olstup_cfg);
+    while (err != PmsmControlTypes::ERR::OK)
+        ;
+    err = pmsmC1.configSComm(scomm_cfg);
+    while (err != PmsmControlTypes::ERR::OK)
+        ;
     pmsmC1.init();
-    err = pmsmC1.configControlMode(PmsmControlTypes::MCMode::SComm, PmsmControlTypes::MechMode::OpenSpeed);while(err != PmsmControlTypes::ERR::OK);
-    err = pmsmC1.setSetpoint(300.0*(2*M_PI/60.0), PmsmControlTypes::MechMode::OpenSpeed);
-    int madsad = sizeof(PmsmControl);
-    
+    err = pmsmC1.configControlMode(PmsmControlTypes::MCMode::SComm, PmsmControlTypes::MechMode::OpenSpeed);
+    while (err != PmsmControlTypes::ERR::OK)
+        ;
+    err = pmsmC1.setSetpoint(300.0 * (2 * M_PI / 60.0), PmsmControlTypes::MechMode::OpenSpeed);
+
     daq::Channel channels[9];
-    daq::Stream streams[3];
+
     constexpr char chan[] = "CHAN";
     constexpr char str[] = "STR";
-    
-    for(int i = 0; i < 9; i++)
+
+    // Initialize channels
+    for (int i = 0; i < 9; ++i)
     {
         channels[i].Meta = chan;
-        channels[i].meta_size = 4;
-        channels[i].scale = i;
-        channels[i].offset = -i;
+        channels[i].scale = static_cast<float>(i);
+        channels[i].offset = static_cast<float>(-i);
     }
 
-    
-    for(int i = 0; i < 3; i++)
+    // Construct streams
+    daq::Stream streams[] =
+        {
+            {etl::span<daq::Channel>(&channels[0], 3), str},
+            {etl::span<daq::Channel>(&channels[3], 3), str},
+            {etl::span<daq::Channel>(&channels[6], 3), str}};
+
+    daq_session.registerStreams(streams);
+    while (true)
     {
-        streams[i].channels = channels + i*3;
-        streams[i].channels_num = 3;
-        streams[i].Meta = str;
-        streams[i].meta_size = 3;    
-    }
-
-    daq.streams = streams;
-    daq.streams_num = 3;
-
-    while (true) {
         el_usbxch_update(&usbxch);
         uint16_t read_len = el_usbxch_read(&usbxch, abfStream_rx_buffer, sizeof(abfStream_rx_buffer));
         abfStream.process(abfStream_rx_buffer, read_len);
-        daq.process(nullptr, 0);
+        daq_session.process(nullptr, 0);
         el_delay(1);
-        #ifdef PLATFORM_HOST
-            gui_loop();
-        #endif
+#ifdef PLATFORM_HOST
+        gui_loop();
+#endif
     }
 }

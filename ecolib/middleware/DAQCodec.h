@@ -3,17 +3,15 @@
 #include <stdint.h>
 #include <assert.h>
 #include "../el/ring.h"
-
-#define CODEC_READER
-
-#ifdef CODEC_READER
-#include <vector>
-#endif
-
+#include <etl/vector.h>
+#include <etl/span.h>
+class CodecTest;
 namespace daq::codec
 {
+    class Reader;
+    class Writer;
+
     constexpr uint8_t CONTROL_RESERVE = 16; // Escape + Control Byte + 14 control bytes possible
-    constexpr uint8_t CONTROL_FIRST = 248;
     constexpr uint8_t VIRTUAL_BITS_START = 240;
     constexpr uint8_t VIRTUAL_BITS_END = 247;
 
@@ -26,6 +24,10 @@ namespace daq::codec
     {
         OK,
         RESYNCDOD_BAD,
+        NEED_SYNC,
+        FAULT,
+        BAD_BLOCK,
+        BLOCK_FULL
     };
 
     enum class Flags : uint8_t
@@ -36,6 +38,7 @@ namespace daq::codec
     enum class ControlCode : uint8_t
     {
         RESYNCDOD = 0xFF,
+        FLUSH = 0xFE,
     };
 
     struct ChannelState
@@ -51,29 +54,30 @@ namespace daq::codec
 
     enum class StreamType : uint8_t
     {
-        CONTROL = 0,
-        SAMPLE = 1
+        Control = 0,
+        Sample = 1
     };
-
+    
     class Writer
     {
         friend UnitTest;
-        ChannelState *ccs;
+        friend CodecTest;
+        etl::span<ChannelState> ccs;
+        uint32_t &sample_counter;
         el::ring_fast<uint8_t> stream;
         el::ring_fast<ControlMark> marks;
-
-        uint32_t &sample_counter;
         uint8_t samples_till_sync = 0;
-        uint8_t channels;
         uint8_t sync_period = 64;
         uint8_t reserve;
         uint8_t flags;
-        void internal_flush()
+        Writer() = delete;
+        void internal_resync()
         {
             ControlMark info;
             info.idx = stream.head();
+            uint8_t channels = ccs.size();
             stream.pushFast((uint8_t)ControlCode::RESYNCDOD); // We have reserve bytes in the tank at least, Push Control Bytes, handle escape, change compression to lossy
-            info.size = sizeof(uint32_t) + sizeof(ccs->dod_state) * channels + 1;
+            info.size = sizeof(uint32_t) + sizeof(int16_t) * 2 * channels + 1;
             marks.push(info);
             stream.pushFast(sample_counter >> 24);
             stream.pushFast(sample_counter >> 16);
@@ -88,20 +92,25 @@ namespace daq::codec
             }
             samples_till_sync = sync_period;
         }
-
+        inline int16_t dod_encode(uint8_t channel, int16_t sample)
+        {
+            int16_t delta = sample - ccs[channel].dod_state[0];
+            int16_t dod = delta - ccs[channel].dod_state[1];
+            ccs[channel].dod_state[0] = sample;
+            ccs[channel].dod_state[1] = delta;
+            return dod;
+        }
     public:
-        Writer(uint8_t *stream_buf, uint16_t stream_buf_size, ControlMark *mark_buf, uint16_t mark_buf_size, ChannelState *ccs_, uint8_t channels_, uint32_t &_sample_counter, uint8_t _sync_period) : sample_counter(_sample_counter), stream(stream_buf, stream_buf_size), marks(mark_buf, mark_buf_size)
+        Writer(etl::span<uint8_t> stream_buf, etl::span<ControlMark> mark_buf, etl::span<ChannelState> ccs_, uint32_t &_sample_counter, uint8_t _sync_period) : sample_counter(_sample_counter), stream(stream_buf), marks(mark_buf)
         {
             sync_period = _sync_period;
             ccs = ccs_;
-            reserve = (uint8_t)CONTROL_RESERVE * channels;
-            channels = channels_;
+            reserve = (uint8_t)CONTROL_RESERVE * ccs.size();
             reset();
-            bool stream_valid = stream.isPowerOfTwo(stream_buf_size);
-            bool mark_valid = stream.isPowerOfTwo(mark_buf_size);
+            bool stream_valid = stream.isPowerOfTwo(stream_buf.size());
+            bool mark_valid = stream.isPowerOfTwo(mark_buf.size());
             assert(stream_valid && mark_valid);
         }
-
         void reset()
         {
             stream.clear();
@@ -110,15 +119,18 @@ namespace daq::codec
             sample_counter = 0;
             flags = 0;
         }
-        void reset_state(ChannelState *ccs_)
+        bool reset_state(etl::span<ChannelState> ccs_)
         {
-            for (int i = 0; i < channels; i++)
+            if(ccs.size() != ccs_.size())return false;
+            for (size_t i = 0; i < ccs.size(); i++)
                 ccs[i] = ccs_[i];
+            return true;
         }
         inline bool pushSample(int16_t *samples)
         {
             bool write = true;
             bool success = true;
+            bool sync = false;
             if (flags & (uint8_t)Flags::BACKPRESSURE)
             {
                 write = false;
@@ -133,10 +145,10 @@ namespace daq::codec
             }
             if (success && samples_till_sync == 0) // Resync
             {
-                internal_flush();
                 write = false;
+                sync = true;
             }
-            for (int i = 0; i < channels; i++)
+            for (size_t i = 0; i < ccs.size(); i++)
             {
                 int16_t dod_val = dod_encode(i, samples[i]); // First of all get dod_encode residuals (decollerator)....
                 uint8_t sign = (uint16_t)dod_val >> 15;
@@ -145,11 +157,11 @@ namespace daq::codec
                     continue;
                 if (mag < (VIRTUAL_BITS_START / 2))
                 {
-                    stream.pushFast(mag << 1 | sign); // zigzag
+                    stream.pushFast((mag << 1) - sign); // zigzag
                 }
                 else
                 {
-                    uint16_t zz = mag << 1 | sign;
+                    uint16_t zz = (mag << 1) - sign;
                     uint8_t high_bits = zz >> 8;
                     if (high_bits < 8)
                     {
@@ -164,29 +176,28 @@ namespace daq::codec
                     }
                 }
             }
+            if (sync)
+            {
+                internal_resync();
+            }
             if (write)
                 samples_till_sync--;
             return success;
-        }
-
-        inline int16_t dod_encode(uint8_t channel_, int16_t sample)
-        {
-            int16_t delta = sample - ccs[channel_].dod_state[0];
-            int16_t dod = delta - ccs[channel_].dod_state[1];
-            ccs[channel_].dod_state[0] = sample;
-            ccs[channel_].dod_state[1] = delta;
-            return dod;
         }
         bool flush()
         {
             uint16_t _free = stream.free();
             if (_free <= (uint8_t)CONTROL_RESERVE)
                 return false;
+            ControlMark info;
+            info.idx = stream.head();
+            stream.pushFast((uint8_t)ControlCode::FLUSH); // We have reserve bytes in the tank at least, Push Control Bytes, handle escape, change compression to lossy
+            info.size = 1;
+            marks.push(info);
             samples_till_sync = 0;
             return true;
         }
-
-        inline uint16_t readNext(uint8_t *buffer, uint16_t buffer_len, StreamType &type)
+        inline uint16_t readNext(etl::span<uint8_t> buf, StreamType &type)
         {
             // No entropy compression for now, to be added later
             ControlMark next_mark;
@@ -199,34 +210,32 @@ namespace daq::codec
                 if (dist_to_mark > 0)
                 {
                     bytes_to_read = dist_to_mark;
-                    type = StreamType::SAMPLE;
+                    type = StreamType::Sample;
                 }
                 else
                 {
                     bytes_to_read = next_mark.size;
-                    type = StreamType::CONTROL;
+                    type = StreamType::Control;
                 }
             }
             else
             {
-                bytes_to_read = stream.count();
-                type = StreamType::SAMPLE;
+                bytes_to_read = stream.size();
+                type = StreamType::Sample;
             }
-            if (type == StreamType::CONTROL && bytes_to_read > buffer_len)
+            if (type == StreamType::Control && (bytes_to_read > buf.size() || bytes_to_read == 0))
                 return 0;
-            if (bytes_to_read == 0)
-                return 0;
-            if (bytes_to_read > buffer_len)
-                bytes_to_read = buffer_len;
+            if (bytes_to_read > buf.size())
+                bytes_to_read = buf.size();
             uint8_t *r1, *r2;
             uint16_t c1, c2;
-            if (!stream.peekRead(&r1, &c1, &r2, &c2))
+            if (!stream.read_reserve(&r1, &c1, &r2, &c2))
                 return 0;
             uint16_t copied = 0;
 
             // First contiguous region
             uint16_t n = (c1 < bytes_to_read) ? c1 : bytes_to_read;
-            memcpy(buffer, r1, n);
+            memcpy(buf.data(), r1, n);
             copied += n;
 
             // Second contiguous region (if needed)
@@ -235,87 +244,108 @@ namespace daq::codec
                 uint16_t rem = bytes_to_read - copied;
                 uint16_t n2 = (c2 < rem) ? c2 : rem;
 
-                memcpy(buffer + copied, r2, n2);
+                memcpy(buf.data() + copied, r2, n2);
                 copied += n2;
             }
-            stream.releaseRead(copied);
-            if (type == StreamType::CONTROL)
+            stream.read_commit(copied);
+            if (type == StreamType::Control)
             {
                 ControlMark dummy;
                 marks.pop(dummy);
             }
-            if (!stream.count())
+            if (!stream.size())
                 flags &= ~(uint8_t)Flags::BACKPRESSURE;
             return bytes_to_read;
         }
     };
 
-#ifdef CODEC_READER
-
     enum class ReaderState
     {
-        NONE,
+        Sample,
         DOD,
-        LARGEDOD,
+        LARGE16,
         VIRTUALBITS
+    };
+
+    class SampleBlock
+    {
+        friend Reader;
+
+    private:
+        bool ready = false;
+        uint8_t channels;
+        uint32_t counter = 0;
+        etl::vector_ext<int16_t> samples;
+        SampleBlock() = delete;
+    public:
+        bool isReady() { return ready; }
+        uint8_t getChannels(){return channels;}
+        SampleBlock(etl::span<int16_t> samples_buf, uint8_t channels_) : samples(samples_buf.data(), samples_buf.size())
+        {
+            channels = channels_;
+        }
+        etl::span<const int16_t> getSamples()
+        {
+            if(ready)
+            {
+                ready = false;
+                return etl::span<const int16_t>(samples.data(), samples.size());
+            }else
+            {
+                return {};
+            }
+        }
     };
 
     class Reader
     {
-        uint8_t *buf;
-        int16_t *temp_buf;
+        etl::array<uint8_t, 64> scratch_buf;
         int16_t *dod_buf;
-        uint8_t current_channel;
-        uint16_t buf_len;
-        uint16_t buf_idx;
         ChannelState *ccs;
         uint8_t channels;
+        uint8_t current_channel;
         ReaderState state;
+        uint8_t state_rem = 0;
         bool in_sync = false;
+        SampleBlock &block;
+        etl::span<const uint8_t> buf;
+        size_t buf_idx;
 
     public:
-        Reader(ChannelState *ccs_, uint8_t channels_)
+        Reader(etl::span<ChannelState> ccs_, etl::span<int16_t> dod_buf_, SampleBlock &block_) : block(block_)
         {
-            ccs = ccs_;
-            channels = channels_;
+            ccs = ccs_.data();
+            dod_buf = dod_buf_.data();
+            channels = (ccs_.size()==dod_buf_.size())?ccs_.size():0;   
             current_channel = 0;
-            state = ReaderState::NONE;
+            state = ReaderState::DOD;
         }
-        inline Err decode(uint8_t *buffer, uint16_t buffer_len, StreamType type, el::ring_fast<int16_t> *sample_fifo)
+        inline Err decode(etl::span<const uint8_t> buf_, StreamType type)
         {
             buf_idx = 0;
-            buf = buffer;
-            if (buffer_len == 0)
+            buf = buf_;
+            if (buf.size() == 0)
                 return Err::OK;
-            uint8_t byte;
-            if (type == StreamType::CONTROL)
-            {
-                switch (buf[buf_idx++])
-                {
-                case (uint8_t)ControlCode::RESYNCDOD:
-                {
-                    uint8_t expected_size = sizeof(uint32_t) + sizeof(ccs->dod_state) * channels + 1;
-                    if (buffer_len != expected_size)
-                        return Err::RESYNCDOD_BAD;
-                    uint32_t counter = (buf[buf_idx] << 24) | (buf[buf_idx + 1] << 16) | (buf[buf_idx + 2] << 8) | (buf[buf_idx + 3]);
-                    buf_idx += 4;
-                    for(int i = 0; i < channels; i++)
-                    {
-                        ccs[i].dod_state[0] = (buf[buf_idx] << 8) | (buf[buf_idx + 1]);
-                        ccs[i].dod_state[1] = (buf[buf_idx + 2] << 8) | (buf[buf_idx + 3]);
-                        buf_idx += 4;
-                    }
-                    break;
-                }
 
-                default:
-                    break;
+            if(in_sync)
+            {
+                if (state == ReaderState::Sample)
+                {
+                    syncUpdate();
                 }
             }
-            else
-            {//A Sample stream full of DOD's
-                
 
+            if (type == StreamType::Control)
+            {
+                return decodeControl();
+            }
+            else if (in_sync)
+            {
+                return decodeSample();
+            }
+            else
+            {
+                return Err::NEED_SYNC;
             }
         }
         inline int16_t dod_decode(uint8_t channel_, int16_t dod)
@@ -326,7 +356,157 @@ namespace daq::codec
             ccs[channel_].dod_state[1] = delta;
             return sample;
         }
+        inline int16_t unzigzag(uint16_t val)
+        {
+            return static_cast<int16_t>(
+                (val >> 1) ^ -(static_cast<int16_t>(val & 1)));
+        }
+        inline Err decodeControl()
+        {
+            switch (buf[buf_idx++])
+            {
+            case (uint8_t)ControlCode::RESYNCDOD:
+                return decodeResyncDod();
+                break;
+            case (uint8_t)ControlCode::FLUSH:
+                return decodeFlush();
+                break;
+            default:
+                return Err::FAULT;
+                break;
+            }
+        }
+        inline Err decodeFlush()
+        {
+            if (in_sync)
+            block.ready = true;
+            return Err::OK;
+        }
+        inline Err decodeResyncDod()
+        {
+            uint8_t expected_size = sizeof(uint32_t) + sizeof(ccs->dod_state) * channels + 1;
+            if (buf.size() != expected_size || buf.size() > scratch_buf.size())
+                return Err::RESYNCDOD_BAD;
+            for (size_t i = 0; i < buf.size(); i++)
+            {
+                scratch_buf[i] = buf[buf_idx++];
+            }
+            if (in_sync)
+                block.ready = true;
+            in_sync = true;
+            state = ReaderState::Sample;
+            return Err::OK;
+        }
+        inline Err decodeSample()
+        {
+            for (size_t i = 0; i < buf.size(); i++)
+            {
+                uint8_t byte = buf[buf_idx++];
+                switch (state)
+                {
+                case ReaderState::DOD:
+                    decodeDod(byte);
+                    break;
+                case ReaderState::LARGE16:
+                    decodeLarge16(byte);
+                    break;
+                case ReaderState::VIRTUALBITS:
+                    decodeVirtualBits(byte);
+                    break;
+                default:
+                    break;
+                }
+                if (current_channel == channels)
+                {
+                    emitSample();
+                }
+            }
+
+            return Err::OK;
+        }
+        inline Err decodeDod(uint8_t byte)
+        {
+            if (byte > VIRTUAL_BITS_END)
+            { // Escape
+                switch (byte)
+                {
+                case (uint8_t)Escape::LARGE16:
+                    state = ReaderState::LARGE16;
+                    state_rem = 2;
+                    break;
+                default:
+                    break;
+                }
+            }
+            else if (byte > VIRTUAL_BITS_START)
+            { // VirtualBits
+                state = ReaderState::VIRTUALBITS;
+                state_rem = 1;
+                scratch_buf[0] = byte - VIRTUAL_BITS_START;
+            }
+            else
+            {
+                // Normal DOD
+                dod_buf[current_channel++] = unzigzag(byte);
+            }
+            return Err::OK;
+        }
+        inline Err decodeLarge16(uint8_t byte)
+        {
+            scratch_buf[2 - state_rem] = byte;
+            state_rem--;
+            if (state_rem == 0)
+            {
+                dod_buf[current_channel++] = unzigzag(scratch_buf[0] << 8 | scratch_buf[1]);
+                state = ReaderState::DOD;
+            }
+            return Err::OK;
+        }
+        inline Err decodeVirtualBits(uint8_t byte)
+        {
+            scratch_buf[1] = byte;
+            state_rem--;
+            if (state_rem == 0)
+            {
+                dod_buf[current_channel++] = unzigzag(scratch_buf[0] << 8 | scratch_buf[1]);
+                state = ReaderState::DOD;
+            }
+            return Err::OK;
+        }
+        inline Err syncUpdate()
+        {
+            uint8_t sch_idx = 0;
+            block.counter = scratch_buf[sch_idx] << 24 | scratch_buf[sch_idx + 1] << 16 | scratch_buf[sch_idx + 2] << 8 | scratch_buf[sch_idx + 3];
+            sch_idx += 4;
+            block.samples.clear();
+            if (block.samples.capacity() == 0)
+                return Err::BAD_BLOCK;
+            for (int i = 0; i < channels; i++)
+            {
+                int16_t sample = scratch_buf[sch_idx] << 8 | scratch_buf[sch_idx + 1];
+                sch_idx += 2;
+                int16_t delta = scratch_buf[sch_idx] << 8 | scratch_buf[sch_idx + 1];
+                sch_idx += 2;
+                block.samples.push_back(sample);
+                ccs[i].dod_state[0] = sample;
+                ccs[i].dod_state[1] = delta;
+            }
+            block.ready = false;
+            state = ReaderState::DOD;
+            return Err::OK;
+        }
+        inline Err emitSample()
+        {
+            if(block.samples.available() < channels){
+                return Err::BLOCK_FULL;
+            }
+            for (int i = 0; i < channels; i++)
+            {
+                int16_t sample = dod_decode(i, dod_buf[i]);
+                block.samples.push_back(sample);
+            }
+            current_channel = 0;
+            return Err::OK;
+        }
     };
 };
-
-#endif

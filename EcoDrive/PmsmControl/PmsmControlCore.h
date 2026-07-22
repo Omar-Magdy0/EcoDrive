@@ -1,12 +1,11 @@
 
 #include "arm_math.h"
-#include "el/core.h"
 #include "el_mc3p.h"
 #include "eld_conf.h"
 #include "el_hall.h"
-#include "el_core.h"
+#include "eld_core.h"
 #include "PosDriver.h"
-#include "el/math.h"
+#include "math/math.h"
 #include <array>
 #include <cstdint>
 #include <cstddef>
@@ -99,7 +98,7 @@ class PmsmControlCore
     void init();
     void setControlMode(PmsmControlTypes::MCMode mc_mode);
     void pwmConfigUpdate(PmsmControlTypes::ConfigPwm cfg);
-    void olstup_lut_run(Olstup&, q31_t&, float&);
+    void olstup_lut(Olstup&, q31_t&, float&);
     PmsmControlCore(): posDriver(*this){};
     
     public:

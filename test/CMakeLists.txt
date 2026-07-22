@@ -27,6 +27,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
+add_subdirectory(${THIRDPARTY_DIR}/etl etl)
 # Option 2: Use find_package if installed system-wide
 # find_package(Catch2 3 REQUIRED)
 file(GLOB_RECURSE TEST_SOURCES
@@ -47,6 +48,19 @@ add_executable(unit_tests
     ${CORE_SOURCES}
     ${MIDDLEWARE_SOURCES}
 )
+target_compile_options(unit_tests PRIVATE
+    -fsanitize=address
+    -fno-omit-frame-pointer
+    -g
+)
+target_compile_definitions(unit_tests PRIVATE
+    ETL_THROW_EXCEPTIONS
+    ETL_VERBOSE_ERRORS
+    ETL_CHECK_PUSH_POP
+)
+target_link_options(unit_tests PRIVATE
+    -fsanitize=address
+)   
 
 target_include_directories(unit_tests PRIVATE
     ${ECOLIB_DIR}
@@ -54,9 +68,11 @@ target_include_directories(unit_tests PRIVATE
     ${ECOLIB_DIR}/middleware
     ${THIRDPARTY_DIR}
 )
-
+get_target_property(INCLUDES etl INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "etl includes = ${INCLUDES}")
 target_link_libraries(unit_tests PRIVATE
     Catch2::Catch2WithMain
+    etl::etl
 )
 
 include(Catch)

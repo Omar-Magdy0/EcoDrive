@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <type_traits>
-
+#include <etl/span.h>
 
 
 namespace idv
@@ -15,24 +15,23 @@ enum class Err : uint8_t
 
 class Writer
 {
-    uint8_t *buffer;
-    uint16_t buffer_capacity;
-    uint16_t buffer_idx = 0;
+    etl::span<uint8_t> buf;
+    uint16_t buf_idx = 0;
 
     template <typename T>
     inline Err addPrimitive(uint8_t id, const T &value)
     {
-        if (buffer_idx + sizeof(T) + 2 > buffer_capacity)
+        if (buf_idx + sizeof(T) + 2 > buf.size())
             return Err::BUFFER_FULL;
-        buffer[buffer_idx++] = id;
-        buffer[buffer_idx++] = sizeof(T);
-        memcpy(buffer + buffer_idx, &value, sizeof(value));
-        buffer_idx += sizeof(value);
+        buf[buf_idx++] = id;
+        buf[buf_idx++] = sizeof(T);
+        memcpy(buf.data() + buf_idx, &value, sizeof(value));
+        buf_idx += sizeof(value);
         return Err::OK;
     }
-public:
     Writer() = delete;
-    Writer(uint8_t *_buffer, uint16_t _buffer_capacity) : buffer(_buffer), buffer_capacity(_buffer_capacity) {};
+public:
+    Writer(etl::span<uint8_t> buffer_) : buf(buffer_){};
     Err add_UINT8(uint8_t id, uint8_t value) { return addPrimitive(id, value); }
     Err add_INT8(uint8_t id, int8_t value) { return addPrimitive(id, value); }
     Err add_UINT16(uint8_t id, uint16_t value) { return addPrimitive(id, value); }
@@ -45,12 +44,12 @@ public:
     Err add_DOUBLE(uint8_t id, double value) { return addPrimitive(id, value); }
     Err add_BINARY(uint8_t id, const uint8_t *str, uint8_t length)
     {
-        if (buffer_idx + length + 2 > buffer_capacity)
+        if (size_t(buf_idx + length + 2) > buf.size())
             return Err::BUFFER_FULL;
-        buffer[buffer_idx++] = id;
-        buffer[buffer_idx++] = length;
-        memcpy(buffer + buffer_idx, str, length);
-        buffer_idx += length;
+        buf[buf_idx++] = id;
+        buf[buf_idx++] = length;
+        memcpy(buf.data() + buf_idx, str, length);
+        buf_idx += length;
         return Err::OK;
     }
     template<typename T>
@@ -77,45 +76,44 @@ public:
     template <typename T>
     static constexpr inline uint8_t SERIALIZED_SIZE(){return sizeof(T) + 2;}
     static constexpr inline uint8_t BINARY_SIZE(uint8_t length) { return length + 2; }
-    uint16_t size() const { return buffer_idx; }
+    uint16_t size() const { return buf_idx; }
     void reset()
     {
-        buffer_idx = 0;
+        buf_idx = 0;
     }
     uint8_t *data() const
     {
-        return buffer;
+        return buf.data();
     }
 };
 
 class Reader
 {
-    const uint8_t *data_mem;
-    uint16_t length = 0;
-    uint16_t data_idx = 0;
+    etl::span<uint8_t> buf;
+    uint16_t buf_idx = 0;
 
     uint8_t idv_id;
     uint8_t idv_len;
     const uint8_t *idv_value;
 public:
     Reader() = default;
-    Reader(const uint8_t* data, uint16_t length)
+    Reader(etl::span<uint8_t> buf)
     {
-        reset(data, length);
+        reset();
     }
     bool next()
     {
-        if(data_idx == UINT16_MAX)return false;
-        if(data_idx + 2 > length)return false;
-        idv_id = data_mem[data_idx++];
-        idv_len = data_mem[data_idx++];
-        if (data_idx + idv_len > length)
+        if(buf_idx == UINT16_MAX)return false;
+        if(size_t(buf_idx + 2) > buf.size())return false;
+        idv_id = buf[buf_idx++];
+        idv_len = buf[buf_idx++];
+        if (buf_idx + idv_len > buf.size())
         {
-            data_idx = UINT16_MAX;
+            buf_idx = UINT16_MAX;
             return false;
         }
-        idv_value = data_mem + data_idx;
-        data_idx += idv_len;
+        idv_value = buf.data() + buf_idx;
+        buf_idx += idv_len;
         return true;
     }
     template <typename T>
@@ -129,11 +127,9 @@ public:
         memcpy(&val, idv_value, sizeof(T));
         return true;
     }
-    void reset(const uint8_t *p_data, uint16_t p_length)
+    void reset()
     {
-        data_mem = p_data;
-        length = p_length;
-        data_idx = 0;
+        buf_idx = 0;
     }
     inline const uint8_t *asBinary() const
     {

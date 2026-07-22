@@ -73,18 +73,6 @@ uint16_t el_usbcdc_read(el_uart_handle_t *handle, uint8_t* data, uint8_t len)
     return 0;
 }
 
-el_ring_stats_t el_usbcdc_rx_stats(el_uart_handle_t *handle)
-{
-    (void)handle;
-    return (el_ring_stats_t){0};
-}
-
-el_ring_stats_t el_usbcdc_tx_stats(el_uart_handle_t *handle)
-{
-    (void)handle;
-    return (el_ring_stats_t){0};
-}
-
 void el_usbcdc_resetStats(el_uart_handle_t *handle)
 {
     (void)handle;

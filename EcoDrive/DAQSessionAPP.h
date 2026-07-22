@@ -2,7 +2,7 @@
 #include "DAQStream.h"
 #include "ABFStream.h"
 #include "el_usbxch.h"
-
+#include <etl/span.h>
 class DAQSessionAPP : public daq::Session
 {
 protected:
@@ -12,8 +12,8 @@ protected:
 public:
     DAQSessionAPP(abf::Stream &abf_stream,
                   el_usbxch_handle_t &usb_handle,
-                  uint8_t *idv_buffer,
-                  uint16_t idv_buffer_len) : daq::Session(idv_buffer, idv_buffer_len), abf(abf_stream), usb(usb_handle)
+                  const char* Meta,
+                  etl::span<uint8_t> idv_buf) : daq::Session(Meta, idv_buf), abf(abf_stream), usb(usb_handle)
     {
     }
     uint8_t send() override
@@ -25,14 +25,15 @@ public:
         el_usbxch_flush(&usb);
         return 0;
     }
-    uint8_t on_mark(daq::MARKER mark, bool entry)override
+    uint8_t on_mark(daq::MARKER mark, bool entry) override
     {
         switch (mark)
         {
         case daq::MARKER::AUTO_DISCOVER_REQ:
-            if(!entry)discovery_respond();
+            if (!entry)
+                discovery_respond();
             break;
-        
+
         default:
             break;
         }

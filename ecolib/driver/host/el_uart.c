@@ -160,8 +160,8 @@ el_ring_stats_t el_uart1_tx_stats(el_uart_handle_t *handle)
 
 void el_uart1_resetStats(el_uart_handle_t *handle)
 {
-    el_ring_reserveWrite(&uart1_rx_buffer);
-    el_ring_reserveWrite(&uart1_tx_buffer);
+    el_ring_write_reserve(&uart1_rx_buffer);
+    el_ring_write_reserve(&uart1_tx_buffer);
 }
 
 //===========================================

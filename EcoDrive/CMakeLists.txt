@@ -52,6 +52,7 @@ include_directories(
 
 # Link with platform EARLY to get include paths
 add_subdirectory(platform/${PLATFORM_NAME})
+add_subdirectory(${THIRDPARTY_DIR}/etl etl)
 
 message(STATUS "LIBRARIES TO LINK: ${PLATFORM_LIB}")
 
@@ -93,34 +94,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${PLATFORM_INTERFACE}
     ${PLATFORM_LIB}
     ${TOOLCHAIN_LINK_LIBRARIES}
+    etl::etl
 )
 
 # BUILD Platform Tied TEST CODE
 if(PLATFORM_NAME STREQUAL "host")
-    add_definitions(-DPLATFORM_HOST)
-
-# ── Unit Tests (optional) ────────────────────────────────────
-option(TESTS_BUILD "Build unit test" OFF)
-if(TESTS_BUILD)
-    # Set third-party directory at root level
-    set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/thirdparty)
-    file(MAKE_DIRECTORY ${THIRDPARTY_DIR})
-    
-    add_subdirectory(test)
-    message(STATUS "Unit test enabled. Use 'ctest' to run.")
-    
-    # Add convenience targets at root level
-    add_custom_target(build_tests
-        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all_unit_tests
-        COMMENT "Building all unit test..."
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        PLATFORM_HOST
+        ETL_THROW_EXCEPTIONS
+        ETL_VERBOSE_ERRORS
+        ETL_CHECK_PUSH_POP
     )
-    
-    add_custom_target(run_tests
-        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target run_all_tests
-        COMMENT "Running all unit test..."
-    )
-endif()
-
 endif()
 
 

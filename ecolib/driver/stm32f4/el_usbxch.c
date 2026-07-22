@@ -62,8 +62,8 @@ void el_usbxch_init(el_usbxch_handle_t *h)
     /* --- Clear the handle --- */
     memset(h, 0, sizeof(*h));
     /* --- Initialise ring buffers --- */
-    el_ring_init(&h->tx, h->tx_storage, 1, sizeof(h->tx_storage));
-    el_ring_init(&h->rx, h->rx_storage, 1, sizeof(h->rx_storage));
+    el_ring_init(&h->tx, h->tx_storage, sizeof(h->tx_storage));
+    el_ring_init(&h->rx, h->rx_storage, sizeof(h->rx_storage));
     h->usbxch.ctx = h;
     hUsbDeviceFS.pClassData = (void*)&h->usbxch;
     MX_USB_DEVICE_Init();
@@ -76,10 +76,10 @@ uint32_t el_usbxch_write(el_usbxch_handle_t *h, const uint8_t *data, uint32_t le
 {
     void *w1, *w2;
     uint16_t c1, c2;
-    if (el_ring_reserveWrite(&h->tx, (uint16_t)length, &w1, &c1, &w2, &c2)) {
+    if (el_ring_write_reserve(&h->tx, (uint16_t)length, &w1, &c1, &w2, &c2)) {
         memcpy(w1, data, c1);
         if(w2)memcpy(w2, data + c1, c2);
-        el_ring_commitWrite(&h->tx, length);
+        el_ring_write_commit(&h->tx, length);
     } else {
         return length;
     }
@@ -91,7 +91,7 @@ uint32_t el_usbxch_write(el_usbxch_handle_t *h, const uint8_t *data, uint32_t le
  * --------------------------------------------------------------------------- */
 uint32_t el_usbxch_write_available(el_usbxch_handle_t *h)
 {
-    return (uint32_t)el_ring_freeSpace(&h->tx);
+    return (uint32_t)el_ring_free(&h->tx);
 }
 
 /* ---------------------------------------------------------------------------
@@ -115,9 +115,6 @@ uint32_t el_usbxch_clear(el_usbxch_handle_t *h)
     /* Drain TX: reset head/tail to empty */
     h->tx.head = h->tx.tail = 0;
     h->rx.head = h->rx.tail = 0;
-
-    el_ring_resetStats(&h->tx);
-    el_ring_resetStats(&h->rx);
     return 0;
 }
 
@@ -129,7 +126,7 @@ uint32_t el_usbxch_read(el_usbxch_handle_t *h, uint8_t *data, uint32_t length)
     void *r1, *r2;
     uint16_t c1, c2;
     uint32_t total = 0;
-    if (el_ring_peekRead(&h->rx, &r1, &c1, &r2, &c2)) {
+    if (el_ring_read_reserve(&h->rx, &r1, &c1, &r2, &c2)) {
         uint16_t to_copy = (uint16_t)((length < (uint32_t)(c1 + c2)) ? length : (uint32_t)(c1 + c2));
 
         uint16_t copy_from_first = (to_copy < c1) ? to_copy : c1;
@@ -142,7 +139,7 @@ uint32_t el_usbxch_read(el_usbxch_handle_t *h, uint8_t *data, uint32_t length)
             memcpy(data + copy_from_first, r2, copy_from_second);
             total += copy_from_second;
         }
-        el_ring_releaseRead(&h->rx, (uint16_t)total);
+        el_ring_read_commit(&h->rx, (uint16_t)total);
     }
     return total;
 }
@@ -152,7 +149,7 @@ uint32_t el_usbxch_read(el_usbxch_handle_t *h, uint8_t *data, uint32_t length)
  * --------------------------------------------------------------------------- */
 uint32_t el_usbxch_read_available(el_usbxch_handle_t *h)
 {
-    uint16_t occ = el_ring_occupied(&h->rx);
+    uint16_t occ = el_ring_size(&h->rx);
     return occ;
 }
 
@@ -170,7 +167,7 @@ bool el_usbxch_connected(el_usbxch_handle_t *h)
 void el_usbxch_update(el_usbxch_handle_t *h)
 {
     /* Start IN transfer for EP1 if data is pending */
-    if (!(h->flags & USBXCH_FLAG_TX_BUSY) && el_ring_occupied(&h->tx) > 0)
+    if (!(h->flags & USBXCH_FLAG_TX_BUSY) && el_ring_size(&h->tx) > 0)
         usbxch_start_tx(h);
 }
 
@@ -198,7 +195,7 @@ static void usbxch_start_tx(el_usbxch_handle_t *h)
         return;
     }
 
-    if (!el_ring_peekRead(tx, &r1, &c1, &r2, &c2)) {
+    if (!el_ring_read_reserve(tx, &r1, &c1, &r2, &c2)) {
         /* Nothing to send */
         return;
     }
@@ -213,28 +210,26 @@ void USBD_XCH_GetRxStorage(void *ctx, uint8_t **ptr, uint16_t *size)
     el_usbxch_handle_t *h = ctx;
     void *r2;
     uint16_t c2;
-    uint16_t fs = el_ring_freeSpace(&h->rx);
-    el_ring_reserveWrite(&h->rx, fs, &h->r1, &h->c1, &r2, &c2);
+    uint16_t fs = el_ring_free(&h->rx);
+    el_ring_write_reserve(&h->rx, fs, &h->r1, &h->c1, &r2, &c2);
     *ptr = h->r1;
     *size = h->c1;
 }
 
 void USBD_XCH_RxComplete(void *ctx, uint8_t *rx_buf, uint16_t size)
 {
-    void *w1, *w2;
-    uint16_t c1, c2;
     el_usbxch_handle_t *h = ctx;
-    el_ring_commitWrite(&h->rx, size);
+    el_ring_write_commit(&h->rx, size);
 }
 
 void USBD_XCH_TxComplete(void *ctx)
 {
     el_usbxch_handle_t *h = ctx;
-    el_ring_releaseRead(&h->tx, h->tx_to_release);
+    el_ring_read_commit(&h->tx, h->tx_to_release);
 
     void *r1, *r2;
     uint16_t c1, c2;
-    if (!el_ring_peekRead(&h->tx, &r1, &c1, &r2, &c2)) {
+    if (!el_ring_read_reserve(&h->tx, &r1, &c1, &r2, &c2)) {
         /* Nothing to send */
         h->flags &= ~USBXCH_FLAG_TX_BUSY; //clear busy flag and return, nothing to send
         return;
