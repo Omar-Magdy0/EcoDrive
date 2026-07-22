@@ -3,10 +3,8 @@ cmake_minimum_required(VERSION 3.20)
 
 # Select target platform
 set(PLATFORM_NAME "host" CACHE STRING "Target platform (host, stm32f4)")
-set(MIDDLEWARE_DIR ${CMAKE_SOURCE_DIR}/../middleware)
+set(ECOLIB_DIR ${CMAKE_SOURCE_DIR}/../ecolib)
 set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/../thirdparty)
-set(ELCORE_DIR ${CMAKE_SOURCE_DIR}/../core)
-set(ELDRIVER_DIR ${CMAKE_SOURCE_DIR}/../eldriver)
 set(PMSMCONTROL_DIR ${CMAKE_SOURCE_DIR}/PmsmControl)
 
 ####platform specific settings
@@ -46,14 +44,15 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # Include directories
 include_directories(
     ${CMAKE_SOURCE_DIR}
-    ${ELCORE_DIR}
-    ${MIDDLEWARE_DIR}
+    ${ECOLIB_DIR}
+    ${ECOLIB_DIR}/middleware
     ${PMSMCONTROL_DIR}
 )
 
 
 # Link with platform EARLY to get include paths
 add_subdirectory(platform/${PLATFORM_NAME})
+add_subdirectory(${THIRDPARTY_DIR}/etl etl)
 
 message(STATUS "LIBRARIES TO LINK: ${PLATFORM_LIB}")
 
@@ -61,8 +60,8 @@ message(STATUS "LIBRARIES TO LINK: ${PLATFORM_LIB}")
 include_directories(${PLATFORM_INCLUDES})
 
 file(GLOB_RECURSE MIDDLEWARE_SRC    
-    ${MIDDLEWARE_DIR}/*.cpp
-    ${MIDDLEWARE_DIR}/*.c
+    ${ECOLIB_DIR}/middleware/*.cpp
+    ${ECOLIB_DIR}/middleware/*.c
 )
 
 
@@ -79,8 +78,8 @@ set(APPLICATION_SRC
 
 
 file(GLOB_RECURSE CORE_SRC
-    ${ELCORE_DIR}/*.cpp
-    ${ELCORE_DIR}/*.c
+    ${ECOLIB_DIR}/el/*.cpp
+    ${ECOLIB_DIR}/el/*.c
 )
 
 
@@ -95,34 +94,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${PLATFORM_INTERFACE}
     ${PLATFORM_LIB}
     ${TOOLCHAIN_LINK_LIBRARIES}
+    etl::etl
 )
 
 # BUILD Platform Tied TEST CODE
 if(PLATFORM_NAME STREQUAL "host")
-    add_definitions(-DPLATFORM_HOST)
-
-# ── Unit Tests (optional) ────────────────────────────────────
-option(TESTS_BUILD "Build unit test" OFF)
-if(TESTS_BUILD)
-    # Set third-party directory at root level
-    set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/thirdparty)
-    file(MAKE_DIRECTORY ${THIRDPARTY_DIR})
-    
-    add_subdirectory(test)
-    message(STATUS "Unit test enabled. Use 'ctest' to run.")
-    
-    # Add convenience targets at root level
-    add_custom_target(build_tests
-        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all_unit_tests
-        COMMENT "Building all unit test..."
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        PLATFORM_HOST
+        ETL_THROW_EXCEPTIONS
+        ETL_VERBOSE_ERRORS
+        ETL_CHECK_PUSH_POP
     )
-    
-    add_custom_target(run_tests
-        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target run_all_tests
-        COMMENT "Running all unit test..."
-    )
-endif()
-
 endif()
 
 

@@ -11,7 +11,7 @@ constexpr q15_t SQRT3_Q3P12 = ((int32_t)(1.73205080757*INT16_MAX)>>3);
 constexpr int SPEED_FROM_DELTA_SHIFT = 7;
 
 using namespace PmsmControlTypes;
-static inline q31_t maxa_minb_2_q31(q31_t i1,q31_t i2)
+static inline q31_t maxa_minb_q31(q31_t i1,q31_t i2)
 {
     q31_t max,min;
     i1 = i1<0?-i1:i1;
@@ -122,7 +122,7 @@ void PmsmControlCore::Foc_pwmLoop()
     foc.state.Vq_q31 = arm_pid_q31(&foc.state.Iq_pid, eq);
     //Circular overmodulation clamping + pid state update (anti-windup)
     //Here overmodulation logic is intended
-    q31_t vmag_q31 = maxa_minb_2_q31(foc.state.Vd_q31, foc.state.Vq_q31);
+    q31_t vmag_q31 = maxa_minb_q31(foc.state.Vd_q31, foc.state.Vq_q31);
     int32_t vbus_lim_q31 = ((int64_t)state.Vbus_q31 * mc3p.duty_max_q15)>>15;
     int32_t mod_idx_q3p12 = (((int32_t)(vmag_q31>>16) * SQRT3_Q3P12)/(vbus_lim_q31>>16));
     if(mod_idx_q3p12 > foc.state.mod_idx_max_q3p12)
@@ -137,5 +137,5 @@ void PmsmControlCore::Foc_pwmLoop()
     arm_inv_park_q31(foc.state.Vd_q31, foc.state.Vq_q31, &valpha_q31, &vbeta_q31, sin, cos);
     dalpha_q15 = (valpha_q31) / (state.Vbus_q31 >> 15);
     dbeta_q15 = (vbeta_q31)/ (state.Vbus_q31 >> 15);
-    eldriver_mc3p_write_svm(&mc3p, dalpha_q15, dbeta_q15);
+    el_mc3p_write_svm(&mc3p, dalpha_q15, dbeta_q15);
 }

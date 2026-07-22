@@ -6,10 +6,6 @@ set(DEVICE_DEFINITIONS
     USE_FULL_ASSERT
 )
 
-set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/../thirdparty)
-set(ELDRIVER_DIR ${CMAKE_SOURCE_DIR}/../eldriver)
-
-
 set(CMSIS_DSP_DIR ${THIRDPARTY_DIR}/CMSIS-DSP)
 set(CMSISCORE ${THIRDPARTY_DIR}/CMSIS)
 set(IMGUI_DIR ${THIRDPARTY_DIR}/imgui)
@@ -24,7 +20,7 @@ set(HOST_COMMON_INCLUDES
     ${IMPLOT_DIR}
     ${IMGUIFD_DIR}
     ${EIGEN_DIR}
-    ${ELDRIVER_DIR}/host
+    ${ECOLIB_DIR}/driver/host
 )
 
 set(IMGUI_SRC  
@@ -46,8 +42,10 @@ set(Platform_Src
 )
 
 file(GLOB_RECURSE Driver_Core_Src
-    ${ELDRIVER_DIR}/host/*.cpp
-    ${ELDRIVER_DIR}/host/*.c
+    ${ECOLIB_DIR}/driver/host/*.cpp
+    ${ECOLIB_DIR}/driver/host/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/el_hall.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/el_mc3p.cpp
 )
 
 find_package(Threads REQUIRED)
@@ -61,7 +59,6 @@ find_package(HDF5 REQUIRED COMPONENTS C CXX)
 add_library(host_platform STATIC)
 target_sources(host_platform PRIVATE
     ${IMGUI_SRC}
-    ${CMAKE_CURRENT_SOURCE_DIR}/TCPServer.cpp
 )
 
 target_include_directories(host_platform PUBLIC ${HOST_COMMON_INCLUDES})

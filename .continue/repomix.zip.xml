@@ -1,0 +1,2305 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+The content has been processed where comments have been removed, empty lines have been removed, content has been compressed (code blocks are separated by ⋮---- delimiter).
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Code comments have been removed from supported file types
+- Empty lines have been removed from all files
+- Content has been compressed - code blocks are separated by ⋮---- delimiter
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+digest/
+  EcoDrive/
+    platform/
+      host/
+        CMakeLists.txt
+        el_hall.cpp
+        el_hall.h
+        el_mc3p.cpp
+        el_mc3p.h
+        platform.cmake
+        platform.cpp
+        platform.h
+        sil.h
+        silgui.h
+      stm32f4/
+        CMakeLists.txt
+        platform.c
+        platform.cmake
+        platform.h
+    PmsmControl/
+      PmsmControl.cpp
+      PmsmControl.h
+      PmsmControlConf.h
+      PmsmControlCore_Foc.cpp
+      PmsmControlCore_Foc.h
+      PmsmControlCore_SComm.cpp
+      PmsmControlCore_SComm.h
+      PmsmControlCore.cpp
+      PmsmControlCore.h
+      PmsmControlTypes.h
+      PosDriver.cpp
+      PosDriver.h
+    CMakeLists.txt
+    DAQSessionAPP.h
+    main.cpp
+    sys.cpp
+    sys.h
+  ecolib/
+    driver/
+      host/
+        el_core.c
+        el_core.h
+        el_uart.c
+        el_uart.h
+        el_usbcdc.c
+        el_usbcdc.h
+        el_usbxch.cpp
+        el_usbxch.h
+        eld_conf.h
+        TCPServer.cpp
+        TCPServer.h
+      stm32f4/
+        el_core.c
+        el_core.h
+        el_hall.c
+        el_hall.h
+        el_mc3p_it.c
+        el_mc3p.c
+        el_mc3p.h
+        el_uart.c
+        el_uart.h
+        el_usbcdc.c
+        el_usbcdc.h
+        el_usbxch.c
+        el_usbxch.h
+        eld_conf.h
+    el/
+      core.h
+      el_ring.h
+      math.h
+      mempool.h
+      ring.h
+      vector
+    middleware/
+      ABFStream.cpp
+      ABFStream.h
+      DAQCodec.h
+      DAQStream.cpp
+      DAQStream.h
+      IDV.h
+      ScopeStream.h
+  EcoTool/
+    CMakeLists.txt
+    DAQSessionAPP.h
+    EcoTool.cpp
+    RingBuffer.hpp
+    Serial.hpp
+    TcpClient.hpp
+    Usbxch.cpp
+    Usbxch.h
+  test/
+    el/
+      test_ring.cpp
+    middleware/
+      test_ABFStream.cpp
+      test_Codec.cpp
+      test_DAQStream.cpp
+      test_IDV.cpp
+      test_ScopeStream.cpp
+    CMakeLists.txt
+    common.h
+    dummy_test.cpp
+    test_sil.cpp
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="digest/EcoDrive/platform/host/CMakeLists.txt">
+cmake_minimum_required(VERSION 3.20)
+
+# Host platform module used by top-level CMake via add_subdirectory(platform/host).
+
+set(DEVICE_DEFINITIONS
+    USE_FULL_ASSERT
+)
+
+set(CMSIS_DSP_DIR ${THIRDPARTY_DIR}/CMSIS-DSP)
+set(CMSISCORE ${THIRDPARTY_DIR}/CMSIS)
+set(IMGUI_DIR ${THIRDPARTY_DIR}/imgui)
+set(IMPLOT_DIR ${THIRDPARTY_DIR}/implot)
+set(IMGUIFD_DIR ${THIRDPARTY_DIR}/ImGuiFileDialog)
+
+set(HOST_COMMON_INCLUDES
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+    ${IMPLOT_DIR}
+    ${IMGUIFD_DIR}
+    ${EIGEN_DIR}
+    ${ECOLIB_DIR}/driver/host
+)
+
+set(IMGUI_SRC  
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMPLOT_DIR}/implot_items.cpp
+    ${IMPLOT_DIR}/implot.cpp
+    ${IMPLOT_DIR}/implot_demo.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+    ${IMGUIFD_DIR}/ImGuiFileDialog.cpp
+)
+
+set(Platform_Src
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform.cpp
+)
+
+file(GLOB_RECURSE Driver_Core_Src
+    ${ECOLIB_DIR}/driver/host/*.cpp
+    ${ECOLIB_DIR}/driver/host/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/el_hall.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/el_mc3p.cpp
+)
+
+find_package(Threads REQUIRED)
+add_subdirectory(${CMSIS_DSP_DIR}/Source ${CMAKE_CURRENT_BINARY_DIR}/cmsis_dsp_host)
+
+find_package(PkgConfig REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(HDF5 REQUIRED COMPONENTS C CXX)
+
+add_library(host_platform STATIC)
+target_sources(host_platform PRIVATE
+    ${IMGUI_SRC}
+)
+
+target_include_directories(host_platform PUBLIC ${HOST_COMMON_INCLUDES})
+target_compile_definitions(host_platform PUBLIC
+    ${DEVICE_DEFINITIONS}
+    projCOVERAGE_TEST=0
+    projENABLE_TRACING=0
+)
+
+target_link_libraries(host_platform PUBLIC ${HDF5_LIBRARIES} ${HDF5_CXX_LIBRARIES} Threads::Threads CMSISDSP OpenGL::GL glfw)
+
+add_library(host_platform_interface INTERFACE)
+target_link_libraries(host_platform_interface INTERFACE
+    host_platform
+    Threads::Threads
+    CMSISDSP
+)
+
+target_include_directories(host_platform_interface INTERFACE
+    ${HOST_COMMON_INCLUDES}
+    ${HDF5_INCLUDE_DIRS}
+    ${CMSIS_DSP_DIR}/Include
+    ${CMSISCORE}/Include
+)
+target_compile_definitions(host_platform_interface INTERFACE
+    ${DEVICE_DEFINITIONS}
+    projCOVERAGE_TEST=0
+    projENABLE_TRACING=0
+)
+
+# Export variables expected by the parent CMakeLists.txt.
+set(PLATFORM_LIB host_platform PARENT_SCOPE)
+set(PLATFORM_INTERFACE host_platform_interface PARENT_SCOPE)
+set(PLATFORM_INCLUDES ${HOST_COMMON_INCLUDES} ${CMSIS_DSP_DIR}/Include ${CMSISCORE}/Include PARENT_SCOPE)
+set(PLATFORM_DEFINITIONS ${DEVICE_DEFINITIONS} PARENT_SCOPE)
+set(PLATFORM_SOURCE ${Driver_Core_Src} ${Platform_Src} PARENT_SCOPE)
+</file>
+
+<file path="digest/EcoDrive/platform/host/el_hall.cpp">
+uint8_t hall1_gpioRead()
+⋮----
+void el_hall1_init()
+⋮----
+void el_hall1_setComDelay_uS(uint32_t delay_uS)
+⋮----
+void el_hall1_setComCallback(void (*callback)(void))
+⋮----
+float el_hall1_elec_speed(){
+⋮----
+uint8_t el_hall1_read(){
+⋮----
+void el_comDelay_init()
+⋮----
+void el_comDelay_setComDelay_uS(uint32_t delay_uS)
+⋮----
+void el_comDelay_setComCallback(void (*callback)(void))
+⋮----
+void sil_hall_update()
+⋮----
+void el_hall1_reset()
+</file>
+
+<file path="digest/EcoDrive/platform/host/el_hall.h">
+void el_hall1_init();
+void el_hall1_setComDelay_uS(uint32_t COM_delay_uS);
+void el_hall1_setComCallback(void (*callback)(void));
+float el_hall1_elec_speed();
+uint8_t el_hall1_read();
+⋮----
+void el_comDelay_init();
+void el_comDelay_setComDelay_uS(uint32_t COM_delay_uS);
+void el_comDelay_setComCallback(void (*callback)(void));
+void sil_hall_update();
+</file>
+
+<file path="digest/EcoDrive/platform/host/el_mc3p.cpp">
+float el_mc3p_adc_read_single(el_mc3p_handle_t *h, uint32_t channel) { return 0.0; }
+⋮----
+void postScanMethod()
+⋮----
+static void dPsim_dTheta_Sine(double theta_e, double dPsi_dTheta[3])
+⋮----
+static void dPsim_dTheta_Trapezoidal(double theta_e, double dPsi_dTheta[3])
+⋮----
+void el_mc3p_init(el_mc3p_handle_t *h)
+⋮----
+void el_mc3p_reconfigure_pwm(el_mc3p_handle_t *h)
+⋮----
+void el_mc3p_bg_startConv(el_mc3p_handle_t *h){}
+uint8_t el_mc3p_bg_channels(el_mc3p_handle_t *h){return 0;}
+uint8_t el_mc3p_read_bg(el_mc3p_handle_t *h, float* scanData){return 0;}
+uint8_t el_mc3p_bg_isReady(el_mc3p_handle_t *h){return 0;}
+⋮----
+void el_mc3p_read_sync(el_mc3p_handle_t *h, void* data)
+⋮----
+void el_mc3p_write_phase_state(el_mc3p_handle_t *h, el_mc3p_phase_state_t state_u, el_mc3p_phase_state_t state_v, el_mc3p_phase_state_t state_w)
+⋮----
+void el_mc3p_write_phase_duty(el_mc3p_handle_t *h, int16_t duty_u_q15, int16_t duty_v_q15, int16_t duty_w_q15)
+⋮----
+void el_mc3p_write_float(el_mc3p_handle_t *h)
+⋮----
+} mc3p_trap_sector_map_t;
+⋮----
+void el_mc3p_write_trap(el_mc3p_handle_t *h, el_mc3p_sector_t sector, uint16_t duty_q15)
+⋮----
+void el_mc3p_write_svm(el_mc3p_handle_t *h, int16_t alpha_q15, int16_t beta_q15)
+⋮----
+void el_mc3p_set_gain(el_mc3p_handle_t *h,  el_mc3p_sync s, float gain)
+⋮----
+void el_mc3p_set_sync_scale(el_mc3p_handle_t *h, const float scales[MC3P_SYNC_CHANNELS][2])
+</file>
+
+<file path="digest/EcoDrive/platform/host/el_mc3p.h">
+} el_mc3p_sector_t;
+⋮----
+} el_mc3p_mode_t;
+⋮----
+} el_mc3p_phase_state_t;
+⋮----
+}el_mc3p_sync;
+⋮----
+}el_mc3p_config_t;
+⋮----
+}el_mc3p_handle_t;
+⋮----
+} el_mc3p_svm_data_t;
+⋮----
+} el_mc3p_trap_data_t;
+⋮----
+void el_mc3p_init(el_mc3p_handle_t *h);
+void el_mc3p_reconfigure_pwm(el_mc3p_handle_t *h);
+void el_mc3p_set_gain(el_mc3p_handle_t *h, el_mc3p_sync s, float gain);
+void el_mc3p_set_sync_scale(el_mc3p_handle_t *h, const float scales[MC3P_SYNC_CHANNELS][2]);
+void el_mc3p_bg_startConv(el_mc3p_handle_t *h);
+uint8_t el_mc3p_bg_channels(el_mc3p_handle_t *h);
+float el_mc3p_adc_read_single(el_mc3p_handle_t *h, uint32_t channel);
+⋮----
+uint8_t el_mc3p_read_bg(el_mc3p_handle_t *h, float *scanData);
+uint8_t el_mc3p_bg_isReady(el_mc3p_handle_t *h);
+void el_mc3p_read_sync(el_mc3p_handle_t *h, void* scanData);
+⋮----
+void el_mc3p_write_phase_state(el_mc3p_handle_t *h, el_mc3p_phase_state_t state_u, el_mc3p_phase_state_t state_v, el_mc3p_phase_state_t state_w);
+void el_mc3p_write_phase_duty(el_mc3p_handle_t *h, int16_t duty_u_q15, int16_t duty_v_q15, int16_t duty_w_q15);
+⋮----
+void el_mc3p_write_float(el_mc3p_handle_t *h);
+void el_mc3p_write_trap(el_mc3p_handle_t *h, el_mc3p_sector_t sector, uint16_t duty_q15);
+void el_mc3p_write_svm(el_mc3p_handle_t *h, int16_t alpha_q15, int16_t beta_q15);
+⋮----
+__attribute__((weak)) void el_xmc3p_tickerCallback(void);
+__attribute__((weak)) void el_mc3p_sync_postScanCallback(void);
+</file>
+
+<file path="digest/EcoDrive/platform/host/platform.cmake">
+
+</file>
+
+<file path="digest/EcoDrive/platform/host/platform.cpp">
+static inline uint64_t now_ns(void) {
+⋮----
+unsigned int register_timer(vtimer_manager_t* mgr, timer_callback_t cb, uint64_t timestep_ns) {
+⋮----
+bool configure_timer_timestep(vtimer_manager_t* mgr, unsigned int idx ,uint64_t timestep_ns)
+⋮----
+struct SIM{
+⋮----
+void tick(uint64_t elapsed_ns)
+⋮----
+void* tick_thread(void* arg) {
+⋮----
+static inline void glfw_error_callback(int error, const char* description) { std::cerr << "GLFW Error " << error << ": " << description << std::endl; }
+static inline void window_close_callback(GLFWwindow* w) {
+⋮----
+void gui_init(){
+⋮----
+void gui_deinit()
+⋮----
+void gui_loop() {
+⋮----
+void platform_init()
+</file>
+
+<file path="digest/EcoDrive/platform/host/platform.h">
+} vtimer_t;
+⋮----
+} vtimer_manager_t;
+⋮----
+unsigned int register_timer(vtimer_manager_t* mgr, timer_callback_t cb, uint64_t timestep_ns);
+bool configure_timer_timestep(vtimer_manager_t *mgr, unsigned int idx, uint64_t timestep_ns);
+⋮----
+void platform_init();
+void gui_loop();
+</file>
+
+<file path="digest/EcoDrive/platform/host/sil.h">
+struct DummyLoad{
+⋮----
+struct Sil
+⋮----
+struct State{
+⋮----
+struct Param{
+⋮----
+struct Input {
+⋮----
+bool start(const char* filename)
+⋮----
+bool log(const State& s) {
+⋮----
+bool stop(){
+⋮----
+void step(const Input& in)
+⋮----
+void electrical_solve(const Sil::Input &in, double dt, double theta_e, double omega_e)
+⋮----
+void inverter_step(const Sil::Input &in, double dt)
+⋮----
+void abc_to_dq(float a, float b, float c, float *d, float *q)
+⋮----
+void abc_to_alpha_beta(float a, float b, float c, float *alpha, float *beta)
+⋮----
+enum class stateDataOrder
+⋮----
+enum class paramDataOrder
+⋮----
+void logStart(const char* filename)
+⋮----
+H5::DataSpace attr_space(H5S_SCALAR);
+⋮----
+void flushStateBuffer()
+⋮----
+void flushParamBuffer()
+⋮----
+void log(const Sil &sil, const Sil::Input &sil_input, bool log_param = false)
+⋮----
+void logStop()
+⋮----
+bool isLogOn()
+</file>
+
+<file path="digest/EcoDrive/platform/host/silgui.h">
+inline ScopeStream<float> scope(scope_buffer, CHANNELS, SAMPLE_DEPTH);
+⋮----
+enum class VoltagePlotType
+⋮----
+enum class DisplayMode
+⋮----
+struct DataSummary
+⋮----
+static void drawControlPanel()
+⋮----
+inline void draw_rotation_indicator(ImDrawList* draw_list,
+⋮----
+static void drawSummary()
+⋮----
+static ImPlotRange shared_x_range(0, SAMPLE_DEPTH);
+⋮----
+static void drawPhaseCurrentPlot(float height)
+⋮----
+static void drawPhaseVoltagePlot(float height)
+⋮----
+static void drawMechanical(float height)
+⋮----
+static void renderDashboard()
+⋮----
+inline void silgui_render()
+⋮----
+inline void silgui_init()
+⋮----
+inline void silgui_updateData()
+</file>
+
+<file path="digest/EcoDrive/platform/stm32f4/CMakeLists.txt">
+cmake_minimum_required(VERSION 3.20)
+# Include device-specific CMake configuration
+
+# Set device specific definitions
+set(DEVICE_DEFINITIONS
+    USE_HAL_DRIVER
+    STM32F401xC
+    USE_FULL_LL_DRIVER
+    #USE_FULL_ASSERT
+)
+
+# Path configurations
+set(HAL_CONFIG_DIR ${THIRDPARTY_DIR}/stm32/f4)
+set(STM32CMX_DIR ${THIRDPARTY_DIR}/stm32)
+set(STM32F4xx_HAL_DRIVER_DIR ${THIRDPARTY_DIR}/stm32/f4/STM32F4xx_HAL_Driver)
+set(CMSIS_DEVICE_DIR ${THIRDPARTY_DIR}/CMSIS/Device/ST/STM32F4xx/Include)
+set(CMSIS_CORE_DIR ${THIRDPARTY_DIR}/CMSIS)
+set(CMSIS_DSP_DIR ${THIRDPARTY_DIR}/CMSIS-DSP)
+set(CMSIS_DSP_PRIVATE_INCLUDES
+    ${CMSIS_DSP_DIR}/PrivateInclude
+    ${CMSIS_DSP_DIR}/Include/dsp  # Sometimes needed
+)
+set(USBD_DIR ${THIRDPARTY_DIR}/stm32/usbd)
+
+
+# Common include directories for all STM32 targets
+set(STM32_COMMON_INCLUDES
+    ${CMSIS_CORE_DIR}/Include
+    ${CMSIS_CORE_DIR}/Core/Include
+    ${CMSIS_DSP_PRIVATE_INCLUDES}
+    ${STM32F4xx_HAL_DRIVER_DIR}/Inc
+    ${STM32F4xx_HAL_DRIVER_DIR}/Inc/Legacy  # Important for HAL/LL compatibility
+    ${CMSIS_DEVICE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${HAL_CONFIG_DIR}
+    ${USBD_DIR}/Core/Inc
+    ${USBD_DIR}/Class/XCH/Inc
+    ${USBD_DIR}/App
+    ${STM32CMX_DIR}/f4/Target
+    ${ECOLIB_DIR}/driver/stm32f4
+)
+
+# ===== HAL DRIVERS (for complex protocols) =====
+set(STM32_Drivers_Src
+    # Core HAL
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_ll_usb.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_pcd.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_pcd_ex.c
+
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_rcc.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_rcc_ex.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_gpio.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_cortex.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_dma.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_pwr.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_pwr_ex.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_flash.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_flash_ex.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_tim.c     
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_tim_ex.c  
+    # Communication HAL (add as needed)
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_uart.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_hal_can.c
+
+        # Core LL
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_ll_utils.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_ll_rcc.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_ll_gpio.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_ll_dma.c
+    
+    # Motor Control LL (add as needed)
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_ll_tim.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_ll_adc.c
+    ${STM32F4xx_HAL_DRIVER_DIR}/Src/stm32f4xx_ll_usart.c
+)
+
+
+set(Platform_Src
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform.c
+)
+
+set(STM32CMX_Src
+    ${STM32CMX_DIR}/syscalls.c
+    ${STM32CMX_DIR}/sysmem.c
+    ${STM32CMX_DIR}/f4/stm32f4xx_it.c
+    ${STM32CMX_DIR}/f4/toolchain/startup_stm32f401xc.s
+    ${STM32CMX_DIR}/f4/system_stm32f4xx.c
+)
+
+set(USBD_Src
+    ${USBD_DIR}/Core/Src/usbd_core.c
+    ${USBD_DIR}/Core/Src/usbd_ctlreq.c
+    ${USBD_DIR}/Core/Src/usbd_ioreq.c
+    ${USBD_DIR}/Class/XCH/Src/usbd_xch.c
+    ${USBD_DIR}/App/usbd_desc.c
+    ${USBD_DIR}/App/usb_device.c
+    ${STM32CMX_DIR}/f4/Target/usbd_conf.c
+)
+
+set(CMSISCORE ${THIRDPARTY_DIR}/CMSIS)
+add_subdirectory(${CMSIS_DSP_DIR}/Source ${CMAKE_CURRENT_BINARY_DIR}/cmsis_dsp_stm32f4)
+
+# Driver core sources are NOT added to the static library to avoid linker archive issues
+# where weak startup symbols prevent strong handler definitions from being linked.
+# Instead, they are linked directly from the parent scope (see PLATFORM_DRIVER_CORE_SOURCES).
+file(GLOB_RECURSE Driver_Core_Src
+    ${ECOLIB_DIR}/driver/stm32f4/*.cpp
+    ${ECOLIB_DIR}/driver/stm32f4/*.c
+)
+
+add_library(stm32f4_platform STATIC)
+target_sources(stm32f4_platform PRIVATE
+    ${STM32CMX_Src}
+    ${STM32_Drivers_Src}
+    ${USBD_Src}
+)
+
+target_include_directories(stm32f4_platform PUBLIC ${STM32_COMMON_INCLUDES} ${CMSIS_DSP_DIR}/Include )
+target_compile_definitions(stm32f4_platform PUBLIC ${DEVICE_DEFINITIONS})
+
+# =============================================
+# INTERFACE LIBRARY FOR EXPORT
+# =============================================
+# Create interface library for easy linking
+add_library(stm32f4_platform_interface INTERFACE)
+target_link_libraries(stm32f4_platform_interface INTERFACE stm32f4_platform CMSISDSP)
+target_include_directories(stm32f4_platform_interface INTERFACE
+    ${STM32_COMMON_INCLUDES}
+    ${CMSIS_DSP_DIR}/Include
+    ${CMSISCORE}/Include
+)
+target_compile_definitions(stm32f4_platform_interface INTERFACE
+    ${DEVICE_DEFINITIONS}
+)
+
+# =============================================
+# EXPORT VARIABLES FOR PARENT CMakeLists.txt
+# =============================================
+# These will be available in the parent scope
+set(PLATFORM_LIB stm32f4_platform PARENT_SCOPE)
+set(PLATFORM_INTERFACE stm32f4_platform_interface PARENT_SCOPE)
+set(PLATFORM_INCLUDES ${STM32_COMMON_INCLUDES} PARENT_SCOPE)
+set(PLATFORM_DEFINITIONS ${DEVICE_DEFINITIONS} PARENT_SCOPE)
+set(PLATFORM_SOURCE ${Driver_Core_Src} ${Platform_Src} PARENT_SCOPE)
+</file>
+
+<file path="digest/EcoDrive/platform/stm32f4/platform.c">
+void SystemClock_Config(void)
+⋮----
+int __io_putchar(int ch){
+⋮----
+void HAL_MspInit(void)
+⋮----
+void Error_Handler(void)
+⋮----
+void assert_failed(uint8_t *file, uint32_t line)
+⋮----
+static inline void ENABLE_ALL_GPIO_CLOCKS(void) {
+⋮----
+void platform_init(void)
+</file>
+
+<file path="digest/EcoDrive/platform/stm32f4/platform.cmake">
+set(CMAKE_TOOLCHAIN_FILE "${THIRDPARTY_DIR}/stm32/f4/toolchain/gcc-arm-none-eabi.cmake")
+</file>
+
+<file path="digest/EcoDrive/platform/stm32f4/platform.h">
+void platform_init(void);
+void Error_Handler(void);
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PmsmControl.cpp">
+void el_mc3p_sync_postScanCallback(){pmsmC1.mc.pwmLoop();}
+void el_xmc3p_tickerCallback(){pmsmC1.mc.xmcLoop();}
+⋮----
+PmsmControlTypes::ERR PmsmControl::init()
+⋮----
+PmsmControlTypes::ERR PmsmControl::setSetpoint(float sp, PmsmControlTypes::MechMode mech_mode)
+⋮----
+PmsmControlTypes::ERR PmsmControl::configControlMode(PmsmControlTypes::MCMode mc_mode, PmsmControlTypes::MechMode mech_mode)
+⋮----
+PmsmControlTypes::ERR PmsmControl::configElecLimits(PmsmControlTypes::ConfigElecLimits elim)
+⋮----
+PmsmControlTypes::ERR PmsmControl::configMechLimits(PmsmControlTypes::ConfigMechLimits mechlim)
+⋮----
+PmsmControlTypes::ERR PmsmControl::configPwm(PmsmControlTypes::ConfigPwm cfg)
+⋮----
+PmsmControlTypes::ERR PmsmControl::configFocPid(PmsmControlTypes::Pid Id_pid, PmsmControlTypes::Pid Iq_pid)
+⋮----
+PmsmControlTypes::ERR PmsmControl::configFocOlstup(PmsmControlTypes::ConfigOlstup cfg)
+⋮----
+PmsmControlTypes::ERR PmsmControl::configSComm(PmsmControlTypes::ConfigSComm cfg)
+⋮----
+PmsmControlTypes::ERR PmsmControl::getFault() const
+⋮----
+PmsmControlTypes::ERR PmsmControl::setOnFault(void (*onFault)(void *))
+⋮----
+PmsmControlTypes::ERR PmsmControl::clearFault()
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PmsmControl.h">
+friend void el_mc3p_sync_postScanCallback();
+friend void el_xmc3p_tickerCallback();
+⋮----
+static constexpr uint8_t olstup_tb_size() {return PmsmControlTypes::OLSTUP_TABLE_SIZE;};
+⋮----
+PmsmControlTypes::ERR init();
+⋮----
+PmsmControlTypes::ERR getFault() const;
+PmsmControlTypes::ERR setOnFault(void(*onFault)(void*));
+PmsmControlTypes::ERR clearFault();
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PmsmControlConf.h">
+
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PmsmControlCore_Foc.cpp">
+static inline q31_t maxa_minb_2_q31(q31_t i1,q31_t i2)
+⋮----
+void PmsmControlCore::Foc_init()
+⋮----
+void PmsmControlCore::Foc_onEnter(MCMode prev_mct)
+⋮----
+void PmsmControlCore::Foc_onExit()
+⋮----
+void PmsmControlCore::Foc_xmcLoop()
+⋮----
+void PmsmControlCore::Foc_pwmLoop()
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PmsmControlCore_Foc.h">
+struct Foc
+⋮----
+void Foc_olstup_start();
+void Foc_init();
+void Foc_onEnter(PmsmControlTypes::MCMode prev_mct);
+void Foc_onExit();
+void Foc_pwmLoop();
+void Foc_xmcLoop();
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PmsmControlCore_SComm.cpp">
+void PmsmControlCore::SComm_init()
+⋮----
+void PmsmControlCore::SComm_onEnter(MCMode prev_mct)
+⋮----
+void PmsmControlCore::SComm_onExit()
+⋮----
+void PmsmControlCore::SComm_pwmLoop()
+⋮----
+void PmsmControlCore::SComm_xmcLoop()
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PmsmControlCore_SComm.h">
+struct SComm
+⋮----
+enum class IDStage
+⋮----
+enum class IDSubStage
+⋮----
+void SComm_init();
+void SComm_onEnter(PmsmControlTypes::MCMode prev_mct);
+void SComm_onExit();
+void SComm_pwmLoop();
+void SComm_xmcLoop();
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PmsmControlCore.cpp">
+void PmsmControlCore::olstup_lut_run(Olstup &stup, q31_t &ec_sp_q31, float &rps)
+⋮----
+void PmsmControlCore::init()
+⋮----
+void PmsmControlCore::xmcLoop()
+⋮----
+void PmsmControlCore::pwmConfigUpdate(PmsmControlTypes::ConfigPwm cfg)
+⋮----
+void PmsmControlCore::pwmLoop()
+⋮----
+void PmsmControlCore::setControlMode(MCMode mc_mode)
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PmsmControlCore.h">
+float voltage_q31_to_float(q31_t voltage_q31) const { return EL_MC3P_VS_TO_FLOAT(voltage_q31); }
+float current_q31_to_float(q31_t current_q31) const { return EL_MC3P_CS_TO_FLOAT(current_q31); }
+float angle_q31_to_float(q31_t eAngle_q31) const { return (float)eAngle_q31 * (M_PI / INT32_MAX);}
+inline uint32_t xTicks_to_us(uint32_t ticks)const{return ticks*xTicks_period_us;};
+inline uint32_t xTicks_to_ms(uint32_t ticks)const{return xTicks_to_us(ticks)/1000;};
+inline int32_t rps_to_rpxt(float rps){
+⋮----
+inline float rpxt_to_rps(int32_t rpxt){
+⋮----
+struct Olstup
+⋮----
+void init();
+void setControlMode(PmsmControlTypes::MCMode mc_mode);
+void pwmConfigUpdate(PmsmControlTypes::ConfigPwm cfg);
+void olstup_lut_run(Olstup&, q31_t&, float&);
+⋮----
+void pwmLoop();
+void xmcLoop();
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PmsmControlTypes.h">
+enum class Direction : uint8_t
+⋮----
+enum class RunMode : uint8_t
+⋮----
+enum class MechMode : uint8_t
+⋮----
+enum class PosDriverFsm : uint8_t
+⋮----
+enum class MCMode : uint8_t
+⋮----
+enum class ElecMode : uint8_t
+⋮----
+enum class EStopMode : uint8_t
+⋮----
+enum class PosDriverType
+⋮----
+enum class ERR : uint8_t
+⋮----
+enum DirtyPits
+⋮----
+struct ConfigPwm
+⋮----
+struct ConfigEstop
+⋮----
+struct ConfigSComm
+⋮----
+struct Model
+⋮----
+struct ConfigOlstup
+⋮----
+struct ConfigElecLimits
+⋮----
+struct ConfigMechLimits
+⋮----
+struct Pid
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PosDriver.cpp">
+bool PosOpen::init_impl()
+⋮----
+void PosOpen::pTickUpdate_impl()
+⋮----
+void PosOpen::xTickUpdate_impl()
+</file>
+
+<file path="digest/EcoDrive/PmsmControl/PosDriver.h">
+const Impl &self() const { return static_cast<const Impl &>(*this); }
+⋮----
+void align();
+void olramp();
+⋮----
+explicit PosDriverBase(PmsmControlCore &mc) : mc(mc) {}
+⋮----
+bool init() {return self().init_impl();}
+int64_t getMechAng_q31p32() const { return self().getMechAng_q31p32_impl(); }
+int32_t getElecAng_q31() const { return self().getElecAng_q31_impl(); }
+PmsmControlTypes::PosDriverType getType()const { return self().getType_impl(); }
+void pTickUpdate(){self().pTickUpdate_impl();}
+void xTickUpdate(){self().xTickUpdate_impl();}
+static constexpr uint8_t modeSupport(){return self().modeSupport_impl();}
+void setCommAngle(int32_t commAngle_q31) { self().setCommAngle_impl(commAngle_q31);}
+void reset() { self().reset_impl(); }
+⋮----
+explicit PosOpen(PmsmControlCore &mc) : PosDriverBase<PosOpen>(mc) {}
+bool init_impl();
+PmsmControlTypes::PosDriverType getType_impl()
+⋮----
+void pTickUpdate_impl();
+void xTickUpdate_impl();
+int64_t getMechAng_q31p32_impl() const{return 0;};
+int32_t getElecAng_q31_impl() const{return 0;};
+void setCommAngle_impl(q31_t  _commAngle_q31)
+⋮----
+void reset_impl()
+</file>
+
+<file path="digest/EcoDrive/CMakeLists.txt">
+cmake_minimum_required(VERSION 3.20)
+
+
+# Select target platform
+set(PLATFORM_NAME "host" CACHE STRING "Target platform (host, stm32f4)")
+set(ECOLIB_DIR ${CMAKE_SOURCE_DIR}/../ecolib)
+set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/../thirdparty)
+set(PMSMCONTROL_DIR ${CMAKE_SOURCE_DIR}/PmsmControl)
+
+####platform specific settings
+# SET TOOLCHAIN BEFORE PROJECT - ADD THIS LINE
+include(platform/${PLATFORM_NAME}/platform.cmake)
+project(EcoDrive LANGUAGES C CXX ASM)
+
+# Prevent in-source builds
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+    message(FATAL_ERROR "
+    In-source builds are not allowed!
+    Please use:
+    mkdir build && cd build && cmake ..
+    ")
+endif()
+
+# Setup cmake module path and compiler settings
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
+message("Build type: " ${CMAKE_BUILD_TYPE})
+
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
+
+# Set C++ standard
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Control where files go WITHIN the build directory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# Include directories
+include_directories(
+    ${CMAKE_SOURCE_DIR}
+    ${ECOLIB_DIR}
+    ${ECOLIB_DIR}/middleware
+    ${PMSMCONTROL_DIR}
+)
+
+
+# Link with platform EARLY to get include paths
+add_subdirectory(platform/${PLATFORM_NAME})
+
+message(STATUS "LIBRARIES TO LINK: ${PLATFORM_LIB}")
+
+# Add platform includes to global include path
+include_directories(${PLATFORM_INCLUDES})
+
+file(GLOB_RECURSE MIDDLEWARE_SRC    
+    ${ECOLIB_DIR}/middleware/*.cpp
+    ${ECOLIB_DIR}/middleware/*.c
+)
+
+
+
+set(APPLICATION_SRC
+    ${PMSMCONTROL_DIR}/PmsmControl.cpp
+    ${PMSMCONTROL_DIR}/PosDriver.cpp
+    ${PMSMCONTROL_DIR}/PmsmControlCore.cpp
+    ${PMSMCONTROL_DIR}/PmsmControlCore_Foc.cpp
+    ${PMSMCONTROL_DIR}/PmsmControlCore_SComm.cpp
+    ${CMAKE_SOURCE_DIR}/main.cpp
+    ${CMAKE_SOURCE_DIR}/sys.cpp
+)
+
+
+file(GLOB_RECURSE CORE_SRC
+    ${ECOLIB_DIR}/el/*.cpp
+    ${ECOLIB_DIR}/el/*.c
+)
+
+
+# Create executable
+add_executable(${PROJECT_NAME} ${APPLICATION_SRC} ${CORE_SRC} ${MIDDLEWARE_SRC})
+
+# Add eld sources directly to the executable to ensure strong IRQ handlers
+# override weak startup symbols (avoids linker archive symbol resolution issues)
+target_sources(${PROJECT_NAME} PRIVATE ${PLATFORM_SOURCE})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${PLATFORM_INTERFACE}
+    ${PLATFORM_LIB}
+    ${TOOLCHAIN_LINK_LIBRARIES}
+)
+
+# BUILD Platform Tied TEST CODE
+if(PLATFORM_NAME STREQUAL "host")
+    add_definitions(-DPLATFORM_HOST)
+
+# ── Unit Tests (optional) ────────────────────────────────────
+option(TESTS_BUILD "Build unit test" OFF)
+if(TESTS_BUILD)
+    # Set third-party directory at root level
+    set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/thirdparty)
+    file(MAKE_DIRECTORY ${THIRDPARTY_DIR})
+    
+    add_subdirectory(test)
+    message(STATUS "Unit test enabled. Use 'ctest' to run.")
+    
+    # Add convenience targets at root level
+    add_custom_target(build_tests
+        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all_unit_tests
+        COMMENT "Building all unit test..."
+    )
+    
+    add_custom_target(run_tests
+        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target run_all_tests
+        COMMENT "Running all unit test..."
+    )
+endif()
+
+endif()
+
+
+
+if(NOT PLATFORM_NAME STREQUAL "host")
+# ADD THIS: Show size automatically after every build
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "=== Memory Usage ==="
+    COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:${PROJECT_NAME}>
+    COMMENT "Displaying memory usage"
+)
+
+# Size target for checking memory usage
+add_custom_target(size
+    DEPENDS ${PROJECT_NAME}
+    COMMAND ${CMAKE_COMMAND} -E echo "=== Detailed Memory Analysis ==="
+    COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:${PROJECT_NAME}>
+)
+
+# Convert output to hex and binary
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_NAME}.hex
+)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_NAME}.bin
+)
+endif()
+</file>
+
+<file path="digest/EcoDrive/DAQSessionAPP.h">
+uint8_t send() override
+⋮----
+uint8_t on_mark(daq::MARKER mark, bool entry)override
+</file>
+
+<file path="digest/EcoDrive/main.cpp">
+int main(){
+</file>
+
+<file path="digest/EcoDrive/sys.cpp">
+void Sys::init()
+</file>
+
+<file path="digest/EcoDrive/sys.h">
+static inline void onFrame(void* ctx, uint8_t id, uint8_t* payload, uint8_t payload_len)
+⋮----
+static inline void onError(void* ctx, uint8_t id)
+⋮----
+static void init(void);
+</file>
+
+<file path="digest/ecolib/driver/host/el_core.c">
+void el_core_init(el_core_t *h)
+</file>
+
+<file path="digest/ecolib/driver/host/el_core.h">
+}el_core_t;
+⋮----
+void el_core_init(el_core_t *h);
+⋮----
+static inline uint32_t el_prof_tick()
+⋮----
+static inline uint32_t el_prof_tock(uint32_t start)
+⋮----
+typedef uint16_t el_pin_t;
+⋮----
+} el_gpio_mode_t;
+⋮----
+} el_gpio_state_t;
+⋮----
+static inline void el_gpio_mode(el_pin_t pin_num, el_gpio_mode_t mode) {
+⋮----
+static inline void el_gpio_write(el_pin_t pin_num, el_gpio_state_t state) {
+⋮----
+static inline void el_gpio_toggle(el_pin_t pin_num) {
+⋮----
+static inline el_gpio_state_t el_gpio_read(el_pin_t pin_num) {
+⋮----
+static inline uint32_t el_atomic_start(void) {
+⋮----
+static inline void el_atomic_end(uint32_t primask) {
+⋮----
+static inline void el_delay(uint32_t delay_ms)
+</file>
+
+<file path="digest/ecolib/driver/host/el_uart.c">
+void uart1_dma_receive_handle();
+⋮----
+static void uart1_dma_transmit_complete_callback();
+⋮----
+void uart1_dma_receive_complete_register_callback(void(*func)(void));
+⋮----
+void uart1_dmaInit();
+void uart1_interruptInit();
+void uart1_uartInit(el_uart_handle_t *handle);
+⋮----
+void uart1_dmaInit()
+⋮----
+void uart1_interruptInit()
+⋮----
+void uart1_gpio_init()
+⋮----
+void el_uart1_init(el_uart_handle_t *handle)
+⋮----
+el_ring_stats_t el_uart1_rx_stats(el_uart_handle_t *handle)
+⋮----
+el_ring_stats_t el_uart1_tx_stats(el_uart_handle_t *handle)
+⋮----
+void el_uart1_resetStats(el_uart_handle_t *handle)
+⋮----
+void DMA2_Stream5_IRQHandler(void) {
+⋮----
+void DMA2_Stream7_IRQHandler(void)
+</file>
+
+<file path="digest/ecolib/driver/host/el_uart.h">
+}el_uart_config_t;
+⋮----
+}el_uart_status_t;
+⋮----
+}el_uart_handle_t;
+⋮----
+void el_uart1_init(el_uart_handle_t *handle);
+uint8_t el_uart1_write(el_uart_handle_t *handle, const uint8_t* data, uint8_t len);
+uint16_t el_uart1_read(el_uart_handle_t *handle, uint8_t* data, uint8_t len);
+el_ring_stats_t el_uart1_rx_stats(el_uart_handle_t *handle);
+el_ring_stats_t el_uart1_tx_stats(el_uart_handle_t *handle);
+void el_uart1_resetStats(el_uart_handle_t *handle);
+</file>
+
+<file path="digest/ecolib/driver/host/el_usbcdc.c">
+void el_usbcdc_init(el_uart_handle_t *handle)
+⋮----
+uint8_t el_usbcdc_write(el_uart_handle_t *handle, uint8_t* data, uint8_t len)
+⋮----
+uint16_t el_usbcdc_read(el_uart_handle_t *handle, uint8_t* data, uint8_t len)
+⋮----
+el_ring_stats_t el_usbcdc_rx_stats(el_uart_handle_t *handle)
+⋮----
+el_ring_stats_t el_usbcdc_tx_stats(el_uart_handle_t *handle)
+⋮----
+void el_usbcdc_resetStats(el_uart_handle_t *handle)
+</file>
+
+<file path="digest/ecolib/driver/host/el_usbcdc.h">
+void el_usbcdc_init(el_uart_handle_t *handle);
+uint8_t el_usbcdc_write(el_uart_handle_t *handle, uint8_t* data, uint8_t len);
+uint16_t el_usbcdc_read(el_uart_handle_t *handle, uint8_t* data, uint8_t len);
+el_ring_stats_t el_usbcdc_rx_stats(el_uart_handle_t *handle);
+el_ring_stats_t el_usbcdc_tx_stats(el_uart_handle_t *handle);
+void el_usbcdc_resetStats(el_uart_handle_t *handle);
+</file>
+
+<file path="digest/ecolib/driver/host/el_usbxch.cpp">
+void el_usbxch_init(el_usbxch_handle_t *h)
+⋮----
+uint32_t el_usbxch_write(el_usbxch_handle_t *h, const uint8_t *data, uint32_t length)
+⋮----
+uint32_t el_usbxch_read(el_usbxch_handle_t *h, uint8_t *data, uint32_t length)
+⋮----
+bool el_usbxch_connected(el_usbxch_handle_t *h)
+⋮----
+void el_usbxch_update(el_usbxch_handle_t *h)
+⋮----
+uint32_t el_usbxch_write_available(el_usbxch_handle_t *h)
+⋮----
+uint32_t el_usbxch_flush(el_usbxch_handle_t *h)
+⋮----
+uint32_t el_usbxch_read_available(el_usbxch_handle_t *h)
+</file>
+
+<file path="digest/ecolib/driver/host/el_usbxch.h">
+}el_usbxch_handle_t;
+⋮----
+void el_usbxch_init(el_usbxch_handle_t *h);
+uint32_t el_usbxch_write(el_usbxch_handle_t *h, const uint8_t* data, uint32_t length);
+uint32_t el_usbxch_write_available(el_usbxch_handle_t *h);
+uint32_t el_usbxch_flush(el_usbxch_handle_t *h);
+uint32_t el_usbxch_read(el_usbxch_handle_t *h, uint8_t *data, uint32_t length);
+uint32_t el_usbxch_read_available(el_usbxch_handle_t *h);
+bool el_usbxch_connected(el_usbxch_handle_t *h);
+void el_usbxch_update(el_usbxch_handle_t *h);
+</file>
+
+<file path="digest/ecolib/driver/host/eld_conf.h">
+
+</file>
+
+<file path="digest/ecolib/driver/host/TCPServer.cpp">
+bool TCPServer::init(uint16_t port)
+⋮----
+bool TCPServer::pollClient()
+⋮----
+void TCPServer::disconnect()
+⋮----
+void TCPServer::stop()
+⋮----
+bool TCPServer::isConnected() const
+⋮----
+int TCPServer::available() const
+⋮----
+int TCPServer::write(const void* data, size_t len)
+⋮----
+int TCPServer::read(void* data, size_t len)
+</file>
+
+<file path="digest/ecolib/driver/host/TCPServer.h">
+bool init(uint16_t port);
+bool pollClient();
+⋮----
+void disconnect();
+void stop();
+⋮----
+bool isConnected() const;
+⋮----
+int available() const;
+⋮----
+int write(const void* data, size_t len);
+⋮----
+int read(void* data, size_t len);
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_core.c">
+static inline void dwt_init(void)
+⋮----
+void el_core_init(el_core_t *h)
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_core.h">
+}el_core_t;
+⋮----
+void el_core_init(el_core_t *h);
+⋮----
+static inline uint32_t el_prof_tick()
+⋮----
+static inline uint32_t el_prof_tock(uint32_t start)
+⋮----
+typedef uint16_t el_pin_t;
+⋮----
+} el_gpio_mode_t;
+⋮----
+} el_gpio_state_t;
+⋮----
+static inline void el_gpio_mode(el_pin_t pin_num, el_gpio_mode_t mode) {
+⋮----
+static inline void el_gpio_write(el_pin_t pin_num, el_gpio_state_t state) {
+⋮----
+static inline void el_gpio_toggle(el_pin_t pin_num) {
+⋮----
+static inline el_gpio_state_t el_gpio_read(el_pin_t pin_num) {
+⋮----
+static inline uint32_t el_atomic_start(void) {
+⋮----
+static inline void el_atomic_end(uint32_t primask) {
+⋮----
+static inline void el_delay(uint32_t delay_ms)
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_hall.c">
+uint8_t hall1_gpioRead()
+⋮----
+void el_hall1_init()
+⋮----
+void el_hall1_setComDelay_uS(uint32_t delay_uS)
+⋮----
+void el_hall1_setComCallback(void (*callback)(void))
+⋮----
+float el_hall1_elec_speed(){
+⋮----
+uint8_t el_hall1_read(){
+⋮----
+void el_comDelay_init()
+⋮----
+void el_comDelay_setComDelay_uS(uint32_t delay_uS)
+⋮----
+void el_comDelay_setComCallback(void (*callback)(void))
+⋮----
+void TIM2_IRQHandler(void)
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_hall.h">
+void el_hall1_init();
+⋮----
+void el_hall1_setComDelay_uS(uint32_t delay_uS);
+⋮----
+void el_hall1_setComCallback(void (*callback)(void));
+⋮----
+float el_hall1_elec_speed();
+⋮----
+uint8_t el_hall1_read();
+⋮----
+int32_t el_hall1_elec_angle_q31();
+⋮----
+void el_hall1_reset();
+⋮----
+void el_comDelay_init();
+⋮----
+void el_comDelay_setComDelay_uS(uint32_t COM_delay_uS);
+⋮----
+void el_comDelay_setComCallback(void (*callback)(void));
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_mc3p_it.c">
+HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
+⋮----
+void HAL_SuspendTick(void)
+⋮----
+void HAL_ResumeTick(void)
+⋮----
+__attribute__((weak)) void el_xmc3p_tickerCallback(void){}
+__attribute__((weak)) void el_mc3p_sync_postScanCallback(void){}
+⋮----
+void mc3p_irq_bind(el_mc3p_handle_t* h)
+⋮----
+__attribute__((weak)) void INTERNAL_mc3p_ADC_JEOS_IRQ(el_mc3p_handle_t *h){}
+⋮----
+void ADC_IRQHandler(void)
+⋮----
+void TIM1_UP_TIM10_IRQHandler(void)
+⋮----
+void TIM1_TRG_COM_TIM11_IRQHandler(void)
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_mc3p.c">
+void mc3p_adc_svm_update(el_mc3p_handle_t *h, el_mc3p_sector_t sector);
+void mc3p_adc_trap_update(el_mc3p_handle_t *h, el_mc3p_sector_t sector);
+void mc3p_adc_mode(el_mc3p_handle_t *h, el_mc3p_sector_t sector);
+void mc3p_offset_calibration(el_mc3p_handle_t *h);
+⋮----
+uint16_t adc1_Sample_Single_Channel_Temporary(uint32_t channel)
+⋮----
+float mc3p_adc_read_single(el_mc3p_handle_t *h, uint32_t channel)
+⋮----
+void mc3p_adc_calibrate(el_mc3p_handle_t *h)
+⋮----
+void mc3p_adc_init(el_mc3p_handle_t *h)
+⋮----
+void mc3p_gpio_init()
+⋮----
+void mc3p_dma_init()
+⋮----
+void mc3p_interrupt_init(){
+⋮----
+static void mc3p_tim1_init(el_mc3p_handle_t *h){
+⋮----
+void el_mc3p_init(el_mc3p_handle_t *h)
+⋮----
+void el_mc3p_reconfigure_pwm(el_mc3p_handle_t *h)
+⋮----
+void el_mc3p_write_phase_state(el_mc3p_handle_t *h, el_mc3p_phase_state_t state_u, el_mc3p_phase_state_t state_v, el_mc3p_phase_state_t state_w)
+⋮----
+void el_mc3p_write_phase_duty(el_mc3p_handle_t *h, int16_t dutyu_q15, int16_t dutyv_q15, int16_t dutyw_q15)
+⋮----
+void el_mc3p_write_float(el_mc3p_handle_t *h)
+⋮----
+} mc3p_trap_sector_map_t;
+⋮----
+void el_mc3p_write_trap(el_mc3p_handle_t *h, el_mc3p_sector_t sector, uint16_t duty_q15)
+⋮----
+void el_mc3p_write_svm(el_mc3p_handle_t *h, int16_t alpha_q15, int16_t beta_q15)
+⋮----
+void mc3p_adc_mode(el_mc3p_handle_t *h, el_mc3p_sector_t sector)
+⋮----
+void mc3p_adc_svm_update(el_mc3p_handle_t *h, el_mc3p_sector_t sector)
+⋮----
+} mc3p_adc_map_t;
+⋮----
+void mc3p_adc_trap_update(el_mc3p_handle_t *h, el_mc3p_sector_t sector)
+⋮----
+void el_mc3p_read_sync(el_mc3p_handle_t *h, void *data)
+⋮----
+uint8_t el_mc3p_read_bg(el_mc3p_handle_t *h, float* scanData)
+⋮----
+void el_mc3p_bg_startConv(el_mc3p_handle_t *h)
+⋮----
+uint8_t el_mc3p_bg_channels(el_mc3p_handle_t *h)
+⋮----
+uint8_t el_mc3p_bg_isReady(el_mc3p_handle_t *h)
+⋮----
+void DMA2_Stream0_IRQHandler(void)
+⋮----
+void el_mc3p_set_gain(el_mc3p_handle_t *h,  el_mc3p_sync s, float gain)
+⋮----
+void el_mc3p_set_sync_scale(el_mc3p_handle_t *h, const float scales[MC3P_SYNC_CHANNELS][2])
+⋮----
+void mc3p_offset_calibration(el_mc3p_handle_t *h)
+⋮----
+void INTERNAL_mc3p_ADC_JEOS_IRQ(el_mc3p_handle_t *h)
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_mc3p.h">
+} el_mc3p_sector_t;
+⋮----
+} el_mc3p_mode_t;
+⋮----
+} el_mc3p_phase_state_t;
+⋮----
+} el_mc3p_sync;
+⋮----
+} el_mc3p_config_t;
+⋮----
+} el_mc3p_handle_t;
+⋮----
+} el_mc3p_svm_data_t;
+⋮----
+} el_mc3p_trap_data_t;
+⋮----
+void mc3p_irq_bind(el_mc3p_handle_t *h);
+⋮----
+void el_mc3p_init(el_mc3p_handle_t *h);
+void el_mc3p_reconfigure_pwm(el_mc3p_handle_t *h);
+⋮----
+void el_mc3p_set_gain(el_mc3p_handle_t *h, el_mc3p_sync s, float gain);
+⋮----
+void el_mc3p_set_sync_scale(el_mc3p_handle_t *h, const float scales[MC3P_SYNC_CHANNELS][2]);
+⋮----
+void el_mc3p_bg_startConv(el_mc3p_handle_t *h);
+⋮----
+uint8_t el_mc3p_bg_channels(el_mc3p_handle_t *h);
+⋮----
+uint8_t el_mc3p_read_bg(el_mc3p_handle_t *h, float *scanData);
+⋮----
+uint8_t el_mc3p_bg_isReady(el_mc3p_handle_t *h);
+⋮----
+void el_mc3p_read_sync(el_mc3p_handle_t *h, void *scanData);
+⋮----
+float el_mc3p_adc_read_single(el_mc3p_handle_t *h, uint32_t channel);
+⋮----
+void el_mc3p_write_phase_state(el_mc3p_handle_t *h, el_mc3p_phase_state_t state_u, el_mc3p_phase_state_t state_v, el_mc3p_phase_state_t state_w);
+⋮----
+void el_mc3p_write_phase_duty(el_mc3p_handle_t *h, int16_t duty_u_q15, int16_t duty_v_q15, int16_t duty_w_q15);
+⋮----
+void el_mc3p_write_float(el_mc3p_handle_t *h);
+⋮----
+void el_mc3p_write_trap(el_mc3p_handle_t *h, el_mc3p_sector_t sector, uint16_t duty_q15);
+⋮----
+void el_mc3p_write_svm(el_mc3p_handle_t *h, int16_t alpha_q15, int16_t beta_q15);
+⋮----
+__attribute__((weak)) void el_xmc3p_tickerCallback(void);
+⋮----
+__attribute__((weak)) void el_mc3p_sync_postScanCallback(void);
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_uart.c">
+void uart1_dma_receive_handle();
+⋮----
+static void uart1_dma_transmit_complete_callback();
+⋮----
+void uart1_dma_receive_complete_register_callback(void(*func)(void));
+⋮----
+void uart1_dmaInit();
+void uart1_interruptInit();
+void uart1_uartInit(el_uart_handle_t *handle);
+⋮----
+void uart1_dmaInit()
+⋮----
+void uart1_interruptInit()
+⋮----
+void uart1_gpio_init()
+⋮----
+void el_uart1_init(el_uart_handle_t *handle)
+⋮----
+el_ring_stats_t el_uart1_rx_stats(el_uart_handle_t *handle)
+⋮----
+el_ring_stats_t el_uart1_tx_stats(el_uart_handle_t *handle)
+⋮----
+void el_uart1_resetStats(el_uart_handle_t *handle)
+⋮----
+void DMA2_Stream5_IRQHandler(void) {
+⋮----
+void DMA2_Stream7_IRQHandler(void)
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_uart.h">
+}el_uart_config_t;
+⋮----
+}el_uart_status_t;
+⋮----
+}el_uart_handle_t;
+⋮----
+void el_uart1_init(el_uart_handle_t *handle);
+⋮----
+uint8_t el_uart1_write(el_uart_handle_t *handle, const uint8_t* data, uint8_t len);
+⋮----
+uint16_t el_uart1_read(el_uart_handle_t *handle, uint8_t* data, uint8_t len);
+⋮----
+el_ring_stats_t el_uart1_rx_stats(el_uart_handle_t *handle);
+⋮----
+el_ring_stats_t el_uart1_tx_stats(el_uart_handle_t *handle);
+⋮----
+void el_uart1_resetStats(el_uart_handle_t *handle);
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_usbcdc.c">
+void el_usbcdc_init(el_uart_handle_t *handle)
+⋮----
+uint8_t el_usbcdc_write(el_uart_handle_t *handle, uint8_t* data, uint8_t len)
+⋮----
+uint16_t el_usbcdc_read(el_uart_handle_t *handle, uint8_t* data, uint8_t len)
+⋮----
+el_ring_stats_t el_usbcdc_rx_stats(el_uart_handle_t *handle)
+⋮----
+el_ring_stats_t el_usbcdc_tx_stats(el_uart_handle_t *handle)
+⋮----
+void el_usbcdc_resetStats(el_uart_handle_t *handle)
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_usbcdc.h">
+void el_usbcdc_init(el_uart_handle_t *handle);
+⋮----
+uint8_t el_usbcdc_write(el_uart_handle_t *handle, uint8_t* data, uint8_t len);
+⋮----
+uint16_t el_usbcdc_read(el_uart_handle_t *handle, uint8_t* data, uint8_t len);
+⋮----
+el_ring_stats_t el_usbcdc_rx_stats(el_uart_handle_t *handle);
+⋮----
+el_ring_stats_t el_usbcdc_tx_stats(el_uart_handle_t *handle);
+⋮----
+void el_usbcdc_resetStats(el_uart_handle_t *handle);
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_usbxch.c">
+static void usbxch_start_tx(el_usbxch_handle_t *h);
+⋮----
+void el_usbxch_init(el_usbxch_handle_t *h)
+⋮----
+uint32_t el_usbxch_write(el_usbxch_handle_t *h, const uint8_t *data, uint32_t length)
+⋮----
+uint32_t el_usbxch_write_available(el_usbxch_handle_t *h)
+⋮----
+uint32_t el_usbxch_flush(el_usbxch_handle_t *h)
+⋮----
+uint32_t el_usbxch_clear(el_usbxch_handle_t *h)
+⋮----
+uint32_t el_usbxch_read(el_usbxch_handle_t *h, uint8_t *data, uint32_t length)
+⋮----
+uint32_t el_usbxch_read_available(el_usbxch_handle_t *h)
+⋮----
+bool el_usbxch_connected(el_usbxch_handle_t *h)
+⋮----
+void el_usbxch_update(el_usbxch_handle_t *h)
+⋮----
+static void usbxch_start_tx(el_usbxch_handle_t *h)
+⋮----
+void USBD_XCH_GetRxStorage(void *ctx, uint8_t **ptr, uint16_t *size)
+⋮----
+void USBD_XCH_RxComplete(void *ctx, uint8_t *rx_buf, uint16_t size)
+⋮----
+void USBD_XCH_TxComplete(void *ctx)
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/el_usbxch.h">
+} el_usbxch_flags_t;
+⋮----
+} el_usbxch_handle_t;
+⋮----
+void el_usbxch_init(el_usbxch_handle_t *h);
+⋮----
+uint32_t el_usbxch_write(el_usbxch_handle_t *h, const uint8_t* data, uint32_t length);
+⋮----
+uint32_t el_usbxch_write_available(el_usbxch_handle_t *h);
+⋮----
+uint32_t el_usbxch_flush(el_usbxch_handle_t *h);
+⋮----
+uint32_t el_usbxch_clear(el_usbxch_handle_t *h);
+⋮----
+uint32_t el_usbxch_read(el_usbxch_handle_t *h, uint8_t *data, uint32_t length);
+⋮----
+uint32_t el_usbxch_read_available(el_usbxch_handle_t *h);
+⋮----
+bool el_usbxch_connected(el_usbxch_handle_t *h);
+⋮----
+void el_usbxch_update(el_usbxch_handle_t *h);
+</file>
+
+<file path="digest/ecolib/driver/stm32f4/eld_conf.h">
+
+</file>
+
+<file path="digest/ecolib/el/core.h">
+}el_swttimer_t;
+⋮----
+static inline uint32_t el_swttimer_elapsed_ticks(el_swttimer_t *t, uint32_t tick_current)
+⋮----
+static inline float el_swttimer_elapsed_time(el_swttimer_t *t, uint32_t tick_current)
+⋮----
+static inline uint8_t el_swttimer_timout(el_swttimer_t *t, uint32_t tick_curret, uint32_t ticks_to_pass)
+⋮----
+static inline void el_swttimer_reset(el_swttimer_t *t, uint32_t start_tick)
+</file>
+
+<file path="digest/ecolib/el/el_ring.h">
+} el_ring_stats_t;
+⋮----
+}el_ring_t;
+⋮----
+static inline void el_ring_init(el_ring_t* cb,
+⋮----
+static inline el_ring_stats_t el_ring_getStats(const el_ring_t* cb)
+⋮----
+static inline void el_ring_resetStats(el_ring_t* cb)
+⋮----
+static inline uint16_t el_ring_occupied(const el_ring_t* cb) {
+⋮----
+static inline uint16_t el_ring_freeSpace(const el_ring_t* cb) {
+⋮----
+static inline void el_ring_commitWrite(el_ring_t* cb, uint16_t count) {
+⋮----
+static inline void el_ring_releaseRead(el_ring_t* cb, uint16_t count) {
+⋮----
+static inline bool el_ring_reserveWrite(el_ring_t* cb,
+⋮----
+static inline void el_ring_reserveWriteOverride(
+⋮----
+static inline bool el_ring_peekRead(el_ring_t* cb,
+</file>
+
+<file path="digest/ecolib/el/math.h">
+static inline int el_increment_roll(int x, int min, int max)
+⋮----
+static inline int el_decrement_roll(int x, int min, int max)
+⋮----
+static inline float el_linearInterp(float *y_arr, float *x_arr, float x)
+</file>
+
+<file path="digest/ecolib/el/mempool.h">
+} smem_t;
+⋮----
+static inline void el_smem_init(smem_t *cp, uint8_t *mem, uint32_t memsize)
+⋮----
+static inline void *el_smem_alloc(smem_t *cp, uint32_t size)
+⋮----
+static inline void *el_smem_alloc_aligned(smem_t *cp, uint32_t size)
+</file>
+
+<file path="digest/ecolib/el/ring.h">
+bool isPowerOfTwo(uint16_t x)
+⋮----
+bool isPowerOfTwoAssert(uint16_t x)
+⋮----
+bool push(const T &item)
+⋮----
+void pushFast(const T &item)
+⋮----
+bool pop(T &item)
+⋮----
+bool peek(T &item)
+⋮----
+bool peekRaw(T &item, uint16_t idx) const
+⋮----
+bool advance(uint16_t n)
+⋮----
+bool distanceFromTail(int16_t idx, uint16_t &distance)
+⋮----
+void clear()
+⋮----
+bool empty() const { return head_ == tail_; }
+bool full() const { return ((head_ + 1) & mask_) == tail_; }
+uint16_t free() const { return (capacity() - count()); }
+uint16_t count() const { return (head_ - tail_) & mask_; }
+uint16_t capacity() const { return size - 1; }
+⋮----
+bool reserveWrite(
+⋮----
+void commitWrite(uint16_t count)
+⋮----
+bool peekRead(
+⋮----
+void releaseRead(uint16_t count)
+⋮----
+uint16_t tail() const { return tail_; }
+uint16_t head() const { return head_; }
+</file>
+
+<file path="digest/ecolib/el/vector">
+
+</file>
+
+<file path="digest/ecolib/middleware/ABFStream.cpp">
+uint8_t Stream::crc8Calculate(const uint8_t* data, uint8_t len)
+⋮----
+Stream::Stream(uint8_t* buffer, uint8_t bufferSize, void *_context, void(*_onFrame)(void*, uint8_t, uint8_t*, uint8_t), void(*_onError)(void*, uint8_t))
+⋮----
+Err Stream::encode(uint8_t* header, uint8_t* payload,
+⋮----
+Err Stream::process(const uint8_t* data, uint16_t length)
+⋮----
+void Stream::reset()
+⋮----
+abf::Stats Stream::getStats() const
+</file>
+
+<file path="digest/ecolib/middleware/ABFStream.h">
+enum class Err : uint8_t
+⋮----
+enum class State : uint8_t
+⋮----
+struct Stats
+⋮----
+Err process(const uint8_t *data, uint16_t length);
+⋮----
+Err encode(uint8_t *header, uint8_t *payload,
+⋮----
+void reset();
+⋮----
+Stats getStats() const;
+⋮----
+static uint8_t crc8Calculate(const uint8_t *data, uint8_t len);
+</file>
+
+<file path="digest/ecolib/middleware/DAQCodec.h">
+enum class Escape : uint8_t
+⋮----
+enum class Err : uint8_t
+⋮----
+enum class Flags : uint8_t
+⋮----
+enum class ControlCode : uint8_t
+⋮----
+struct ChannelState
+⋮----
+struct ControlMark
+⋮----
+enum class StreamType : uint8_t
+⋮----
+void internal_flush()
+⋮----
+void reset()
+⋮----
+void reset_state(ChannelState *ccs_)
+⋮----
+inline bool pushSample(int16_t *samples)
+⋮----
+inline int16_t dod_encode(uint8_t channel_, int16_t sample)
+⋮----
+bool flush()
+⋮----
+inline uint16_t readNext(uint8_t *buffer, uint16_t buffer_len, StreamType &type)
+⋮----
+enum class ReaderState
+⋮----
+bool isReady(){return ready;}
+⋮----
+inline Err decode(uint8_t *buffer, uint16_t buffer_len, StreamType type)
+⋮----
+inline int16_t dod_decode(uint8_t channel_, int16_t dod)
+⋮----
+inline int16_t unzigzag(uint16_t val)
+⋮----
+inline Err decodeControl()
+⋮----
+inline Err decodeResyncDod()
+⋮----
+inline Err decodeSample()
+⋮----
+inline Err decodeDod(uint8_t byte)
+⋮----
+inline Err decodeLarge16(uint8_t byte)
+⋮----
+inline Err decodeVirtualBits(uint8_t byte)
+⋮----
+inline Err syncUpdate()
+⋮----
+inline Err emitSample()
+</file>
+
+<file path="digest/ecolib/middleware/DAQStream.cpp">
+void Session::annonate()
+⋮----
+idv::Err Session::discovery_req()
+⋮----
+idv::Err Session::discovery_respond()
+⋮----
+uint8_t Session::process(const uint8_t *data, uint16_t data_len)
+⋮----
+idv::Err Stream::serialize(idv::Writer &writer, uint8_t parent_id)
+⋮----
+idv::Err Channel::serialize(idv::Writer &writer, uint8_t parent_id)
+⋮----
+idv::Err Session::serialize(idv::Writer &writer, uint8_t parent_id)
+</file>
+
+<file path="digest/ecolib/middleware/DAQStream.h">
+enum class ID : uint8_t
+⋮----
+enum class MARKER : uint8_t
+⋮----
+constexpr uint8_t ENTRY(MARKER m) { return (uint8_t)m; }
+constexpr uint8_t EXIT(MARKER m) { return ((uint8_t)m | 0x80); }
+⋮----
+idv::Err sample(int16_t *samples);
+⋮----
+virtual uint8_t on_mark(MARKER mark, bool entry) { return 0; };
+virtual uint8_t on_field(ID field, idv::Reader &r) { return 0; };
+void annonate();
+idv::Err discovery_req();
+idv::Err discovery_respond();
+⋮----
+uint8_t process(const uint8_t *data, uint16_t data_len);
+</file>
+
+<file path="digest/ecolib/middleware/IDV.h">
+enum class Err : uint8_t
+⋮----
+inline Err addPrimitive(uint8_t id, const T &value)
+⋮----
+Err add_UINT8(uint8_t id, uint8_t value) { return addPrimitive(id, value); }
+Err add_INT8(uint8_t id, int8_t value) { return addPrimitive(id, value); }
+Err add_UINT16(uint8_t id, uint16_t value) { return addPrimitive(id, value); }
+Err add_INT16(uint8_t id, int16_t value) { return addPrimitive(id, value); }
+Err add_UINT32(uint8_t id, uint32_t value) { return addPrimitive(id, value); }
+Err add_INT32(uint8_t id, int32_t value) { return addPrimitive(id, value); }
+Err add_UINT64(uint8_t id, uint64_t value) { return addPrimitive(id, value); }
+Err add_INT64(uint8_t id, int64_t value) { return addPrimitive(id, value); }
+Err add_FLOAT(uint8_t id, float value) { return addPrimitive(id, value); }
+Err add_DOUBLE(uint8_t id, double value) { return addPrimitive(id, value); }
+Err add_BINARY(uint8_t id, const uint8_t *str, uint8_t length)
+⋮----
+static constexpr inline uint8_t PRIMITIVE_SIZE() { return sizeof(T) + 2; }
+⋮----
+static constexpr inline uint8_t SERIALIZED_SIZE(){return sizeof(T) + 2;}
+static constexpr inline uint8_t BINARY_SIZE(uint8_t length) { return length + 2; }
+uint16_t size() const { return buffer_idx; }
+void reset()
+⋮----
+uint8_t *data() const
+⋮----
+reset(data, length);
+⋮----
+bool next()
+⋮----
+void reset(const uint8_t *p_data, uint16_t p_length)
+⋮----
+inline const uint8_t *asBinary() const
+⋮----
+inline uint8_t valueLength() const
+⋮----
+inline uint8_t id() const
+</file>
+
+<file path="digest/ecolib/middleware/ScopeStream.h">
+constexpr uint32_t buffer_size(uint8_t channels, uint32_t sample_depth) const {
+⋮----
+void write(const T *data)
+⋮----
+bool read(T* out_buffer, uint16_t buffer_size) {
+⋮----
+bool read(uint8_t channel, T* out_buffer, uint16_t buffer_size)
+⋮----
+bool isFrozen() const {
+⋮----
+bool isTriggered() const {
+⋮----
+void reset() {
+⋮----
+const T* get_buffer() const {
+⋮----
+void set_trigger_level(T level) {
+⋮----
+void update_decimation(uint8_t divisions, uint32_t time_per_div_us, uint32_t sample_rate)
+⋮----
+void update_decimation(uint8_t decimation)
+</file>
+
+<file path="digest/EcoTool/CMakeLists.txt">
+cmake_minimum_required(VERSION 3.10)
+
+# Project name and version
+project(EcoTool VERSION 1.0.0 LANGUAGES CXX)
+
+set(PLATFORM_NAME "host" CACHE STRING "Target platform (host, stm32f4)")
+set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/../thirdparty)
+set(ECOLIB_DIR ${CMAKE_SOURCE_DIR}/../ecolib)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Set build type to Release if not specified
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+endif()
+
+# Find libusb-1.0
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
+
+
+
+file(GLOB_RECURSE MIDDLEWARE_SRC    
+    ${ECOLIB_DIR}/middleware/*.cpp
+    ${ECOLIB_DIR}/middleware/*.c
+)
+
+file(GLOB_RECURSE CORE_SRC    
+    ${ECOLIB}/el/*.cpp
+    ${ECOLIB}/el/*.c
+)
+
+# Add executable
+add_executable(${PROJECT_NAME}
+    EcoTool.cpp
+    # Header files are listed for IDE visibility, not strictly required for build
+    Usbxch.cpp
+    Serial.hpp
+    ${MIDDLEWARE_SRC}
+    ${CORE_SRC}
+)
+
+find_package(PkgConfig REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(Threads REQUIRED)
+# Link libusb and threads
+target_link_libraries(${PROJECT_NAME}
+    ${LIBUSB_LIBRARIES}
+    Threads::Threads
+    OpenGL::GL 
+    glfw
+)
+
+# Include directories for libusb
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${LIBUSB_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${ECOLIB_DIR}/middleware
+    ${ECOLIB}/el
+)
+
+# Compiler flags (optional - remove if not needed)
+target_compile_options(${PROJECT_NAME} PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+    -O2
+)
+
+# For debugging, uncomment this:
+# target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG)
+
+# Install (optional - remove if not needed)
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+</file>
+
+<file path="digest/EcoTool/DAQSessionAPP.h">
+struct Field
+⋮----
+std::memcpy(value.data(), &v, sizeof(T));
+⋮----
+void set(const void *data, size_t size)
+⋮----
+uint8_t send() override
+⋮----
+uint8_t on_mark(daq::MARKER marker, bool entry) override
+⋮----
+uint8_t on_field(daq::ID id, idv::Reader &reader) override
+</file>
+
+<file path="digest/EcoTool/EcoTool.cpp">
+void print_buffer(const uint8_t *data, size_t len)
+⋮----
+static inline void onFrame(void *ctx, uint8_t id, uint8_t *payload, uint8_t payload_len);
+static inline void onError(void *ctx, uint8_t id);
+⋮----
+static inline void onFrame(void *ctx, uint8_t id, uint8_t *payload, uint8_t payload_len)
+⋮----
+static inline void onError(void *ctx, uint8_t id)
+⋮----
+int main()
+⋮----
+"",     // serial number (empty = first matching device)
+0x0000, // VID
+0x0000, // PID
+0,      // interface
+0x81,   // Bulk IN endpoint
+⋮----
+; // Bulk OUT endpoint
+</file>
+
+<file path="digest/EcoTool/RingBuffer.hpp">
+class RingBuffer {
+⋮----
+explicit RingBuffer(size_t capacity = 16384)
+⋮----
+size_t capacity() const { return buf_.size() - 1; }
+⋮----
+bool empty() const {
+std::lock_guard<std::mutex> l(m_);
+⋮----
+size_t available() const {
+⋮----
+size_t push(const uint8_t* data, size_t len) {
+⋮----
+size_t pop(uint8_t* dst, size_t len) {
+</file>
+
+<file path="digest/EcoTool/Serial.hpp">
+class Serial {
+⋮----
+Serial() : serial_port_(io_context_) {}
+⋮----
+bool connect(const std::string& port,
+⋮----
+void disconnect() {
+⋮----
+bool isConnected() const {
+⋮----
+int write(const uint8_t* data, size_t length) {
+⋮----
+int write(const std::vector<uint8_t>& data) {
+⋮----
+void setReadCallback(ReadCallback callback) {
+std::lock_guard<std::mutex> lock(callback_mutex_);
+⋮----
+int read(uint8_t* data, size_t max_len) {
+⋮----
+void startAsyncRead() {
+⋮----
+void handleRead(const boost::system::error_code& ec, std::size_t bytes_transferred) {
+⋮----
+void txLoop() {
+⋮----
+std::unique_lock<std::mutex> lk(tx_mutex_);
+</file>
+
+<file path="digest/EcoTool/TcpClient.hpp">
+class TcpClient
+⋮----
+TcpClient() = default;
+⋮----
+bool connect(const std::string& host, uint16_t port)
+⋮----
+void disconnect()
+⋮----
+bool is_connected() const
+⋮----
+int available() const
+⋮----
+int write(const void* data, size_t length)
+⋮----
+int read(void* buffer, size_t length)
+</file>
+
+<file path="digest/EcoTool/Usbxch.cpp">
+bool UsbxchLibusb::connect(const std::string &serial_number,
+⋮----
+void UsbxchLibusb::disconnect()
+⋮----
+bool UsbxchLibusb::isConnected() const { return connected_; }
+⋮----
+int UsbxchLibusb::write(const uint8_t *data, size_t length)
+⋮----
+std::lock_guard<std::mutex> lock(tx_mutex_);
+⋮----
+int UsbxchLibusb::read(uint8_t *data, size_t max_len)
+⋮----
+size_t UsbxchLibusb::available()
+⋮----
+double UsbxchLibusb::getRxSpeedBytesPerSecond() const { return speed_tracker_.rxBps(); }
+double UsbxchLibusb::getTxSpeedBytesPerSecond() const { return speed_tracker_.txBps(); }
+void UsbxchLibusb::resetSpeeds() { speed_tracker_.reset(); }
+⋮----
+void UsbxchLibusb::ioLoop()
+⋮----
+bool UsbxchTcp::connect(const std::string &serial_number, uint16_t vid, uint16_t pid, int interface_number, unsigned char bulk_in_ep, unsigned char bulk_out_ep, int timeout_ms)
+⋮----
+void UsbxchTcp::disconnect()
+⋮----
+bool UsbxchTcp::isConnected() const
+⋮----
+int UsbxchTcp::write(const uint8_t *data, size_t length)
+⋮----
+int UsbxchTcp::read(uint8_t *data, size_t max_len)
+⋮----
+size_t UsbxchTcp::available()
+⋮----
+void UsbxchTcp::ioLoop()
+⋮----
+double UsbxchTcp::getRxSpeedBytesPerSecond() const { return speed_tracker_.rxBps(); }
+double UsbxchTcp::getTxSpeedBytesPerSecond() const { return speed_tracker_.txBps(); }
+void UsbxchTcp::resetSpeeds() { speed_tracker_.reset(); }
+</file>
+
+<file path="digest/EcoTool/Usbxch.h">
+struct SpeedTracker
+⋮----
+void reset()
+⋮----
+double rxBps() const
+⋮----
+double txBps() const
+⋮----
+virtual ~IUsbxch() = default;
+virtual bool connect(const std::string &serial_number,
+⋮----
+virtual void disconnect() = 0;
+virtual bool isConnected() const = 0;
+virtual int write(const uint8_t *data, size_t length) = 0;
+virtual int write(const std::vector<uint8_t> &data) = 0;
+virtual int read(uint8_t *data, size_t max_len) = 0;
+virtual size_t available() = 0;
+virtual double getRxSpeedBytesPerSecond() const = 0;
+virtual double getTxSpeedBytesPerSecond() const = 0;
+virtual void resetSpeeds() = 0;
+⋮----
+bool connect(const std::string &serial_number,
+⋮----
+int write(const uint8_t *data, size_t length) override;
+⋮----
+int write(const std::vector<uint8_t> &data) override
+⋮----
+int read(uint8_t *data, size_t max_len) override;
+size_t available() override;
+double getRxSpeedBytesPerSecond() const override;
+double getTxSpeedBytesPerSecond() const override;
+void resetSpeeds() override;
+⋮----
+void ioLoop();
+</file>
+
+<file path="digest/test/el/test_ring.cpp">
+
+</file>
+
+<file path="digest/test/middleware/test_ABFStream.cpp">
+struct FrameCapture {
+⋮----
+void captureFrame(void* context, uint8_t serviceId, uint8_t* payload, uint8_t payloadLength)
+⋮----
+void captureError(void* context, uint8_t error)
+⋮----
+std::vector<uint8_t> buildFrame(const std::vector<uint8_t>& payload, uint8_t serviceId)
+</file>
+
+<file path="digest/test/middleware/test_Codec.cpp">
+class SignalGenerator
+⋮----
+static std::vector<int16_t> Sine(
+⋮----
+std::vector<int16_t> out(samples);
+⋮----
+static std::vector<int16_t> Triangle(
+⋮----
+static std::vector<int16_t> Constant(
+⋮----
+static std::vector<int16_t> Step(
+⋮----
+class CodecTestHelper
+⋮----
+explicit CodecTestHelper(Writer &codec, uint8_t channels)
+⋮----
+void feedSamples(const std::vector<std::vector<int16_t>> &samples)
+⋮----
+std::vector<int16_t> frame(channels);
+⋮----
+std::vector<uint8_t> readAll()
+⋮----
+void flush()
+⋮----
+Writer &codec()
+⋮----
+static void RunGoldenTest(
+⋮----
+std::vector<ChannelState> channel_states(channelCount);
+⋮----
+CodecTestHelper test(stream, channelCount);
+</file>
+
+<file path="digest/test/middleware/test_DAQStream.cpp">
+
+</file>
+
+<file path="digest/test/middleware/test_IDV.cpp">
+
+</file>
+
+<file path="digest/test/middleware/test_ScopeStream.cpp">
+
+</file>
+
+<file path="digest/test/CMakeLists.txt">
+# Unit Tests CMake Configuration
+# ==============================
+# Purpose: Build and run unit tests with Catch2
+# Usage: cmake -B build -DTESTS_BUILD=ON && cmake --build build
+
+cmake_minimum_required(VERSION 3.16)
+set(PLATFORM_NAME "host" CACHE STRING "Target platform (host, stm32f4)")
+set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/../thirdparty)
+set(ECOLIB_DIR ${CMAKE_SOURCE_DIR}/../ecolib)
+# Only include if this is included as a subdirectory
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    # Standalone build mode
+    project(EcoDriveTests LANGUAGES CXX VERSION 1.0.0)
+endif()
+
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# ── Dependencies ─────────────────────────────────────────────
+# Option 1: FetchContent (recommended for reproducibility)
+include(FetchContent)
+FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY  https://github.com/catchorg/Catch2.git
+    GIT_TAG         v3.8.1
+)
+FetchContent_MakeAvailable(Catch2)
+
+# Option 2: Use find_package if installed system-wide
+# find_package(Catch2 3 REQUIRED)
+file(GLOB_RECURSE TEST_SOURCES
+    "${CMAKE_SOURCE_DIR}/middleware/*.cpp"
+)
+
+file(GLOB_RECURSE CORE_SOURCES
+    "${ECOLIB_DIR}/el/*.cpp"
+)
+
+file(GLOB_RECURSE MIDDLEWARE_SOURCES
+    "${ECOLIB_DIR}/middleware/*.cpp"
+)
+
+add_executable(unit_tests
+    ${CMAKE_SOURCE_DIR}/dummy_test.cpp
+    ${TEST_SOURCES}
+    ${CORE_SOURCES}
+    ${MIDDLEWARE_SOURCES}
+)
+
+target_include_directories(unit_tests PRIVATE
+    ${ECOLIB_DIR}
+    ${CMAKE_SOURCE_DIR}
+    ${ECOLIB_DIR}/middleware
+    ${THIRDPARTY_DIR}
+)
+
+target_link_libraries(unit_tests PRIVATE
+    Catch2::Catch2WithMain
+)
+
+include(Catch)
+catch_discover_tests(unit_tests)
+</file>
+
+<file path="digest/test/common.h">
+static std::string toStringHex(const uint8_t* data, size_t length)
+⋮----
+static std::string toStringHex(const std::vector<uint8_t> &vec,
+⋮----
+<< std::setw(2)
+⋮----
+static std::string toString(const daq::codec::ControlMark &mark)
+</file>
+
+<file path="digest/test/dummy_test.cpp">
+class RingBuffer {
+⋮----
+bool push(T item) {
+⋮----
+bool pop(T& item) {
+⋮----
+bool empty() const {
+⋮----
+bool is_full() const {
+⋮----
+size_t size() const {
+⋮----
+uint8_t crc8_dvb_s2(uint8_t crc, uint8_t data) {
+⋮----
+uint8_t compute_crc8(const uint8_t* data, size_t len) {
+⋮----
+struct Result {
+</file>
+
+<file path="digest/test/test_sil.cpp">
+void write_svpwm(Sil::Input& in, double V_alpha, double V_beta)
+⋮----
+void write_trap(Sil::Input& in, unsigned int sector, double V_sect)
+⋮----
+inline double trapezoidal_wave(double theta)
+⋮----
+inline void dPsim_dTheta(double theta_e, double dPsi_dTheta[3])
+⋮----
+void gen_test();
+void lrt_test();
+void ocv_test();
+void olr1_test();
+void olr2_test();
+void foc_test();
+void dc_test();
+⋮----
+void trapezoidal_wave_test()
+⋮----
+int main()
+⋮----
+void ocv_test()
+⋮----
+void lrt_test()
+⋮----
+void olr1_test()
+⋮----
+void olr2_test()
+⋮----
+void dc_test()
+⋮----
+void gen_test()
+</file>
+
+</files>

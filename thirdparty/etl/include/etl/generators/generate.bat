@@ -1,0 +1,13 @@
+python3 -m cogapp -d -e -o../private/fsm_fwd_decl_cpp03.h -DHandlers=16 fsm_fwd_decl_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/fsm_friend_decl_cpp03.h -DHandlers=16 fsm_friend_decl_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/fsm_cpp03.h -DHandlers=16 fsm_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/message_router_cpp03.h -DHandlers=16 message_router_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/largest_type_cpp03.h -DNTypes=16 largest_type_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/largest_alignment_cpp03.h -DNTypes=16 largest_alignment_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/largest_cpp03.h -DNTypes=16 largest_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/smallest_cpp03.h -DNTypes=16 smallest_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/type_traits_cpp03.h -DIsOneOf=16 type_traits_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/type_lookup_cpp03.h -DNTypes=16 type_lookup_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/type_select_cpp03.h -DNTypes=16 type_select_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/message_packet_cpp03.h -DHandlers=16 message_packet_cpp03_generator.h
+python3 -m cogapp -d -e -o../private/variant_pool_cpp03.h -DNTypes=16 variant_pool_cpp03_generator.h

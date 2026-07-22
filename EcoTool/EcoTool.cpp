@@ -28,16 +28,16 @@ void print_buffer(const uint8_t *data, size_t len)
 uint8_t abf_rx_buf[255];
 uint8_t idv_rx_buf[255];
 IUsbxch *usb;
-DAQSessionAPP *daq;
+DAQSessionAPP *idaq;
 static inline void onFrame(void *ctx, uint8_t id, uint8_t *payload, uint8_t payload_len);
 static inline void onError(void *ctx, uint8_t id);
-ABFStream abfStream = ABFStream(abf_rx_buf, sizeof(abf_rx_buf), NULL, onFrame, onError);
+abf::Stream astream = abf::Stream(abf_rx_buf, sizeof(abf_rx_buf), NULL, onFrame, onError);
 
 static inline void onFrame(void *ctx, uint8_t id, uint8_t *payload, uint8_t payload_len)
 {
     std::cout << "ID : " << id << std::endl;
     print_buffer(payload, payload_len);
-    daq->process(payload, payload_len);
+    idaq->process(payload, payload_len);
 }
 static inline void onError(void *ctx, uint8_t id)
 {
@@ -49,7 +49,7 @@ int main()
 {
     auto nextEvent = Clock::now() + std::chrono::seconds(5);
     usb = new UsbxchLibusb;
-    daq = new DAQSessionAPP(abfStream, *usb, idv_rx_buf, sizeof(idv_rx_buf));
+    idaq = new DAQSessionAPP(astream, *usb, idv_rx_buf, sizeof(idv_rx_buf));
     while(!usb->connect(
         "",     // serial number (empty = first matching device)
         0x0000, // VID
@@ -79,13 +79,13 @@ int main()
                     0x01,
                     1000);
             }
-            daq->discovery_req();
+            idaq->discovery_req();
         }
         if (bytes > 0)
         {
             uint8_t service_id;
             uint8_t payload_length;
-            ABFErrorCode status = abfStream.process(buffer, bytes);
+            abf::Err status = astream.process(buffer, bytes);
         }
         else
         {

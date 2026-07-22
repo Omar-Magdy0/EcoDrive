@@ -3,8 +3,8 @@
 
 PmsmControl pmsmC1;
 //Static Callback registration
-void eldriver_mc3p_sync_postScanCallback(){pmsmC1.mc.pwmLoop();}
-void eldriver_xmc3p_tickerCallback(){pmsmC1.mc.xmcLoop();}
+void el_mc3p_sync_postScanCallback(){pmsmC1.mc.pwmLoop();}
+void el_xmc3p_tickerCallback(){pmsmC1.mc.xmcLoop();}
 
 using namespace PmsmControlTypes;
 using namespace PmsmControlConf;
@@ -40,10 +40,10 @@ PmsmControlTypes::ERR PmsmControl::setSetpoint(float sp, PmsmControlTypes::MechM
 PmsmControlTypes::ERR PmsmControl::configControlMode(PmsmControlTypes::MCMode mc_mode, PmsmControlTypes::MechMode mech_mode)
 {
     if(mc_mode != MCMode::Idle && mc.control.mc_mode != MCMode::Idle){return ERR::CONFIG_NOT_ALLOWED_MOTOR_RUNNING;}
-    uint32_t mask = eldriver_atomic_start();
+    uint32_t mask = el_atomic_start();
     mc.setControlMode(mc_mode);
     mc.control.mech_mode = mech_mode;
-    eldriver_atomic_end(mask);
+    el_atomic_end(mask);
     return ERR::OK;
 }
 
@@ -69,9 +69,9 @@ PmsmControlTypes::ERR PmsmControl::configPwm(PmsmControlTypes::ConfigPwm cfg)
     if(cfg.duty_min < 0 || cfg.duty_min > 1){return ERR::CONFIG_BAD;}
     if(cfg.duty_min > cfg.duty_max){return ERR::CONFIG_BAD;}
     //Atomic operation we do this quick
-    uint32_t mask = eldriver_atomic_start();
+    uint32_t mask = el_atomic_start();
     mc.pwmConfigUpdate(cfg);
-    eldriver_atomic_end(mask);
+    el_atomic_end(mask);
     return ERR::OK;
 }
 
@@ -92,10 +92,10 @@ PmsmControlTypes::ERR PmsmControl::configFocPid(PmsmControlTypes::Pid Id_pid, Pm
     mc.foc.state.Iq_pid.Ki = Iq_pid.Ki * INT32_MAX;
     mc.foc.state.Iq_pid.Kd = Iq_pid.Kd * INT32_MAX;
     //Atomic operation , We do this quick
-    uint32_t mask = eldriver_atomic_start();
+    uint32_t mask = el_atomic_start();
     arm_pid_init_q31(&mc.foc.state.Id_pid, 0);
     arm_pid_init_q31(&mc.foc.state.Iq_pid, 0);
-    eldriver_atomic_end(mask);
+    el_atomic_end(mask);
     return ERR::OK;
 }
 
@@ -123,11 +123,11 @@ PmsmControlTypes::ERR PmsmControl::configFocOlstup(PmsmControlTypes::ConfigOlstu
 PmsmControlTypes::ERR PmsmControl::configSComm(PmsmControlTypes::ConfigSComm cfg)
 {
     if(mc.control.mc_mode != MCMode::Idle){return ERR::CONFIG_NOT_ALLOWED_MOTOR_RUNNING;}
-    if(cfg.dc_vinj <= 0  || cfg.dc_vinj > ELDRIVER_MC3P_VS_SCALE){return ERR::CONFIG_BAD;}
-    if(cfg.hfi_vinj <= 0 || cfg.hfi_vinj > ELDRIVER_MC3P_VS_SCALE){return ERR::CONFIG_BAD;}
+    if(cfg.dc_vinj <= 0  || cfg.dc_vinj > EL_MC3P_VS_SCALE){return ERR::CONFIG_BAD;}
+    if(cfg.hfi_vinj <= 0 || cfg.hfi_vinj > EL_MC3P_VS_SCALE){return ERR::CONFIG_BAD;}
     mc.scomm.hfi_N = cfg.hfi_N;
-    mc.scomm.dc_vinj_q31 = ELDRIVER_MC3P_FLOAT_TO_VS(cfg.dc_vinj);
-    mc.scomm.hfi_vinj_q31 = ELDRIVER_MC3P_FLOAT_TO_VS(cfg.hfi_vinj);
+    mc.scomm.dc_vinj_q31 = EL_MC3P_FLOAT_TO_VS(cfg.dc_vinj);
+    mc.scomm.hfi_vinj_q31 = EL_MC3P_FLOAT_TO_VS(cfg.hfi_vinj);
     return ERR::OK;
 }
 

@@ -55,8 +55,8 @@ struct Field
 struct Object
 {
     uint8_t pid;
-    DAQ_IDV::MARKER marker;
-    std::unordered_map<DAQ_IDV::ID, Field> fields;
+    daq::MARKER marker;
+    std::unordered_map<daq::ID, Field> fields;
 };
 
 inline constexpr std::array<std::string_view, 10> ID_NAMES =
@@ -73,13 +73,13 @@ inline constexpr std::array<std::string_view, 10> ID_NAMES =
         "COMPRESSION",
 };
 
-class DAQSessionAPP : public DAQSession
+class DAQSessionAPP : public daq::Session
 {
 protected:
-    ABFStream &abf;
+    abf::Stream &abf;
     IUsbxch &usb;
     Object c_obj;
-    DAQ_IDV::MARKER c_mark;
+    daq::MARKER c_mark;
     uint8_t c_id = 0;
     uint8_t c_pid = 0;
     bool has_id = false;
@@ -87,25 +87,25 @@ protected:
 
 public:
     std::unordered_map<uint8_t, Object> objects;
-    DAQSessionAPP(ABFStream &abf_stream,
+    DAQSessionAPP(abf::Stream &abf_stream,
                   IUsbxch &usb,
                   uint8_t *idv_buffer,
-                  uint16_t idv_buffer_len) : DAQSession(idv_buffer, idv_buffer_len), abf(abf_stream), usb(usb)
+                  uint16_t idv_buffer_len) : daq::Session(idv_buffer, idv_buffer_len), abf(abf_stream), usb(usb)
     {
     }
     uint8_t send() override
     {
-        uint8_t abf_header[ABF_HEADER_SIZE];
+        uint8_t abf_header[abf::HEADER_SIZE];
         abf.encode(abf_header, writer.data(), 16, writer.size());
-        usb.write(abf_header, ABF_HEADER_SIZE);
+        usb.write(abf_header, abf::HEADER_SIZE);
         usb.write(writer.data(), writer.size());
         return 0;
     }
-    uint8_t on_mark(DAQ_IDV::MARKER marker, bool entry) override
+    uint8_t on_mark(daq::MARKER marker, bool entry) override
     {
         switch (marker)
         {
-        case DAQ_IDV::MARKER::AUTO_DISCOVER_REP:
+        case daq::MARKER::AUTO_DISCOVER_REP:
             break;
         default: //
             if (entry)
@@ -123,18 +123,18 @@ public:
         }
         return 0;
     }
-    uint8_t on_field(DAQ_IDV::ID id, IDVReader &reader) override
+    uint8_t on_field(daq::ID id, idv::Reader &reader) override
     {
-        DAQ_IDV::ID field_id = id;
+        daq::ID field_id = id;
         switch (id)
         {
-        case DAQ_IDV::ID::ID:
+        case daq::ID::ID:
             has_id = true;
             reader.as<uint8_t>(c_id);
             objects[c_id].fields[field_id].set(c_id);
             objects[c_id].marker = c_mark;
             break;
-        case DAQ_IDV::ID::PARENT_ID:
+        case daq::ID::PARENT_ID:
             has_pid = true;
             reader.as<uint8_t>(c_pid);
             if (has_id)
@@ -144,7 +144,7 @@ public:
                 objects[c_id].pid = c_pid;
             }
             break;
-        case DAQ_IDV::ID::META:
+        case daq::ID::META:
             if (has_id)
                 objects[c_id].fields[field_id].set(reader.asBinary(), reader.valueLength());
             break;

@@ -51,6 +51,18 @@
             "problemMatcher": ["$gcc"] 
         },
         {
+            "label": "Test: Debug",
+            "type": "shell",
+            "command": "cd test/build && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j4",
+            "problemMatcher": ["$gcc"] 
+        },
+                {
+            "label": "Test: Clean",
+            "type": "shell",
+            "command": "cd test/build && rm -rf *",
+            "problemMatcher": ["$gcc"] 
+        },
+        {
             "label": "Virtual PORTS",
             "type": "shell",
             "command": "sudo socat -d -d pty,link=/dev/ttyACM_CDC0,raw,echo=0,mode=666 pty,link=/dev/ttyACM_CDC1,raw,echo=0,mode=666",

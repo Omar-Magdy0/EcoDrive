@@ -2,7 +2,7 @@
 #include <array>
 #include <cstdint>
 #include <cstddef>
-#include "eldriver_mc3p.h"
+#include "el_mc3p.h"
 #include "arm_math.h"
 
 namespace PmsmControlTypes
