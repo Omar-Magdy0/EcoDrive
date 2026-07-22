@@ -6,6 +6,8 @@
 #include <cstddef>
 #include <cstdint>
 
+// TODO : use a cleaner/internal ecolib ring buffer implementation instead
+
 class RingBuffer {
 public:
     explicit RingBuffer(size_t capacity = 16384)

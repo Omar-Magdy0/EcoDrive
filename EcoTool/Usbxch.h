@@ -14,6 +14,7 @@
 #include <array>
 #include "RingBuffer.hpp"
 
+// TODO #21: Refactor the USBXCH implementation , more coincise code
 struct SpeedTracker
 {
     std::chrono::steady_clock::time_point last{};
